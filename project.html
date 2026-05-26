@@ -1,0 +1,2665 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solstein — Car Insurance Comparison</title>
+<link rel="stylesheet" href="solstein-tokens.css">
+<link rel="stylesheet" href="solstein-app.css">
+<link rel="stylesheet" href="solstein-toast.css">
+<script src="solstein-dropdown.js" defer></script>
+<script src="solstein-toast.js" defer></script>
+<script src="user-menu.js" defer></script><style>
+/* ── Project header ──────────────────────────────────────────────── */
+.proj-header {
+  display: block;
+  margin-bottom: 36px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--sol-hairline);
+}
+.proj-header .title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.proj-header .title-row .page-title { flex: 0 1 auto; }
+.proj-header .meta-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text-3);
+}
+.proj-header .meta-row .dot { width: 2px; height: 2px; border-radius: 50%; background: var(--sol-text-disabled); }
+.proj-header .meta-row .domain { color: var(--sol-accent-55); }
+.proj-header .desc {
+  max-width: 720px;
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--sol-text-2);
+  line-height: 1.7;
+  margin-top: 22px;
+}
+.proj-header .actions {
+  display: flex; gap: 8px; align-items: flex-start;
+}
+
+.member-stack { display: flex; align-items: center; }
+.member-stack .av {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--sol-surface-2);
+  border: 1px solid var(--sol-hairline-strong);
+  font-family: var(--font-display); font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--sol-text);
+  font-weight: 500;
+  margin-left: -6px;
+}
+.member-stack .av:first-child { margin-left: 0; }
+.member-stack .more {
+  margin-left: 8px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
+}
+
+/* ── Tabs ────────────────────────────────────────────────────────── */
+.tabs {
+  display: flex; gap: 0;
+  margin-bottom: 36px;
+  border-bottom: 1px solid var(--sol-hairline);
+}
+.tab {
+  appearance: none; background: transparent; border: none;
+  padding: 14px 22px 16px;
+  color: var(--sol-text-3);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  border-bottom: 1px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--transition), border-color var(--transition);
+}
+.tab:hover { color: var(--sol-text-2); }
+.tab.is-on {
+  color: var(--sol-text);
+  border-bottom-color: var(--sol-accent);
+}
+.tab .count {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 4px;
+  color: var(--sol-text-disabled);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+.tab.is-on .count {
+  color: var(--sol-accent-55);
+}
+
+.panel { display: none; }
+.panel.is-on { display: block; }
+
+/* ── Graphs grid ─────────────────────────────────────────────────── */
+.graphs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+@media (max-width: 900px) { .graphs-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .graphs-grid { grid-template-columns: 1fr; } }
+.graph-card {
+  display: block;
+  padding: 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--sol-hairline);
+  background: var(--sol-surface);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color var(--transition), background var(--transition);
+  position: relative;
+}
+.graph-card:hover {
+  border-color: var(--sol-accent-40);
+  background: var(--sol-surface-2);
+}
+.graph-thumb {
+  height: 144px;
+  background: var(--sol-ground);
+  border-bottom: 1px solid var(--sol-hairline);
+  position: relative;
+  overflow: hidden;
+}
+.graph-thumb svg { width: 100%; height: 100%; }
+.graph-thumb .node {
+  fill: var(--sol-surface);
+  stroke: var(--sol-hairline-strong);
+  stroke-width: 1;
+}
+.graph-thumb .node.cat-op   { stroke: var(--cat-op); }
+.graph-thumb .node.cat-info { stroke: var(--cat-info); }
+.graph-thumb .node.cat-tech { stroke: var(--cat-tech); }
+.graph-thumb .node.cat-gov  { stroke: var(--cat-gov); }
+.graph-thumb .edge { stroke: var(--sol-hairline-strong); stroke-width: 1; fill: none; opacity: 0.7; }
+.graph-thumb .ver {
+  position: absolute; top: 12px; left: 14px;
+  padding: 3px 8px;
+  border-radius: var(--radius);
+  background: transparent;
+  border: 1px solid var(--sol-hairline-strong);
+  font-family: var(--font-display); font-weight: 500;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text-2);
+}
+
+.graph-meta { padding: 16px 20px 18px; }
+.graph-meta .gn {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  color: var(--sol-text);
+}
+.graph-meta .gr {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  color: var(--sol-text-3);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.graph-meta .gr .dot { width: 2px; height: 2px; border-radius: 50%; background: var(--sol-text-disabled); }
+.graph-meta .gr .count { color: var(--sol-text-2); }
+
+/* ── Empty state (graphs tab with 0 graphs) ──────────────────────── */
+.empty-hero {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 360px;
+}
+
+/* ── Members table ───────────────────────────────────────────────── */
+.members-card {
+  border-radius: var(--radius);
+  border: 1px solid var(--sol-hairline);
+  background: var(--sol-surface);
+  overflow: hidden;
+  max-width: 880px;
+}
+.members-card .head, .members-card .row {
+  display: grid;
+  grid-template-columns: 1fr 0.9fr 130px 80px;
+  gap: 18px;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--sol-hairline);
+}
+.members-card .row:last-child { border-bottom: none; }
+.members-card .head {
+  background: transparent;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--sol-text-3);
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--sol-hairline-strong);
+}
+.members-card .who { display: flex; align-items: center; gap: 14px; }
+.members-card .av {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--sol-surface-2);
+  border: 1px solid var(--sol-hairline-strong);
+  font-family: var(--font-display); font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--sol-text); font-weight: 500;
+  flex-shrink: 0;
+}
+.members-card .name { font-size: 14px; font-weight: 400; color: var(--sol-text); }
+.members-card .email { font-size: 13px; color: var(--sol-text-2); font-weight: 300; }
+.members-card .role {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--sol-hairline-strong);
+  color: var(--sol-text-2);
+}
+.members-card .role.owner  { color: var(--sol-accent); border-color: var(--sol-accent-40); }
+.members-card .role.editor { color: var(--sol-text); }
+.members-card .role.viewer { color: var(--sol-text-3); }
+.members-card .actions {
+  display: flex; justify-content: flex-end;
+}
+.members-card .icon-btn {
+  width: 30px; height: 30px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--sol-text-3);
+  display: grid; place-items: center;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+.members-card .icon-btn:hover { color: var(--sol-text); border-color: var(--sol-hairline-strong); }
+
+/* Members table — stacked card layout on narrow screens */
+@media (max-width: 720px) {
+  .members-card .head { display: none; }
+  .members-card .row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "who actions"
+      "email actions"
+      "role role";
+    row-gap: 10px;
+    padding: 14px 16px;
+  }
+  .members-card .who { grid-area: who; }
+  .members-card .email { grid-area: email; font-size: 12.5px; }
+  .members-card .role { grid-area: role; justify-self: start; }
+  .members-card .actions { grid-area: actions; align-self: start; }
+}
+.members-add {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 24px;
+  background: transparent;
+  border-top: 1px solid var(--sol-hairline);
+  cursor: pointer;
+  color: var(--sol-text-2);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: background var(--transition), color var(--transition);
+}
+.members-add:hover { color: var(--sol-text); background: var(--sol-surface-2); }
+.members-add .ic {
+  width: 24px; height: 24px; border-radius: var(--radius);
+  background: transparent;
+  color: var(--sol-accent);
+  display: grid; place-items: center;
+  font-size: 16px; line-height: 1;
+  border: 1px solid var(--sol-accent-40);
+}
+
+/* Add member is owner-only. Driven by data-current-role on <body>.
+   Flip to "editor" or "viewer" to demo the non-owner view. */
+#add-member-btn { display: none; }
+body[data-current-role="owner"] #add-member-btn { display: inline-flex; }
+
+/* Member-row action menu is owner-only. */
+body[data-current-role="editor"] .members-card .icon-btn,
+body[data-current-role="viewer"] .members-card .icon-btn { display: none; }
+
+.members-gate {
+  display: none;
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--sol-hairline);
+  background: var(--sol-surface);
+  font-size: 12.5px;
+  color: var(--sol-text-3);
+  line-height: 1.5;
+  border-radius: var(--radius);
+}
+body[data-current-role="editor"] .members-gate,
+body[data-current-role="viewer"] .members-gate { display: block; }
+
+.members-band {
+  display: flex; align-items: center;
+  gap: 16px;
+  margin-top: 32px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+.members-toggle {
+  display: flex; gap: 6px;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+}
+.members-toggle button {
+  appearance: none; background: transparent; border: 1px solid var(--sol-hairline-strong);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--sol-text-3);
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+.members-toggle button:hover { color: var(--sol-text); }
+.members-toggle button.is-on {
+  color: var(--sol-text);
+  border-color: var(--sol-accent-40);
+}
+.members-toggle button .ct { color: var(--sol-text-disabled); margin-left: 4px; letter-spacing: 0.1em; }
+.members-toggle button.is-on .ct { color: var(--sol-accent-55); }
+
+/* ── Member action popover ───────────────────────────────────────── */
+.mm-backdrop {
+  position: fixed; inset: 0;
+  z-index: 90;
+  background: transparent;
+}
+.member-menu {
+  position: fixed;
+  z-index: 100;
+  min-width: 260px;
+  background: var(--sol-surface);
+  border: 1px solid var(--sol-hairline-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 16px 48px -8px rgba(0,0,0,0.6), 0 2px 12px rgba(0,0,0,0.3);
+  padding: 6px;
+  font-size: 13px;
+  color: var(--sol-text);
+  opacity: 0; transform: translateY(-4px);
+  transition: opacity var(--transition), transform var(--transition);
+}
+.member-menu.is-open { opacity: 1; transform: translateY(0); }
+
+.member-menu .mm-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px 12px;
+  border-bottom: 1px solid var(--sol-hairline);
+  margin-bottom: 4px;
+}
+.member-menu .mm-head .av {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--sol-surface-2);
+  border: 1px solid var(--sol-hairline-strong);
+  font-family: var(--font-display); font-size: 10px; letter-spacing: 0.1em;
+  color: var(--sol-text); font-weight: 500;
+  flex-shrink: 0;
+}
+.member-menu .mm-head .ident { min-width: 0; flex: 1; }
+.member-menu .mm-head .nm {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--sol-text);
+}
+.member-menu .mm-head .em {
+  font-family: var(--font-body); font-size: 12px;
+  font-weight: 300;
+  color: var(--sol-text-3);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.member-menu .mm-ext {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 9px;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: var(--radius);
+  border: 1px solid var(--sol-hairline-strong);
+  background: transparent;
+  color: var(--sol-text-3);
+  margin-top: 6px;
+}
+
+.member-menu .mm-section {
+  padding: 6px 4px 4px;
+}
+.member-menu .mm-label {
+  font-family: var(--font-mono); font-size: 9px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-4);
+  padding: 4px 8px 6px;
+}
+.member-menu .mm-role-grp {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px;
+  padding: 0 4px;
+}
+.member-menu .mm-role {
+  appearance: none;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 6px;
+  font-family: inherit; font-size: 12px;
+  color: var(--text-2);
+  cursor: pointer;
+  text-align: center;
+  transition: all 120ms ease;
+}
+.member-menu .mm-role:hover { background: var(--sol-surface-2); color: var(--sol-text); border-color: var(--sol-hairline-strong); }
+.member-menu .mm-role.is-on {
+  background: transparent;
+  border-color: var(--sol-accent-40);
+  color: var(--sol-text);
+}
+.member-menu .mm-role:disabled {
+  opacity: 0.4; cursor: not-allowed;
+}
+.member-menu .mm-divider {
+  height: 1px;
+  background: var(--sol-hairline);
+  margin: 6px 4px;
+}
+.member-menu .mm-item {
+  appearance: none;
+  display: flex; align-items: center; gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  color: var(--sol-text);
+  font-family: inherit; font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 100ms ease, color 100ms ease;
+}
+.member-menu .mm-item:hover { background: var(--sol-surface-2); }
+.member-menu .mm-item .ic {
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+  color: var(--sol-text-3);
+}
+.member-menu .mm-item:hover .ic { color: var(--sol-text-2); }
+.member-menu .mm-item.is-destructive { color: var(--sol-risk); }
+.member-menu .mm-item.is-destructive .ic { color: var(--sol-risk); opacity: 0.85; }
+.member-menu .mm-item.is-destructive:hover { background: color-mix(in oklch, var(--sol-risk) 12%, transparent); }
+.member-menu .mm-item:disabled {
+  opacity: 0.45; cursor: not-allowed;
+}
+.member-menu .mm-item:disabled:hover { background: transparent; }
+.member-menu .mm-hint {
+  font-family: var(--font-mono); font-size: 9.5px;
+  color: var(--sol-text-disabled); letter-spacing: 0.04em;
+  padding: 4px 10px 6px;
+}
+/* ── Project Settings modal ───────────────────────────────── */
+.sol-modal-backdrop {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(10, 12, 15, 0.72);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 48px 24px 64px;
+  overflow-y: auto;
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--transition), visibility var(--transition);
+}
+.sol-modal-backdrop.is-open { opacity: 1; visibility: visible; }
+
+.sol-modal {
+  background: var(--sol-bg);
+  border: 1px solid var(--sol-hairline-strong);
+  border-radius: var(--radius);
+  width: 100%; max-width: 720px;
+  transform: translateY(-12px);
+  transition: transform var(--transition);
+}
+.sol-modal-backdrop.is-open .sol-modal { transform: translateY(0); }
+
+.sol-modal-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 24px;
+  padding: 36px 40px 28px;
+  border-bottom: 1px solid var(--sol-hairline);
+}
+.sol-modal-eyebrow {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--sol-accent-55);
+  margin: 0 0 12px;
+}
+.sol-modal-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 28px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: var(--sol-text);
+  margin: 0 0 6px;
+}
+.sol-modal-sub {
+  font-size: 13px;
+  color: var(--sol-text-2);
+  font-weight: 300;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 48ch;
+}
+.sol-modal-close {
+  appearance: none; background: transparent;
+  border: 1px solid var(--sol-hairline-strong);
+  border-radius: var(--radius);
+  width: 32px; height: 32px;
+  display: grid; place-items: center;
+  color: var(--sol-text-2);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color var(--transition), border-color var(--transition);
+}
+.sol-modal-close:hover { color: var(--sol-text); border-color: var(--sol-text-3); }
+
+.sol-modal-section {
+  padding: 32px 40px;
+  border-bottom: 1px solid var(--sol-hairline);
+}
+.sol-modal-section-label {
+  display: flex; align-items: center; gap: 14px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--sol-accent-55);
+  margin: 0 0 18px;
+}
+.sol-modal-section-label::before {
+  content: ""; width: 20px; height: 1px; background: var(--sol-accent-55);
+}
+.sol-modal-section h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sol-text);
+  margin: 0 0 6px;
+}
+.sol-modal-section .help {
+  font-size: 13px;
+  color: var(--sol-text-2);
+  font-weight: 300;
+  line-height: 1.6;
+  margin: 0 0 22px;
+  max-width: 56ch;
+}
+
+.sol-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 22px; }
+@media (max-width: 600px) { .sol-grid-2 { grid-template-columns: 1fr; } }
+
+/* Solstein form field — used inside the modal */
+.sol-field { display: flex; flex-direction: column; gap: 8px; }
+.sol-field label {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text-2);
+}
+.sol-field .sol-input,
+.sol-field .sol-textarea,
+.sol-field .sol-select {
+  height: 40px;
+  padding: 0 14px;
+  background: transparent;
+  border: 1px solid var(--sol-hairline-strong);
+  border-radius: var(--radius);
+  color: var(--sol-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--transition), background var(--transition);
+}
+.sol-field .sol-textarea {
+  height: auto;
+  padding: 12px 14px;
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.6;
+}
+.sol-field .sol-input:focus,
+.sol-field .sol-textarea:focus,
+.sol-field .sol-select:focus {
+  border-color: var(--sol-accent);
+  background: var(--sol-surface);
+}
+.sol-field .sol-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%23F0EDE8' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+/* Segmented radio */
+.sol-segmented {
+  display: inline-flex;
+  align-self: flex-start;
+  width: fit-content;
+  max-width: 100%;
+  border: 1px solid var(--sol-hairline-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+  flex-wrap: wrap;
+}
+.sol-segmented input { position: absolute; opacity: 0; pointer-events: none; }
+.sol-segmented label {
+  padding: 10px 18px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text-2);
+  cursor: pointer;
+  background: transparent;
+  transition: color var(--transition), background var(--transition);
+  border-right: 1px solid var(--sol-hairline-strong);
+}
+.sol-segmented label:last-of-type { border-right: 0; }
+.sol-segmented label:hover { color: var(--sol-text); }
+.sol-segmented input:checked + label {
+  color: var(--sol-text);
+  background: var(--sol-accent-10);
+  box-shadow: inset 0 -2px 0 var(--sol-accent);
+}
+
+/* Toggle row */
+.sol-toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 18px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--sol-hairline);
+}
+.sol-toggle-row:last-of-type { border-bottom: 0; }
+.sol-toggle-row .ident { min-width: 0; flex: 1; }
+.sol-toggle-row .nm {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sol-text);
+  margin: 0 0 4px;
+}
+.sol-toggle-row .nm .pip { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 10px; vertical-align: middle; }
+.sol-toggle-row .desc {
+  font-size: 12.5px;
+  color: var(--sol-text-2);
+  font-weight: 300;
+  line-height: 1.5;
+  margin: 0;
+}
+.sol-toggle {
+  appearance: none;
+  width: 36px; height: 20px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid var(--sol-hairline-strong);
+  position: relative;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  flex-shrink: 0;
+}
+.sol-toggle::after {
+  content: "";
+  position: absolute;
+  top: 3px; left: 4px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--sol-text-disabled);
+  transition: left var(--transition), background var(--transition);
+}
+.sol-toggle:checked {
+  border-color: var(--sol-accent);
+  background: var(--sol-accent-10);
+}
+.sol-toggle:checked::after {
+  left: 18px;
+  background: var(--sol-accent);
+}
+
+/* Co-brand logo dropzone */
+.sol-logo-slot {
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px 22px;
+  border: 1px dashed var(--sol-hairline-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.sol-logo-slot:hover { border-color: var(--sol-accent-40); border-style: solid; background: var(--sol-surface); }
+.sol-logo-slot .preview {
+  width: 48px; height: 48px;
+  border-radius: var(--radius);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--sol-hairline) 0 4px,
+    transparent 4px 8px
+  );
+  border: 1px solid var(--sol-hairline);
+}
+.sol-logo-slot .meta { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.sol-logo-slot .meta .ttl {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text);
+}
+.sol-logo-slot .meta .sub {
+  font-size: 12px;
+  color: var(--sol-text-3);
+  font-weight: 300;
+}
+
+/* Lifecycle / destructive section */
+.sol-modal-danger {
+  padding: 28px 40px 32px;
+  border-top: 1px double var(--sol-risk);
+  background: transparent;
+}
+.sol-modal-danger .sol-modal-section-label { color: var(--sol-risk); }
+.sol-modal-danger .sol-modal-section-label::before { background: var(--sol-risk); }
+.sol-modal-danger .row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 18px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--sol-hairline);
+}
+.sol-modal-danger .row:last-of-type { border-bottom: 0; }
+.sol-modal-danger .row .copy { flex: 1; min-width: 0; }
+.sol-modal-danger .row .copy .nm {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sol-text);
+  margin: 0 0 4px;
+}
+.sol-modal-danger .row .copy .desc {
+  font-size: 12.5px;
+  color: var(--sol-text-2);
+  font-weight: 300;
+  line-height: 1.5;
+  margin: 0;
+}
+.sol-modal-danger .btn.is-destructive {
+  border-color: var(--sol-risk);
+  color: var(--sol-risk);
+}
+.sol-modal-danger .btn.is-destructive::before { display: none; }
+.sol-modal-danger .btn.is-destructive:hover {
+  background: rgba(198, 107, 94, 0.08);
+  border-color: var(--sol-risk);
+}
+
+.sol-modal-footer {
+  display: flex; align-items: center; gap: 12px;
+  padding: 24px 40px;
+  border-top: 1px solid var(--sol-hairline);
+}
+.sol-modal-footer .spacer { flex: 1; }
+.sol-modal-footer .meta {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--sol-text-3);
+}
+/* ── Add member modal ─────────────────────────────────── */
+.sol-chip-input {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid var(--sol-hairline-strong);
+  border-radius: var(--radius);
+  min-height: 64px;
+  cursor: text;
+  transition: border-color var(--transition), background var(--transition);
+}
+.sol-chip-input.is-focus {
+  border-color: var(--sol-accent);
+  background: var(--sol-surface);
+}
+.sol-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 4px 4px 4px 10px;
+  background: transparent;
+  border: 1px solid var(--sol-hairline-strong);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--sol-text);
+  max-width: 100%;
+}
+.sol-chip .em { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sol-chip .meta {
+  font-family: var(--font-display); font-weight: 500;
+  font-size: 9px; letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text-3);
+  padding-left: 8px;
+  border-left: 1px solid var(--sol-hairline-strong);
+}
+.sol-chip button {
+  appearance: none; background: transparent; border: 0;
+  width: 22px; height: 22px;
+  display: grid; place-items: center;
+  color: var(--sol-text-3);
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: color var(--transition), background var(--transition);
+}
+.sol-chip button:hover { color: var(--sol-text); background: var(--sol-surface-2); }
+.sol-chip.is-member { color: var(--sol-text-2); border-style: dashed; }
+.sol-chip.is-member .em { text-decoration: line-through; text-decoration-color: var(--sol-hairline-strong); }
+.sol-chip.is-invalid {
+  border: 1px double var(--sol-risk);
+  color: var(--sol-text);
+}
+.sol-chip.is-invalid .meta { color: var(--sol-risk); }
+.sol-chip-input input {
+  flex: 1; min-width: 180px;
+  border: 0; outline: none; background: transparent;
+  color: var(--sol-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 4px 0;
+}
+.sol-chip-input input::placeholder { color: var(--sol-text-disabled); }
+
+.sol-inline-note {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--sol-hairline);
+  background: transparent;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--sol-text-2);
+  margin-top: 14px;
+}
+.sol-inline-note.is-info { border-left: 2px solid var(--sol-accent); }
+.sol-inline-note.is-warn { border-left: 2px dashed var(--sol-manual); }
+.sol-inline-note .ic {
+  font-family: var(--font-display); font-weight: 500;
+  font-size: 12px; width: 16px; text-align: center;
+  color: var(--sol-accent);
+  flex-shrink: 0;
+}
+.sol-inline-note.is-warn .ic { color: var(--sol-manual); }
+.sol-inline-note strong { color: var(--sol-text); font-weight: 500; }
+.sol-inline-note a { color: var(--sol-accent); text-decoration: underline; text-underline-offset: 3px; }
+
+.sol-mail-preview {
+  background: var(--sol-ground);
+  border: 1px solid var(--sol-hairline);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.sol-mail-preview .head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--sol-hairline);
+}
+.sol-mail-preview .head .mark {
+  width: 22px; height: 22px;
+  color: var(--sol-accent);
+  flex-shrink: 0;
+}
+.sol-mail-preview .head .sep {
+  color: var(--sol-text-disabled); font-size: 12px;
+  font-family: var(--font-display); font-weight: 500;
+  letter-spacing: 0.2em;
+}
+.sol-mail-preview .head .client {
+  font-family: var(--font-display); font-weight: 500;
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--sol-text-2);
+}
+.sol-mail-preview .body {
+  padding: 16px 18px 18px;
+}
+.sol-mail-preview .body .from {
+  font-family: var(--font-display); font-weight: 500;
+  font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--sol-text-3);
+  margin: 0 0 6px;
+}
+.sol-mail-preview .body .subj {
+  font-family: var(--font-display); font-weight: 500;
+  font-size: 14px; letter-spacing: 0.04em;
+  color: var(--sol-text);
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+.sol-mail-preview .body .line {
+  font-size: 13px; color: var(--sol-text-2);
+  font-weight: 300;
+  line-height: 1.6;
+  margin: 0;
+}
+.sol-mail-preview .body .line + .line { margin-top: 8px; }
+
+/* ── Read-only mode (viewer role OR archived state) ────── */
+.archived-banner {
+  display: none;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  margin: 0 0 28px;
+  border: 1px solid var(--sol-hairline-strong);
+  border-left-width: 2px;
+  background: var(--sol-surface);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--sol-text);
+  border-radius: var(--radius);
+}
+body[data-readonly] .archived-banner { display: flex; }
+body[data-readonly="archived"] .archived-banner { border-left-color: var(--sol-manual); }
+body[data-readonly="viewer"]   .archived-banner { border-left-color: var(--sol-accent); }
+
+/* Hide / disable everything that mutates project state.
+   Use !important to override inline styles set elsewhere. */
+body[data-readonly] #settings-btn,
+body[data-readonly] #add-member-btn,
+body[data-readonly] #add-graph-btn,
+body[data-readonly] .members-add,
+body[data-readonly] .graph-card-add,
+body[data-readonly] #graphsPanel .add-card,
+body[data-readonly] .graph-card .icon-btn,
+body[data-readonly] .member-row .icon-btn,
+body[data-readonly] .members-add-cta { display: none !important; }
+
+body[data-readonly] .archived-banner { display: flex; }
+
+.archived-banner .ab-eyebrow {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding-right: 14px;
+  border-right: 1px solid var(--sol-hairline-strong);
+  flex-shrink: 0;
+}
+body[data-readonly="archived"] .archived-banner .ab-eyebrow { color: var(--sol-manual); }
+body[data-readonly="viewer"]   .archived-banner .ab-eyebrow { color: var(--sol-accent); }
+.archived-banner .ab-copy { flex: 1; color: var(--sol-text-2); line-height: 1.5; }
+.archived-banner .ab-copy strong { color: var(--sol-text); font-weight: 500; }
+.archived-banner .btn { flex-shrink: 0; }
+
+/* ── Disabled lifecycle section for non-owners ───────── */
+body[data-current-role="editor"] .sol-modal-danger .btn,
+body[data-current-role="viewer"] .sol-modal-danger .btn {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.lifecycle-gate {
+  display: none;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--sol-hairline);
+  background: transparent;
+  font-size: 12.5px;
+  color: var(--sol-text-3);
+  line-height: 1.5;
+  border-radius: var(--radius);
+}
+body[data-current-role="editor"] .lifecycle-gate,
+body[data-current-role="viewer"] .lifecycle-gate { display: block; }
+
+/* ── Editor settings gating ─────────────────────────────
+   Editor can VIEW project configuration but not edit it.
+   Owner is the only role allowed to mutate § 01–04 or § 05. */
+body[data-current-role="editor"] .sol-modal-section input:not([type="radio"]):not([type="checkbox"]),
+body[data-current-role="editor"] .sol-modal-section textarea,
+body[data-current-role="editor"] .sol-modal-section .sol-dropdown-trigger,
+body[data-current-role="editor"] .sol-modal-section .sol-segmented label,
+body[data-current-role="editor"] .sol-modal-section .sol-toggle,
+body[data-current-role="editor"] .sol-modal-section .btn {
+  pointer-events: none !important;
+  opacity: 0.55;
+}
+body[data-current-role="editor"] .sol-modal-section input,
+body[data-current-role="editor"] .sol-modal-section textarea {
+  cursor: not-allowed;
+}
+
+/* §05 Lifecycle: hide for editors (more aggressive than the gate line).
+   Viewers can never see this section because Settings is hidden for them. */
+body[data-current-role="editor"] .sol-modal-danger { display: none; }
+
+/* Hide the Save button for non-owners — there's nothing to save. */
+body[data-current-role="editor"] .sol-modal-footer .btn-primary,
+body[data-current-role="viewer"] .sol-modal-footer .btn-primary { display: none; }
+/* Cancel becomes "Close" for non-owners; we rewrite the label in JS too,
+   but the styling reflects the change here. */
+body[data-current-role="editor"] .sol-modal-footer [data-close-modal],
+body[data-current-role="viewer"] .sol-modal-footer [data-close-modal] {
+  border-color: var(--sol-hairline-strong);
+}
+
+/* Top-of-modal banner explaining the read-only mode. */
+.settings-readonly-banner {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 22px;
+  margin: 0;
+  background: var(--sol-surface-2);
+  border-bottom: 1px solid var(--sol-hairline);
+  font-size: 12.5px;
+  color: var(--sol-text-2);
+}
+.settings-readonly-banner strong {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-accent);
+  padding-right: 12px;
+  border-right: 1px solid var(--sol-hairline-strong);
+}
+body[data-current-role="editor"] .settings-readonly-banner { display: flex; }
+
+/* ── Stacked confirmation modal ──────────────────────── */
+.sol-modal-backdrop.is-stacked { z-index: 250; }
+.sol-modal-backdrop.is-stacked .sol-modal { max-width: 480px; }
+
+.confirm-modal .sol-modal-header {
+  padding: 32px 36px 22px;
+}
+.confirm-modal .sol-modal-eyebrow { color: var(--sol-risk); }
+.confirm-modal .sol-modal-title { font-size: 22px; line-height: 1.25; }
+.confirm-modal .sol-modal-section { padding: 24px 36px 28px; border-bottom: 0; }
+.confirm-modal .cm-body {
+  font-size: 13.5px;
+  color: var(--sol-text-2);
+  line-height: 1.65;
+  margin: 0 0 22px;
+}
+.confirm-modal .cm-body strong { color: var(--sol-text); font-weight: 500; }
+.confirm-modal .cm-field-label {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text-2);
+  margin: 0 0 10px;
+}
+.confirm-modal .cm-field-label code {
+  font-family: var(--font-code, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--sol-text);
+  background: var(--sol-surface-2);
+  border: 1px solid var(--sol-hairline);
+  padding: 1px 6px;
+  border-radius: 2px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+.confirm-modal .cm-input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--sol-hairline-strong);
+  border-radius: var(--radius);
+  background: transparent;
+  padding: 0 14px;
+  font-family: var(--font-code, ui-monospace, monospace);
+  font-size: 13px;
+  color: var(--sol-text);
+  outline: none;
+  transition: border-color var(--transition), background var(--transition);
+}
+.confirm-modal .cm-input:focus { background: var(--sol-surface); }
+.confirm-modal .cm-input.is-matched { border-color: var(--sol-risk); }
+.confirm-modal .sol-modal-footer { padding: 18px 36px 22px; }
+.confirm-modal .btn.is-destructive {
+  border-color: var(--sol-risk);
+  color: var(--sol-risk);
+}
+.confirm-modal .btn.is-destructive::before { display: none; }
+.confirm-modal .btn.is-destructive:hover {
+  background: rgba(198, 107, 94, 0.08);
+}
+.confirm-modal .btn.is-destructive:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+</style>
+</head>
+<body data-current-role="owner">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="sol-crystal" viewBox="0 0 52 52">
+    <polygon points="26,4 40,12 44,26 40,40 26,48 12,40 8,26 12,12" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.9"></polygon>
+    <polygon points="26,10 36,16 39,26 36,36 26,42 16,36 13,26 16,16" fill="none" stroke="currentColor" stroke-width="0.75" opacity="0.4"></polygon>
+    <circle cx="26" cy="26" r="2.5" fill="currentColor" opacity="0.9"></circle>
+    <line x1="26" y1="10" x2="26" y2="42" stroke="currentColor" stroke-width="0.5" opacity="0.25"></line>
+    <line x1="10" y1="26" x2="42" y2="26" stroke="currentColor" stroke-width="0.5" opacity="0.25"></line>
+  </symbol>
+</svg>
+<div class="topbar">
+  <div class="brand">
+    <span class="brand-mark sol-mark sol-mark--ambient" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 52 52" aria-hidden="true">
+        <polygon points="26,4 40,12 44,26 40,40 26,48 12,40 8,26 12,12" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.9"></polygon>
+        <polygon class="refraction" points="26,10 36,16 39,26 36,36 26,42 16,36 13,26 16,16" fill="none" stroke="currentColor" stroke-width="0.75" opacity="0.4"></polygon>
+        <circle cx="26" cy="26" r="2.5" fill="currentColor" opacity="0.9"></circle>
+        <circle class="glow" cx="26" cy="26" r="5" fill="currentColor" opacity="0.25" style="filter: blur(3px);"></circle>
+        <line x1="26" y1="10" x2="26" y2="42" stroke="currentColor" stroke-width="0.5" opacity="0.25"></line>
+        <line x1="10" y1="26" x2="42" y2="26" stroke="currentColor" stroke-width="0.5" opacity="0.25"></line>
+      </svg>
+    </span>
+    SOLSTEIN
+  </div>
+  <div class="topbar-divider"></div>
+  <div class="crumb">
+    <a href="home.html">Workspace</a>
+    <span class="sep">/</span>
+    <span class="now">Car Insurance Comparison</span>
+  </div>
+  <div class="topbar-spacer"></div>
+  <div class="user-menu" id="userMenu">
+    <button class="user-chip" type="button" id="userMenuTrigger" aria-haspopup="menu" aria-expanded="false">
+      <div class="avatar">JM</div>
+      <span>James Mitchell</span>
+      <svg class="caret" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 4.5l3 3 3-3"></path>
+      </svg>
+    </button>
+    <div class="user-menu-pop" role="menu" aria-labelledby="userMenuTrigger">
+      <div class="um-identity">
+        <div class="avatar">JM</div>
+        <div class="who">
+          <div class="name">James Mitchell</div>
+          <div class="email">james.mitchell@consultancy.com</div>
+        </div>
+      </div>
+      <div class="um-section">§ Account</div>
+      <a class="um-item" role="menuitem" href="profile.html">Profile &amp; Security</a>
+      <div class="um-divider"></div>
+      <a class="um-item is-danger" role="menuitem" href="signed-out.html">Sign out</a>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <a class="back-link" href="home.html">← All projects</a>
+
+  <div class="archived-banner" role="status">
+    <div class="ab-eyebrow" id="ab-eyebrow">§ Archived</div>
+    <div class="ab-copy" id="ab-copy">This project is <strong>read-only</strong>. Members and clients have lost access; public share links return the link-expired page until you unarchive.</div>
+    <button class="btn btn-sm" id="unarchive-btn">Unarchive</button>
+  </div>
+
+  <header class="proj-header">
+    <div>
+      <div class="title-row">
+        <h1 class="page-title" style="margin-bottom: 0;">Car Insurance Comparison</h1>
+        <button class="btn btn-sm" id="settings-btn">Settings</button>
+      </div>
+      <div class="meta-row">
+        <span class="domain">Insurance</span>
+        <span class="dot"></span>
+        <span>Acme Insurance Group</span>
+      </div>
+      <p class="desc">End-to-end operational and technical reading of the comparison journey — from customer data entry through quote generation to results display, including downstream data consumers and reconciliation flows.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab is-on" data-tab="graphs" role="tab">Graphs <span class="count" id="graphsCount">1</span></button>
+    <button class="tab" data-tab="members" role="tab">Members <span class="count" id="membersCount">5</span></button>
+  </div>
+
+  <!-- ── Graphs panel ── -->
+  <div class="panel is-on" data-tab="graphs" id="graphsPanel" data-state="full">
+    <div class="graphs-grid">
+      <a class="graph-card" href="canvas.html">
+        <div class="graph-thumb">
+          <svg viewBox="0 0 280 130" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <path class="edge" d="M30,40 Q70,40 90,55"/>
+            <path class="edge" d="M90,55 Q130,60 150,40"/>
+            <path class="edge" d="M150,40 Q190,40 220,60"/>
+            <path class="edge" d="M90,55 Q110,80 130,95"/>
+            <path class="edge" d="M150,40 Q175,80 190,95"/>
+            <path class="edge" d="M220,60 Q235,80 235,100"/>
+            <rect class="node cat-op"   x="20" y="32"  width="22" height="16" rx="3"/>
+            <rect class="node cat-op"   x="80" y="47"  width="22" height="16" rx="3"/>
+            <rect class="node cat-info" x="140" y="32" width="22" height="16" rx="3"/>
+            <rect class="node cat-tech" x="210" y="52" width="22" height="16" rx="3"/>
+            <rect class="node cat-op"   x="120" y="87" width="22" height="16" rx="3"/>
+            <rect class="node cat-info" x="180" y="87" width="22" height="16" rx="3"/>
+            <rect class="node cat-tech" x="225" y="92" width="22" height="16" rx="3"/>
+          </svg>
+        </div>
+        <div class="graph-meta">
+          <div class="gn">Quote Journey</div>
+          <div class="gr">
+            <span class="count">56 nodes</span>
+            <span class="dot"></span>
+            <span class="count">71 edges</span>
+            <span class="dot"></span>
+            <span>2h ago</span>
+          </div>
+        </div>
+      </a>
+
+      <a class="add-card" href="import-wizard.html">
+        <div class="plus">+</div>
+        <div class="label">Import graph</div>
+        <div class="sub">Upload JSON</div>
+      </a>
+    </div>
+
+    <div class="empty-hero">
+      <div class="empty-block">
+        <svg class="e-glyph" viewBox="0 0 52 52" aria-hidden="true">
+          <circle cx="10" cy="26" r="3" fill="none" stroke="currentColor" stroke-width="1.5"></circle>
+          <circle cx="42" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.5"></circle>
+          <circle cx="42" cy="40" r="3" fill="none" stroke="currentColor" stroke-width="1.5"></circle>
+          <line x1="13" y1="26" x2="39" y2="13" stroke="currentColor" stroke-width="1" opacity="0.6"></line>
+          <line x1="13" y1="26" x2="39" y2="39" stroke="currentColor" stroke-width="1" opacity="0.6"></line>
+        </svg>
+        <div class="e-rule"></div>
+        <div class="e-eyebrow">§ No Graphs</div>
+        <h2 class="e-lede">Import your first graph</h2>
+        <p class="e-help">Bring one in from a CSV, Excel, or Notion source via the Import Wizard.</p>
+        <div class="e-actions">
+          <a class="e-primary" href="import-wizard.html">Open Wizard</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Members panel ── -->
+  <div class="panel" data-tab="members" id="membersPanel" data-state="full">
+    <div class="members-gate">
+      Only the project owner can add, remove, or change member roles. You can see who else has access here.
+    </div>
+    <div class="members-band">
+      <div class="members-toggle">
+        <button class="is-on" data-filter="all">All <span class="ct">5</span></button>
+        <button data-filter="owner">Owners <span class="ct">1</span></button>
+        <button data-filter="editor">Editors <span class="ct">2</span></button>
+        <button data-filter="viewer">Viewers <span class="ct">2</span></button>
+      </div>
+      <button class="btn btn-primary btn-sm" id="add-member-btn">Add member…</button>
+    </div>
+
+    <div class="members-card">
+      <div class="head">
+        <div>Member</div>
+        <div>Email</div>
+        <div>Role</div>
+        <div></div>
+      </div>
+      <div class="row" data-role="owner" data-self="true" data-name="James Mitchell" data-email="james.mitchell@consultancy.com" data-initials="JM" data-av="neutral">
+        <div class="who">
+          <div class="av">JM</div>
+          <div class="name">James Mitchell <span style="color: var(--sol-accent-55); font-family: var(--font-display); font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; margin-left: 12px;">YOU</span></div>
+        </div>
+        <div class="email">james.mitchell@consultancy.com</div>
+        <div><span class="role owner">Owner</span></div>
+        <div class="actions">
+          <button class="icon-btn" title="Manage member" aria-label="Manage James Mitchell">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+              <circle cx="3" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="13" cy="8" r="1.2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="row" data-role="editor" data-name="Sarah Chen" data-email="sarah.chen@consultancy.com" data-initials="SC" data-av="neutral">
+        <div class="who">
+          <div class="av">SC</div>
+          <div class="name">Sarah Chen</div>
+        </div>
+        <div class="email">sarah.chen@consultancy.com</div>
+        <div><span class="role editor">Editor</span></div>
+        <div class="actions">
+          <button class="icon-btn" title="Manage member" aria-label="Manage James Mitchell">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+              <circle cx="3" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="13" cy="8" r="1.2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="row" data-role="editor" data-name="Anya Borisova" data-email="anya.borisova@consultancy.com" data-initials="AB" data-av="neutral">
+        <div class="who">
+          <div class="av">AB</div>
+          <div class="name">Anya Borisova</div>
+        </div>
+        <div class="email">anya.borisova@consultancy.com</div>
+        <div><span class="role editor">Editor</span></div>
+        <div class="actions">
+          <button class="icon-btn" title="Manage member" aria-label="Manage Anya Borisova">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+              <circle cx="3" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="13" cy="8" r="1.2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="row" data-role="viewer" data-external="true" data-name="Tom Reeve" data-email="t.reeve@acme-insurance.com" data-initials="TR" data-av="neutral">
+        <div class="who">
+          <div class="av">TR</div>
+          <div class="name">Tom Reeve</div>
+        </div>
+        <div class="email">t.reeve@acme-insurance.com</div>
+        <div><span class="role viewer">Viewer</span></div>
+        <div class="actions">
+          <button class="icon-btn" title="Manage member" aria-label="Manage Tom Reeve">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+              <circle cx="3" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="13" cy="8" r="1.2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="row" data-role="viewer" data-external="true" data-name="Priya Kapoor" data-email="priya@acme-insurance.com" data-initials="PK" data-av="neutral">
+        <div class="who">
+          <div class="av">PK</div>
+          <div class="name">Priya Kapoor</div>
+        </div>
+        <div class="email">priya@acme-insurance.com</div>
+        <div><span class="role viewer">Viewer</span></div>
+        <div class="actions">
+          <button class="icon-btn" title="Manage member" aria-label="Manage Priya Kapoor">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+              <circle cx="3" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="13" cy="8" r="1.2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="empty-hero" id="membersEmpty">
+      <div class="empty-block">
+        <svg class="e-glyph" viewBox="0 0 52 52" aria-hidden="true">
+          <circle cx="20" cy="20" r="5" fill="none" stroke="currentColor" stroke-width="1.5"></circle>
+          <path d="M11 38 Q11 28 20 28 Q29 28 29 38" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+          <circle cx="36" cy="22" r="4" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"></circle>
+          <path d="M28 38 Q28 31 36 31 Q44 31 44 38" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"></path>
+        </svg>
+        <div class="e-rule"></div>
+        <div class="e-eyebrow">§ Just You</div>
+        <h2 class="e-lede">Invite your team</h2>
+        <p class="e-help">Bring in collaborators to share graphs and discuss findings. You can change roles or revoke access at any time.</p>
+        <div class="e-actions">
+          <button class="e-primary" type="button" id="invite-from-empty">Invite Members</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    const id = t.dataset.tab;
+    document.querySelectorAll('.tab').forEach(x => x.classList.toggle('is-on', x === t));
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('is-on', p.dataset.tab === id));
+  });
+});
+
+// Members filter (All / Owners / Editors / Viewers)
+document.querySelectorAll('.members-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.members-toggle button').forEach(b => b.classList.toggle('is-on', b === btn));
+    document.querySelectorAll('.members-card .row').forEach(row => {
+      const role = row.dataset.role;
+      row.style.display = (filter === 'all' || role === filter) ? '' : 'none';
+    });
+  });
+});
+
+// ── Member action popover ────────────────────────────────────────
+const ROLES = [
+  { id: 'owner',  label: 'Owner'  },
+  { id: 'editor', label: 'Editor' },
+  { id: 'viewer', label: 'Viewer' },
+];
+const ICONS = {
+  copy:     '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-5A1.5 1.5 0 0 0 3 3.5v5A1.5 1.5 0 0 0 4.5 10H6"/></svg>',
+  link:     '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M9 5h2.5a2.5 2.5 0 0 1 0 5H9M7 11H4.5a2.5 2.5 0 0 1 0-5H7M6 8h4"/></svg>',
+  transfer: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h8l-2-2M13 11H5l2 2"/></svg>',
+  resend:   '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4l6 4.5L14 4"/><rect x="2" y="4" width="12" height="8" rx="1"/></svg>',
+  remove:   '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M3 5h10M6.5 5V3.5A.5.5 0 0 1 7 3h2a.5.5 0 0 1 .5.5V5M5 5l.5 8h5L11 5"/></svg>',
+  leave:    '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h5M10 11l3-3-3-3M7 8h6"/></svg>',
+};
+
+let openMenu = null;
+let openBackdrop = null;
+
+function closeMenu() {
+  if (openMenu) { openMenu.remove(); openMenu = null; }
+  if (openBackdrop) { openBackdrop.remove(); openBackdrop = null; }
+}
+
+function openMemberMenu(btn) {
+  closeMenu();
+  // Defense in depth: the icon-btn is hidden for non-owners via CSS,
+  // but if someone reaches this code path another way, bail.
+  if ((document.body.dataset.currentRole || 'owner') !== 'owner') return;
+  const row = btn.closest('.row');
+  if (!row) return;
+  const ds = row.dataset;
+  const isSelf = ds.self === 'true';
+  const isExternal = ds.external === 'true';
+  const currentRole = ds.role;
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'mm-backdrop';
+  backdrop.addEventListener('click', closeMenu);
+  document.body.append(backdrop);
+  openBackdrop = backdrop;
+
+  const menu = document.createElement('div');
+  menu.className = 'member-menu';
+
+  // Header
+  const head = document.createElement('div');
+  head.className = 'mm-head';
+  head.innerHTML = `
+    <div class="av">${ds.initials}</div>
+    <div class="ident">
+      <div class="nm">${ds.name}${isSelf ? ' <span style="color: var(--sol-accent-55); font-family: var(--font-display); font-size: 10px; font-weight: 500; letter-spacing: 0.2em; margin-left: 10px;">YOU</span>' : ''}</div>
+      <div class="em">${ds.email}</div>
+      ${isExternal ? '<div class="mm-ext">External · Client</div>' : ''}
+    </div>
+  `;
+  menu.append(head);
+
+  // Role section
+  const roleSection = document.createElement('div');
+  roleSection.className = 'mm-section';
+  roleSection.innerHTML = '<div class="mm-label">Role</div>';
+  const grp = document.createElement('div');
+  grp.className = 'mm-role-grp';
+  ROLES.forEach(r => {
+    const b = document.createElement('button');
+    b.className = 'mm-role' + (r.id === currentRole ? ' is-on' : '');
+    b.textContent = r.label;
+    if (isSelf && r.id !== 'owner') {
+      // Mock: prevent demoting yourself (last owner protection)
+      b.disabled = true;
+      b.title = "You're the only owner — promote someone else first";
+    }
+    b.addEventListener('click', () => {
+      row.dataset.role = r.id;
+      const pill = row.querySelector('.role');
+      pill.className = 'role ' + r.id;
+      pill.textContent = r.label;
+      closeMenu();
+    });
+    grp.append(b);
+  });
+  roleSection.append(grp);
+  if (isSelf) {
+    roleSection.append(Object.assign(document.createElement('div'), {
+      className: 'mm-hint', textContent: "You can't demote yourself while you're the only owner.",
+    }));
+  } else if (isExternal && currentRole !== 'owner') {
+    // Reassurance: promoting an external collaborator to Owner does NOT
+    // grant them workspace membership. They still can't create new projects.
+    roleSection.append(Object.assign(document.createElement('div'), {
+      className: 'mm-hint',
+      innerHTML: 'Promoting <strong style="color: var(--sol-text); font-weight: 500;">' + ds.name + '</strong> gives them full control of this project. They still can\u2019t create new projects in your workspace — that\u2019s set by Solstein.',
+    }));
+  }
+  menu.append(roleSection);
+
+  menu.append(Object.assign(document.createElement('div'), { className: 'mm-divider' }));
+
+  // Quick actions
+  const items = [
+    { ic: ICONS.copy,  label: 'Copy email',         action: () => navigator.clipboard?.writeText(ds.email) },
+    { ic: ICONS.link,  label: 'Copy profile link',  action: () => {} },
+  ];
+  items.forEach(it => {
+    const b = document.createElement('button');
+    b.className = 'mm-item';
+    b.innerHTML = `<span class="ic">${it.ic}</span><span>${it.label}</span>`;
+    b.addEventListener('click', () => { it.action(); closeMenu(); });
+    menu.append(b);
+  });
+
+  menu.append(Object.assign(document.createElement('div'), { className: 'mm-divider' }));
+
+  // Destructive
+  const dest = document.createElement('button');
+  dest.className = 'mm-item is-destructive';
+  if (isSelf) {
+    dest.innerHTML = `<span class="ic">${ICONS.leave}</span><span>Leave project</span>`;
+    dest.disabled = true;
+    dest.title = "You're the only owner — promote another member to Owner first";
+  } else {
+    dest.innerHTML = `<span class="ic">${ICONS.remove}</span><span>Remove from project</span>`;
+    dest.addEventListener('click', () => {
+      row.remove();
+      closeMenu();
+    });
+  }
+  menu.append(dest);
+
+  document.body.append(menu);
+
+  // Position: align right edge of menu to right edge of button, below it.
+  const rect = btn.getBoundingClientRect();
+  const menuW = menu.offsetWidth;
+  const menuH = menu.offsetHeight;
+  let top = rect.bottom + 6;
+  let left = rect.right - menuW;
+  if (left < 8) left = 8;
+  if (top + menuH > window.innerHeight - 8) top = rect.top - menuH - 6;
+  menu.style.top = top + 'px';
+  menu.style.left = left + 'px';
+  requestAnimationFrame(() => menu.classList.add('is-open'));
+  openMenu = menu;
+}
+
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.members-card .icon-btn');
+  if (btn) {
+    e.stopPropagation();
+    if (openMenu && openMenu.dataset.anchor === btn.dataset.k) { closeMenu(); return; }
+    openMemberMenu(btn);
+  }
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+window.addEventListener('resize', closeMenu);
+window.addEventListener('scroll', closeMenu, true);
+</script>
+<!-- ── Project Settings modal ──────────────────────────── -->
+<div class="sol-modal-backdrop" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title" aria-hidden="true">
+  <div class="sol-modal">
+
+    <div class="settings-readonly-banner">
+      <strong>§ Editor</strong>
+      <span>Project settings are <em style="color:var(--sol-text-3);font-style:normal;">read-only</em>. Only owners can change identity, defaults, access, or branding.</span>
+    </div>
+
+    <div class="sol-modal-header">
+      <div>
+        <p class="sol-modal-eyebrow">§ Project settings</p>
+        <h2 class="sol-modal-title" id="settings-title">Car Insurance Comparison</h2>
+      </div>
+      <button class="sol-modal-close" aria-label="Close settings" data-close-modal>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <line x1="4" y1="4" x2="12" y2="12"></line>
+          <line x1="12" y1="4" x2="4" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 1 · Identity -->
+    <section class="sol-modal-section">
+      <div class="sol-modal-section-label">§ 01 / Identity</div>
+      <h3>Name and bearing</h3>
+
+      <div class="sol-grid-2">
+        <div class="sol-field" style="grid-column: 1 / -1;">
+          <label for="set-name">Project name</label>
+          <input class="sol-input" id="set-name" value="Car Insurance Comparison">
+        </div>
+        <div class="sol-field">
+          <label for="set-domain">Domain</label>
+          <input class="sol-input" id="set-domain" value="Insurance">
+        </div>
+        <div class="sol-field">
+          <label for="set-client">Client</label>
+          <input class="sol-input" id="set-client" value="Acme Insurance Group">
+        </div>
+        <div class="sol-field" style="grid-column: 1 / -1;">
+          <label for="set-desc">Description</label>
+          <textarea class="sol-textarea" id="set-desc">End-to-end operational and technical reading of the comparison journey — from customer data entry through quote generation to results display, including downstream data consumers and reconciliation flows.</textarea>
+        </div>
+        <div class="sol-field">
+          <label>Project lead</label>
+          <div class="sol-dropdown" id="set-lead" data-value="James Mitchell">
+            <button type="button" class="sol-dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="sol-dropdown-value">James Mitchell</span>
+              <svg class="sol-dropdown-chev" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3,5 6,8 9,5"></polyline></svg>
+            </button>
+            <ul class="sol-dropdown-list" role="listbox">
+              <li role="option" data-value="James Mitchell" aria-selected="true">James Mitchell</li>
+              <li role="option" data-value="Sarah Chen">Sarah Chen</li>
+              <li role="option" data-value="Anya Borisova">Anya Borisova</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · Defaults & reading -->
+    <section class="sol-modal-section">
+      <div class="sol-modal-section-label">§ 02 / Defaults &amp; reading</div>
+      <h3>What the team sees first</h3>
+      <p class="help">The default lens and overlays applied when anyone opens the canvas. Individuals can change theirs locally.</p>
+
+      <div class="sol-field" style="margin-bottom: 22px;">
+        <label>Default view</label>
+        <div class="sol-segmented">
+          <input type="radio" name="defview" id="dv-journey" checked>
+          <label for="dv-journey">Journey</label>
+          <input type="radio" name="defview" id="dv-tech">
+          <label for="dv-tech">Technical architecture</label>
+        </div>
+      </div>
+
+      <div class="sol-field" style="margin-bottom: 22px;">
+        <label>Density preset</label>
+        <div class="sol-segmented">
+          <input type="radio" name="density" id="den-calm">
+          <label for="den-calm">Calm</label>
+          <input type="radio" name="density" id="den-std" checked>
+          <label for="den-std">Standard</label>
+          <input type="radio" name="density" id="den-dense">
+          <label for="den-dense">Dense</label>
+        </div>
+      </div>
+
+      <div class="sol-field">
+        <label>Overlays on open</label>
+        <div style="margin-top: 8px;">
+          <div class="sol-toggle-row">
+            <div class="ident">
+              <p class="nm"><span class="pip" style="background: var(--sol-pii);"></span>PII / Sensitive</p>
+              <p class="desc">Highlight personal or regulated data passing through the graph.</p>
+            </div>
+            <input type="checkbox" class="sol-toggle" checked aria-label="Toggle PII overlay default">
+          </div>
+          <div class="sol-toggle-row">
+            <div class="ident">
+              <p class="nm"><span class="pip" style="background: var(--sol-manual);"></span>Manual processes</p>
+              <p class="desc">Human work and hand-offs that interrupt flow.</p>
+            </div>
+            <input type="checkbox" class="sol-toggle" aria-label="Toggle Manual overlay default">
+          </div>
+          <div class="sol-toggle-row">
+            <div class="ident">
+              <p class="nm"><span class="pip" style="background: var(--sol-risk);"></span>Risk</p>
+              <p class="desc">Known failure modes and single points of failure.</p>
+            </div>
+            <input type="checkbox" class="sol-toggle" checked aria-label="Toggle Risk overlay default">
+          </div>
+          <div class="sol-toggle-row">
+            <div class="ident">
+              <p class="nm"><span class="pip" style="background: var(--sol-unknown);"></span>Unknowns</p>
+              <p class="desc">Inferred but not yet evidenced — awaiting a reading.</p>
+            </div>
+            <input type="checkbox" class="sol-toggle" checked aria-label="Toggle Unknowns overlay default">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · Access -->
+    <section class="sol-modal-section">
+      <div class="sol-modal-section-label">§ 03 / Access</div>
+      <h3>Who can read this project</h3>
+      <p class="help">Project-level visibility, plus how invited external viewers behave by default.</p>
+
+      <div class="sol-field" style="margin-bottom: 22px;">
+        <label>Visibility</label>
+        <div class="sol-segmented">
+          <input type="radio" name="vis" id="vis-private">
+          <label for="vis-private">Private</label>
+          <input type="radio" name="vis" id="vis-team" checked>
+          <label for="vis-team">Team</label>
+          <input type="radio" name="vis" id="vis-link">
+          <label for="vis-link">External link</label>
+        </div>
+      </div>
+
+      <div class="sol-grid-2" style="margin-bottom: 22px;">
+        <div class="sol-field">
+          <label>Default role for new members</label>
+          <div class="sol-dropdown" id="set-defrole" data-value="Viewer">
+            <button type="button" class="sol-dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="sol-dropdown-value">Viewer</span>
+              <svg class="sol-dropdown-chev" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3,5 6,8 9,5"></polyline></svg>
+            </button>
+            <ul class="sol-dropdown-list" role="listbox">
+              <li role="option" data-value="Viewer" aria-selected="true">Viewer</li>
+              <li role="option" data-value="Editor">Editor</li>
+            </ul>
+          </div>
+        </div>
+        <div class="sol-field">
+          <label>Default role for external invites</label>
+          <div class="sol-dropdown" id="set-extrole" data-value="Viewer">
+            <button type="button" class="sol-dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="sol-dropdown-value">Viewer</span>
+              <svg class="sol-dropdown-chev" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3,5 6,8 9,5"></polyline></svg>
+            </button>
+            <ul class="sol-dropdown-list" role="listbox">
+              <li role="option" data-value="Viewer" aria-selected="true">Viewer</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sol-toggle-row">
+          <div class="ident">
+            <p class="nm">External viewers can comment</p>
+            <p class="desc">Allow client-side viewers to leave notes against nodes and edges.</p>
+          </div>
+          <input type="checkbox" class="sol-toggle" checked aria-label="External comments">
+        </div>
+        <div class="sol-toggle-row">
+          <div class="ident">
+            <p class="nm">External viewers can export</p>
+            <p class="desc">Off by default — keeps the canvas anchored to the project.</p>
+          </div>
+          <input type="checkbox" class="sol-toggle" aria-label="External exports">
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · Export & branding -->
+    <section class="sol-modal-section">
+      <div class="sol-modal-section-label">§ 04 / Export &amp; branding</div>
+      <h3>How readings leave the room</h3>
+      <p class="help">Co-branding, footer language, and who in the project is allowed to export.</p>
+
+      <div class="sol-toggle-row" style="margin-bottom: 18px; padding: 14px 0;">
+        <div class="ident">
+          <p class="nm">Co-brand exports</p>
+          <p class="desc">Place the client logo alongside the Solstein mark on PDF and PPT headers.</p>
+        </div>
+        <input type="checkbox" class="sol-toggle" checked aria-label="Co-brand toggle">
+      </div>
+
+      <div class="sol-logo-slot" style="margin-bottom: 22px;">
+        <div class="preview"></div>
+        <div class="meta">
+          <span class="ttl">Drop client logo</span>
+          <span class="sub">PNG or SVG · transparent background · up to 256 px tall</span>
+        </div>
+      </div>
+
+      <div class="sol-field" style="margin-bottom: 22px;">
+        <label for="set-footer">Export footer</label>
+        <textarea class="sol-textarea" id="set-footer" style="min-height: 72px;">Prepared by James Mitchell for Acme Insurance Group. Reading taken May 2026. Evidence on request.</textarea>
+      </div>
+
+      <div class="sol-field">
+        <label>Who can export</label>
+        <div class="sol-segmented">
+          <input type="radio" name="exp" id="exp-owners">
+          <label for="exp-owners">Owners only</label>
+          <input type="radio" name="exp" id="exp-edit" checked>
+          <label for="exp-edit">Owners + Editors</label>
+          <input type="radio" name="exp" id="exp-all">
+          <label for="exp-all">Everyone</label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lifecycle -->
+    <section class="sol-modal-danger">
+      <div class="sol-modal-section-label">§ 05 / Lifecycle</div>
+      <div class="lifecycle-gate">Only owners can rename, duplicate, archive, or delete this project.</div>
+      <div class="row">
+        <div class="copy">
+          <p class="nm">Duplicate project</p>
+          <p class="desc">Creates an independent copy: graphs, canvas layout, and metadata. Members, share links, comments, and exports do not carry over.</p>
+        </div>
+        <button class="btn btn-sm" id="duplicate-btn">Duplicate</button>
+      </div>
+      <div class="row">
+        <div class="copy">
+          <p class="nm">Archive project</p>
+          <p class="desc">Read-only after archiving. Editors and viewers lose access; public share links break. Reversible.</p>
+        </div>
+        <button class="btn btn-sm" id="archive-btn">Archive</button>
+      </div>
+      <div class="row">
+        <div class="copy">
+          <p class="nm">Transfer ownership</p>
+          <p class="desc">Hand the project to another member. They take over branding, defaults, sharing policy, and lifecycle decisions for this project.</p>
+        </div>
+        <button class="btn btn-sm" id="transfer-btn">Transfer…</button>
+      </div>
+      <div class="row">
+        <div class="copy">
+          <p class="nm">Delete project</p>
+          <p class="desc">Permanent. The graph, canvas state, and all member access are removed. Cannot be undone.</p>
+        </div>
+        <button class="btn btn-sm is-destructive" id="delete-btn">Delete…</button>
+      </div>
+    </section>
+
+    <div class="sol-modal-footer">
+      <span class="meta">All changes apply on save</span>
+      <span class="spacer"></span>
+      <button class="btn" data-close-modal>Cancel</button>
+      <button class="btn btn-primary" id="settings-save">Save changes</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Delete confirmation modal (stacked on Settings) ─── -->
+<div class="sol-modal-backdrop is-stacked" id="delete-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="delete-confirm-title" aria-hidden="true">
+  <div class="sol-modal confirm-modal">
+    <div class="sol-modal-header">
+      <div>
+        <p class="sol-modal-eyebrow">§ Delete project</p>
+        <h2 class="sol-modal-title" id="delete-confirm-title">Delete Car Insurance Comparison?</h2>
+      </div>
+      <button class="sol-modal-close" aria-label="Cancel delete" data-close-confirm>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <line x1="4" y1="4" x2="12" y2="12"></line>
+          <line x1="12" y1="4" x2="4" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+
+    <section class="sol-modal-section">
+      <p class="cm-body">
+        This removes <strong id="delete-confirm-name">Car Insurance Comparison</strong>, its <strong>1 graph</strong>, all canvas state, and every member's access. <strong>This cannot be undone.</strong> Any public share links will stop working.
+      </p>
+      <p class="cm-field-label">
+        Type <code id="delete-confirm-label">Car Insurance Comparison</code> to confirm
+      </p>
+      <input type="text" class="cm-input" id="delete-confirm-input" autocomplete="off" spellcheck="false" placeholder="Project name">
+    </section>
+
+    <div class="sol-modal-footer">
+      <span class="spacer"></span>
+      <button class="btn" data-close-confirm>Cancel</button>
+      <button class="btn btn-sm is-destructive" id="delete-confirm-go" disabled>Delete project</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const modal = document.getElementById('settings-modal');
+  const openBtn = document.getElementById('settings-btn');
+  function open() {
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function close() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+  openBtn.addEventListener('click', open);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.closest('[data-close-modal]')) close();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+  });
+
+  // ── Lifecycle actions ───────────────────────────────────────────
+  const PROJECT_NAME = 'Car Insurance Comparison';
+  const dupBtn = document.getElementById('duplicate-btn');
+  const archBtn = document.getElementById('archive-btn');
+  const delBtn = document.getElementById('delete-btn');
+  const unarchBtn = document.getElementById('unarchive-btn');
+  const confirmModal = document.getElementById('delete-confirm-modal');
+  const confirmInput = document.getElementById('delete-confirm-input');
+  const confirmGo = document.getElementById('delete-confirm-go');
+  const confirmName = document.getElementById('delete-confirm-name');
+  const confirmTitle = document.getElementById('delete-confirm-title');
+  const confirmLabel = document.getElementById('delete-confirm-label');
+
+  function role() { return document.body.dataset.currentRole || 'owner'; }
+  function ownerOnly(fn) {
+    return function () {
+      if (role() !== 'owner') {
+        window.solToast && window.solToast({
+          msg: 'Only owners can perform lifecycle actions.',
+          duration: 4000,
+        });
+        return;
+      }
+      fn.apply(this, arguments);
+    };
+  }
+
+  function setLifecycle(state) {
+    document.body.setAttribute('data-lifecycle', state);
+    applyReadOnly();
+  }
+
+  // Unified read-only mode (viewer role OR archived state).
+  function applyReadOnly() {
+    const role = document.body.dataset.currentRole || 'owner';
+    const lc   = document.body.dataset.lifecycle   || 'active';
+    const eyebrow = document.getElementById('ab-eyebrow');
+    const copy    = document.getElementById('ab-copy');
+    const unarchBtn = document.getElementById('unarchive-btn');
+    let reason = null;
+    if (lc === 'archived') reason = 'archived';
+    else if (role === 'viewer') reason = 'viewer';
+
+    if (reason) document.body.setAttribute('data-readonly', reason);
+    else        document.body.removeAttribute('data-readonly');
+
+    // For non-owners, the Settings footer Cancel button is the only exit.
+    // Relabel it "Close" to reflect that semantically.
+    document.querySelectorAll('.sol-modal-footer [data-close-modal]').forEach(function (b) {
+      if (role === 'owner') b.textContent = 'Cancel';
+      else b.textContent = 'Close';
+    });
+
+    if (!eyebrow || !copy) return;
+    if (reason === 'archived') {
+      eyebrow.textContent = '§ Archived';
+      copy.innerHTML = 'This project is <strong>read-only</strong>. Members and clients have lost access; public share links return the link-expired page until you unarchive.';
+      if (unarchBtn) unarchBtn.style.display = '';
+    } else if (reason === 'viewer') {
+      eyebrow.textContent = '§ Viewer';
+      copy.innerHTML = 'You have <strong>viewer access</strong>. You can read this project but not change anything. Contact the project owner for edit access.';
+      if (unarchBtn) unarchBtn.style.display = 'none';
+    }
+
+    // Propagate read-only state to the canvas via URL hash.
+    document.querySelectorAll('a.graph-card[href*="canvas.html"]').forEach(function (a) {
+      const base = a.getAttribute('href').split('#')[0];
+      a.setAttribute('href', reason ? base + '#readonly=' + reason : base);
+    });
+  }
+
+  // Re-apply when role toggles (Tweaks panel).
+  new MutationObserver(applyReadOnly).observe(document.body, {
+    attributes: true,
+    attributeFilter: ['data-current-role', 'data-lifecycle'],
+  });
+  applyReadOnly();
+
+  // Mock sync: when the viewing role tweak changes, mirror it onto the
+  // self row in the members table so the demo stays internally consistent
+  // (otherwise James shows as "Owner" while the page is being viewed as Viewer).
+  function syncSelfRow() {
+    const r = document.body.dataset.currentRole || 'owner';
+    const selfRow = document.querySelector('.members-card .row[data-self="true"]');
+    if (!selfRow) return;
+    selfRow.dataset.role = r;
+    const pill = selfRow.querySelector('.role');
+    if (pill) {
+      pill.className = 'role ' + r;
+      pill.textContent = r[0].toUpperCase() + r.slice(1);
+    }
+  }
+  new MutationObserver(syncSelfRow).observe(document.body, {
+    attributes: true,
+    attributeFilter: ['data-current-role'],
+  });
+  syncSelfRow();
+
+  // Boot lifecycle from URL hash so Home → archived card opens read-only.
+  if (location.hash === '#archived') {
+    setLifecycle('archived');
+  }
+
+  // Duplicate
+  dupBtn && dupBtn.addEventListener('click', ownerOnly(function () {
+    close();
+    window.solToast && window.solToast({
+      msg: 'Duplicated. <strong>"Copy of ' + PROJECT_NAME + '"</strong>',
+      action: 'Open',
+      onAction: function (dismiss) { dismiss(); },
+    });
+  }));
+
+  // Archive
+  archBtn && archBtn.addEventListener('click', ownerOnly(function () {
+    close();
+    setLifecycle('archived');
+    window.solToast && window.solToast({
+      msg: 'Archived <strong>' + PROJECT_NAME + '</strong>. Members and clients lost access.',
+      action: 'Undo',
+      onAction: function (dismiss) {
+        setLifecycle('active');
+        dismiss();
+        window.solToast && window.solToast({
+          msg: 'Restored <strong>' + PROJECT_NAME + '</strong>.',
+          duration: 4000,
+        });
+      },
+    });
+  }));
+
+  // Unarchive
+  unarchBtn && unarchBtn.addEventListener('click', ownerOnly(function () {
+    setLifecycle('active');
+    if (location.hash === '#archived') {
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+    window.solToast && window.solToast({
+      msg: 'Unarchived <strong>' + PROJECT_NAME + '</strong>. Members regain access; share links re-activated.',
+      duration: 5000,
+    });
+  }));
+
+  // Delete — open confirmation
+  function openConfirm() {
+    confirmName.textContent = PROJECT_NAME;
+    confirmLabel.textContent = PROJECT_NAME;
+    confirmTitle.textContent = 'Delete ' + PROJECT_NAME + '?';
+    confirmInput.value = '';
+    confirmInput.classList.remove('is-matched');
+    confirmGo.disabled = true;
+    confirmModal.classList.add('is-open');
+    confirmModal.setAttribute('aria-hidden', 'false');
+    setTimeout(function () { confirmInput.focus(); }, 60);
+  }
+  function closeConfirm() {
+    confirmModal.classList.remove('is-open');
+    confirmModal.setAttribute('aria-hidden', 'true');
+  }
+  delBtn && delBtn.addEventListener('click', ownerOnly(openConfirm));
+
+  if (confirmInput) {
+    confirmInput.addEventListener('input', function () {
+      const matches = confirmInput.value === PROJECT_NAME;
+      confirmGo.disabled = !matches;
+      confirmInput.classList.toggle('is-matched', matches);
+    });
+  }
+  if (confirmModal) {
+    confirmModal.addEventListener('click', function (e) {
+      if (e.target === confirmModal || e.target.closest('[data-close-confirm]')) closeConfirm();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && confirmModal.classList.contains('is-open')) closeConfirm();
+    });
+  }
+  confirmGo && confirmGo.addEventListener('click', function () {
+    if (confirmGo.disabled) return;
+    // Stash a flash toast for Home to pick up on arrival.
+    try {
+      sessionStorage.setItem('flashToast', JSON.stringify({
+        msg: 'Deleted <strong>' + PROJECT_NAME + '</strong>.',
+        kind: 'risk',
+        duration: 6000,
+      }));
+    } catch (e) {}
+    // Hand off to Home. Fade the page first to signal the action took.
+    document.body.style.transition = 'opacity 240ms ease';
+    document.body.style.opacity = '0';
+    document.body.style.pointerEvents = 'none';
+    setTimeout(function () { location.href = 'home.html'; }, 280);
+  });
+
+  // ── Rename toast on Save changes ───────────────────────────────
+  // Tracks all inputs/textareas/checkboxes/dropdowns in the Settings
+  // sections so save-toast fires for any edit, not just identity fields.
+  var initialIdentity = {};
+  function snapshotIdentity() {
+    initialIdentity = {};
+    document.querySelectorAll('.sol-modal-section input, .sol-modal-section textarea, .sol-modal-section .sol-dropdown[data-value]').forEach(function (el, i) {
+      var key = el.id || el.getAttribute('aria-label') || 'idx' + i;
+      if (el.matches('.sol-dropdown')) initialIdentity[key] = el.getAttribute('data-value') || '';
+      else if (el.type === 'checkbox' || el.type === 'radio') initialIdentity[key] = el.checked;
+      else initialIdentity[key] = el.value;
+    });
+  }
+  // Re-snapshot every time Settings opens.
+  openBtn && openBtn.addEventListener('click', snapshotIdentity);
+  snapshotIdentity();
+
+  var saveBtn = document.getElementById('settings-save');
+  saveBtn && saveBtn.addEventListener('click', function () {
+    if ((document.body.dataset.currentRole || 'owner') !== 'owner') {
+      close();
+      return;
+    }
+    var newName = (document.getElementById('set-name') || {}).value || '';
+    var prevName = initialIdentity['set-name'] || PROJECT_NAME;
+    var changed = false;
+    document.querySelectorAll('.sol-modal-section input, .sol-modal-section textarea, .sol-modal-section .sol-dropdown[data-value]').forEach(function (el, i) {
+      var key = el.id || el.getAttribute('aria-label') || 'idx' + i;
+      var nowVal;
+      if (el.matches('.sol-dropdown')) nowVal = el.getAttribute('data-value') || '';
+      else if (el.type === 'checkbox' || el.type === 'radio') nowVal = el.checked;
+      else nowVal = el.value;
+      if (nowVal !== initialIdentity[key]) changed = true;
+    });
+    close();
+    if (newName.trim() && newName !== prevName) {
+      // Update the project header live + page title.
+      var titleEl = document.querySelector('.proj-header .title-row h1');
+      if (titleEl) titleEl.textContent = newName;
+      document.title = newName + ' — Solstein';
+      window.solToast && window.solToast({
+        msg: 'Renamed to <strong>' + newName.replace(/[<>&]/g, '') + '</strong>.',
+        duration: 5000,
+      });
+    } else if (changed) {
+      window.solToast && window.solToast({
+        msg: 'Settings saved.',
+        duration: 4000,
+      });
+    }
+    snapshotIdentity();
+  });
+
+  // ── Transfer Ownership flow ─────────────────────────────────────
+  var transferBtn   = document.getElementById('transfer-btn');
+  var transferModal = document.getElementById('transfer-modal');
+  var transferPick  = document.getElementById('transfer-pick');
+  var transferGo    = document.getElementById('transfer-go');
+  var transferTitle = document.getElementById('transfer-title');
+
+  function rolePillFor(roleId) {
+    var label = roleId[0].toUpperCase() + roleId.slice(1);
+    return { id: roleId, label: label };
+  }
+
+  function openTransfer() {
+    if (!transferModal) return;
+    // Build option list from member rows, excluding self and any external
+    // pending-invite rows.
+    var rows = document.querySelectorAll('.members-card .row');
+    transferPick.innerHTML = '<option value="">— Choose a member —</option>';
+    var eligible = 0;
+    rows.forEach(function (r) {
+      if (r.dataset.self === 'true') return;
+      if (r.dataset.role === 'pending') return;
+      var nameEl = r.querySelector('.who .nm') || r.querySelector('.nm');
+      var name = nameEl ? nameEl.textContent.trim() : 'Member';
+      var role = (r.dataset.role || 'editor');
+      var opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name + '   ·   ' + role[0].toUpperCase() + role.slice(1);
+      opt.dataset.row = '';
+      transferPick.appendChild(opt);
+      eligible++;
+    });
+    if (eligible === 0) {
+      var opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = '— No eligible members —';
+      opt.disabled = true;
+      transferPick.appendChild(opt);
+    }
+    transferTitle.textContent = 'Transfer ' + PROJECT_NAME + '?';
+    transferGo.disabled = true;
+    transferModal.classList.add('is-open');
+    transferModal.setAttribute('aria-hidden', 'false');
+    setTimeout(function () { transferPick.focus(); }, 60);
+  }
+  function closeTransfer() {
+    transferModal.classList.remove('is-open');
+    transferModal.setAttribute('aria-hidden', 'true');
+  }
+
+  transferBtn && transferBtn.addEventListener('click', ownerOnly(openTransfer));
+
+  transferPick && transferPick.addEventListener('change', function () {
+    transferGo.disabled = !transferPick.value;
+  });
+
+  transferModal && transferModal.addEventListener('click', function (e) {
+    if (e.target === transferModal || e.target.closest('[data-close-transfer]')) closeTransfer();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && transferModal && transferModal.classList.contains('is-open')) closeTransfer();
+  });
+
+  transferGo && transferGo.addEventListener('click', function () {
+    if (transferGo.disabled) return;
+    var newOwner = transferPick.value;
+    closeTransfer();
+    close();
+    // Mock: flip role pills.
+    var rows = document.querySelectorAll('.members-card .row');
+    rows.forEach(function (r) {
+      var nameEl = r.querySelector('.who .nm') || r.querySelector('.nm');
+      var name = nameEl ? nameEl.textContent.trim() : '';
+      var pill = r.querySelector('.role');
+      if (r.dataset.self === 'true') {
+        r.dataset.role = 'editor';
+        if (pill) { pill.className = 'role editor'; pill.textContent = 'Editor'; }
+      } else if (name === newOwner) {
+        r.dataset.role = 'owner';
+        if (pill) { pill.className = 'role owner'; pill.textContent = 'Owner'; }
+      }
+    });
+    // Sync Settings § 01 “Project lead” dropdown to the new owner.
+    var lead = document.getElementById('set-lead');
+    if (lead) {
+      lead.setAttribute('data-value', newOwner);
+      var leadVal = lead.querySelector('.sol-dropdown-value');
+      if (leadVal) leadVal.textContent = newOwner;
+      lead.querySelectorAll('[role="option"]').forEach(function (li) {
+        li.setAttribute('aria-selected', li.getAttribute('data-value') === newOwner ? 'true' : 'false');
+      });
+    }
+    // The viewing role tweak should also flip to editor, since "you" are no longer owner.
+    document.body.setAttribute('data-current-role', 'editor');
+    window.solToast && window.solToast({
+      msg: 'Ownership transferred to <strong>' + newOwner.replace(/[<>&]/g, '') + '</strong>. You\u2019re now an Editor on this project.',
+      duration: 7000,
+    });
+  });
+})();
+</script>
+
+<!-- ── Add member modal ─────────────────────────────── -->
+<div class="sol-modal-backdrop" id="invite-modal" role="dialog" aria-modal="true" aria-labelledby="invite-title" aria-hidden="true">
+  <div class="sol-modal">
+
+    <div class="sol-modal-header">
+      <div>
+        <p class="sol-modal-eyebrow">§ Add member</p>
+        <h2 class="sol-modal-title" id="invite-title">Invite to Car Insurance Comparison</h2>
+        <p class="sol-modal-sub">Invites send an email with a one-click join link. They expire in 14 days.</p>
+      </div>
+      <button class="sol-modal-close" aria-label="Close invite" data-close-modal>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <line x1="4" y1="4" x2="12" y2="12"></line>
+          <line x1="12" y1="4" x2="4" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 1 · Who -->
+    <section class="sol-modal-section">
+      <div class="sol-modal-section-label">§ 01 / Who</div>
+      <h3>Email addresses</h3>
+      <p class="help">Paste any number of emails — commas, spaces, or new lines are fine. Names will be stripped automatically.</p>
+
+      <div class="sol-chip-input" id="chip-input">
+        <input type="email" id="chip-field" placeholder="name@company.com, another@…" autocomplete="off">
+      </div>
+      <p class="help" style="margin-top: 10px; margin-bottom: 0;">
+        <span id="chip-stats">No addresses yet.</span>
+      </p>
+
+      <div class="sol-inline-note is-warn" id="external-note" style="display: none;">
+        <span class="ic">!</span>
+        <div>
+          <strong id="external-count">2 addresses</strong> look external. They inherit this project's external viewer policy — <a href="#" data-jump-settings>review in Settings</a>.
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · Role -->
+    <section class="sol-modal-section">
+      <div class="sol-modal-section-label">§ 02 / Role</div>
+      <h3>Role for everyone above</h3>
+      <p class="help">Applies to every chipped address. You can change individual roles after they join.</p>
+
+      <div class="sol-segmented" role="radiogroup">
+        <input type="radio" name="role" id="role-viewer" value="viewer" checked>
+        <label for="role-viewer">Viewer</label>
+        <input type="radio" name="role" id="role-editor" value="editor">
+        <label for="role-editor">Editor</label>
+        <input type="radio" name="role" id="role-owner" value="owner">
+        <label for="role-owner">Owner</label>
+      </div>
+
+      <div class="sol-inline-note is-info" id="owner-note" style="display: none;">
+        <span class="ic">i</span>
+        <div>
+          Owner grants billing, lifecycle, and access decisions. Solstein projects can have <strong>more than one owner</strong>, but each new owner can transfer or delete the project on their own.
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · Personal note -->
+    <section class="sol-modal-section">
+      <div class="sol-modal-section-label">§ 03 / Note <span style="color: var(--sol-text-disabled); margin-left: 8px;">(optional)</span></div>
+      <h3>Add a line to the email</h3>
+      <p class="help">Helps recipients place the project. Three sentences at most works best.</p>
+      <div class="sol-field">
+        <textarea class="sol-textarea" id="invite-note" style="min-height: 80px;" placeholder="Optional. e.g. We're mapping the comparison journey end-to-end — you'll find the canvas with everything we've taken a reading on so far."></textarea>
+      </div>
+    </section>
+
+    <!-- 4 · What they'll get -->
+    <section class="sol-modal-section">
+      <div class="sol-modal-section-label">§ 04 / What they'll get</div>
+      <h3>The email Solstein sends</h3>
+      <p class="help">Co-brand and footer come from project Settings.</p>
+
+      <div class="sol-mail-preview">
+        <div class="head">
+          <span class="mark" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 52 52" aria-hidden="true">
+              <polygon points="26,4 40,12 44,26 40,40 26,48 12,40 8,26 12,12" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.9"></polygon>
+              <polygon points="26,10 36,16 39,26 36,36 26,42 16,36 13,26 16,16" fill="none" stroke="currentColor" stroke-width="0.75" opacity="0.4"></polygon>
+              <circle cx="26" cy="26" r="2.5" fill="currentColor" opacity="0.9"></circle>
+            </svg>
+          </span>
+          <span class="client">Solstein</span>
+          <span class="sep">·</span>
+          <span class="client">Acme Insurance Group</span>
+        </div>
+        <div class="body">
+          <p class="from">From James Mitchell · consultancy.com</p>
+          <p class="subj">James Mitchell invited you to take a reading of Car Insurance Comparison</p>
+          <p class="line">A Solstein project mapping how the comparison journey actually works — systems, data, workflows, ownership, risk. James wants you to have access.</p>
+          <p class="line" id="preview-note" style="color: var(--sol-text-3); font-style: italic; display: none;"></p>
+          <p class="line" style="margin-top: 18px;">
+            <span style="display: inline-block; padding: 6px 14px; border: 1px solid var(--sol-accent-40); border-radius: var(--radius); font-family: var(--font-display); font-weight: 500; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sol-text);">Open the project</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="sol-modal-footer">
+      <span class="meta" id="invite-meta">No invites to send.</span>
+      <span class="spacer"></span>
+      <button class="btn" data-close-modal>Cancel</button>
+      <button class="btn btn-primary" id="invite-send" disabled>Send invite</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  // ── Add member modal ─────────────────────────────────────────────
+  const modal = document.getElementById('invite-modal');
+  const openBtn = document.getElementById('add-member-btn');
+
+  // Also let the empty-state CTA open the same modal
+  const emptyOpen = document.getElementById('invite-from-empty');
+  if (emptyOpen) emptyOpen.addEventListener('click', () => openBtn && openBtn.click());
+  const chipInput = document.getElementById('chip-input');
+  const field = document.getElementById('chip-field');
+  const stats = document.getElementById('chip-stats');
+  const ownerNote = document.getElementById('owner-note');
+  const externalNote = document.getElementById('external-note');
+  const externalCount = document.getElementById('external-count');
+  const noteField = document.getElementById('invite-note');
+  const previewNote = document.getElementById('preview-note');
+  const sendBtn = document.getElementById('invite-send');
+  const meta = document.getElementById('invite-meta');
+
+  // Treat anything not on @consultancy.com as external for this project.
+  const INTERNAL_DOMAIN = 'consultancy.com';
+  // Pretend the existing members of this project are these emails:
+  const EXISTING_EMAILS = new Set([
+    'james.mitchell@consultancy.com',
+    'sarah.chen@consultancy.com',
+    'anya.borisova@consultancy.com',
+    't.reeve@acme-insurance.com',
+    'priya@acme-insurance.com',
+  ]);
+
+  const chips = []; // { email, state: 'ok' | 'member' | 'invalid' }
+
+  function emailValid(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s); }
+  function extractEmail(raw) {
+    // strip names: "Sarah Chen <s@x.com>" → "s@x.com"
+    const m = raw.match(/<([^>]+)>/);
+    return (m ? m[1] : raw).trim().toLowerCase();
+  }
+
+  function addToken(raw) {
+    const e = extractEmail(raw);
+    if (!e) return;
+    if (chips.find(c => c.email === e)) return; // dedupe inside the input
+    let state = 'ok';
+    if (!emailValid(e)) state = 'invalid';
+    else if (EXISTING_EMAILS.has(e)) state = 'member';
+    chips.push({ email: e, state });
+  }
+
+  function flushBuffer() {
+    const raw = field.value;
+    if (!raw.trim()) { field.value = ''; return; }
+    raw.split(/[,\s\n]+/).filter(Boolean).forEach(addToken);
+    field.value = '';
+    render();
+  }
+
+  function render() {
+    // Wipe existing chip nodes (keep the input)
+    [...chipInput.querySelectorAll('.sol-chip')].forEach(n => n.remove());
+    chips.forEach((c, idx) => {
+      const chip = document.createElement('span');
+      chip.className = 'sol-chip' + (c.state === 'member' ? ' is-member' : c.state === 'invalid' ? ' is-invalid' : '');
+      const em = document.createElement('span'); em.className = 'em'; em.textContent = c.email;
+      chip.appendChild(em);
+      if (c.state === 'member') {
+        const m = document.createElement('span'); m.className = 'meta'; m.textContent = 'Member'; chip.appendChild(m);
+      } else if (c.state === 'invalid') {
+        const m = document.createElement('span'); m.className = 'meta'; m.textContent = 'Invalid'; chip.appendChild(m);
+      } else {
+        const isExt = !c.email.endsWith('@' + INTERNAL_DOMAIN);
+        if (isExt) {
+          const m = document.createElement('span'); m.className = 'meta'; m.textContent = 'External'; chip.appendChild(m);
+        }
+      }
+      const rm = document.createElement('button');
+      rm.setAttribute('aria-label', 'Remove ' + c.email);
+      rm.innerHTML = '<svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="4" x2="12" y2="12"></line><line x1="12" y1="4" x2="4" y2="12"></line></svg>';
+      rm.addEventListener('click', () => { chips.splice(idx, 1); render(); });
+      chip.appendChild(rm);
+      chipInput.insertBefore(chip, field);
+    });
+
+    const okCount = chips.filter(c => c.state === 'ok').length;
+    const memCount = chips.filter(c => c.state === 'member').length;
+    const invCount = chips.filter(c => c.state === 'invalid').length;
+    const extCount = chips.filter(c => c.state === 'ok' && !c.email.endsWith('@' + INTERNAL_DOMAIN)).length;
+
+    const parts = [];
+    if (okCount)  parts.push(`${okCount} ready`);
+    if (memCount) parts.push(`${memCount} already a member`);
+    if (invCount) parts.push(`${invCount} invalid`);
+    stats.textContent = parts.length ? parts.join(' · ') : 'No addresses yet.';
+
+    if (extCount > 0) {
+      externalNote.style.display = 'flex';
+      externalCount.textContent = `${extCount} address${extCount === 1 ? '' : 'es'}`;
+    } else {
+      externalNote.style.display = 'none';
+    }
+
+    sendBtn.disabled = okCount === 0 || invCount > 0;
+    if (okCount === 0) meta.textContent = 'No invites to send.';
+    else if (invCount > 0) meta.textContent = 'Fix invalid addresses first.';
+    else meta.textContent = 'Ready to send.';
+    sendBtn.textContent = okCount > 0 ? `Send ${okCount} invite${okCount === 1 ? '' : 's'}` : 'Send invite';
+  }
+
+  function open() {
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => field.focus(), 60);
+  }
+  function close() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+  openBtn.addEventListener('click', open);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.closest('[data-close-modal]')) close();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+  });
+
+  // Chip input focus styling
+  field.addEventListener('focus', () => chipInput.classList.add('is-focus'));
+  field.addEventListener('blur',  () => chipInput.classList.remove('is-focus'));
+  chipInput.addEventListener('click', (e) => { if (e.target === chipInput) field.focus(); });
+
+  // Tokenisation
+  field.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ',' || (e.key === ' ' && field.value.includes('@'))) {
+      e.preventDefault();
+      flushBuffer();
+    } else if (e.key === 'Backspace' && field.value === '' && chips.length > 0) {
+      chips.pop();
+      render();
+    }
+  });
+  field.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text');
+    field.value += text;
+    flushBuffer();
+  });
+  field.addEventListener('blur', flushBuffer);
+
+  // Owner role inline note
+  document.querySelectorAll('input[name="role"]').forEach(r => {
+    r.addEventListener('change', () => {
+      ownerNote.style.display = (document.getElementById('role-owner').checked) ? 'flex' : 'none';
+    });
+  });
+
+  // Reflect personal note into the preview
+  noteField.addEventListener('input', () => {
+    const v = noteField.value.trim();
+    if (v) {
+      previewNote.style.display = '';
+      previewNote.textContent = '“' + v + '”';
+    } else {
+      previewNote.style.display = 'none';
+    }
+  });
+
+  // "Review in Settings" link inside the external-detection banner
+  document.querySelectorAll('[data-jump-settings]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      close();
+      setTimeout(() => document.getElementById('settings-btn').click(), 320);
+    });
+  });
+
+  // Send (mock): drop the chips into the members card as new rows
+  sendBtn.addEventListener('click', () => {
+    if (sendBtn.disabled) return;
+    const valid = chips.filter(c => c.state === 'ok');
+    const role = document.querySelector('input[name="role"]:checked').value;
+    const tbody = document.querySelector('.members-card');
+    const lastRow = tbody.querySelector('.row:last-of-type');
+    valid.forEach(c => {
+      EXISTING_EMAILS.add(c.email);
+      const isExt = !c.email.endsWith('@' + INTERNAL_DOMAIN);
+      const initials = c.email[0].toUpperCase() + (c.email.split('@')[0].split('.')[1] || c.email[1] || '').toUpperCase().slice(0,1);
+      const name = c.email.split('@')[0].replace(/[._]+/g, ' ').replace(/\b\w/g, x => x.toUpperCase());
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.dataset.role = role;
+      if (isExt) row.dataset.external = 'true';
+      row.dataset.name = name;
+      row.dataset.email = c.email;
+      row.dataset.initials = initials.padEnd(2, '?').slice(0,2);
+      row.dataset.av = 'neutral';
+      row.innerHTML = `
+        <div class="who">
+          <div class="av">${row.dataset.initials}</div>
+          <div class="name">${name}</div>
+        </div>
+        <div class="email">${c.email}</div>
+        <div><span class="role ${role}">${role[0].toUpperCase() + role.slice(1)}</span></div>
+        <div class="actions">
+          <button class="icon-btn" title="Manage member" aria-label="Manage member">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+              <circle cx="3" cy="8" r="1.2"></circle><circle cx="8" cy="8" r="1.2"></circle><circle cx="13" cy="8" r="1.2"></circle>
+            </svg>
+          </button>
+        </div>`;
+      tbody.insertBefore(row, lastRow.nextSibling);
+      lastRow.classList.remove('row:last-of-type');
+    });
+    chips.length = 0;
+    noteField.value = '';
+    previewNote.style.display = 'none';
+    render();
+    close();
+  });
+})();
+</script>
+
+<!-- ── Transfer Ownership modal (stacked on Settings) ──────── -->
+<div class="sol-modal-backdrop is-stacked" id="transfer-modal" role="dialog" aria-modal="true" aria-labelledby="transfer-title" aria-hidden="true">
+  <div class="sol-modal confirm-modal">
+    <div class="sol-modal-header">
+      <div>
+        <p class="sol-modal-eyebrow" style="color: var(--sol-accent);">§ Transfer ownership</p>
+        <h2 class="sol-modal-title" id="transfer-title">Transfer Car Insurance Comparison?</h2>
+      </div>
+      <button class="sol-modal-close" aria-label="Cancel transfer" data-close-transfer>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <line x1="4" y1="4" x2="12" y2="12"></line>
+          <line x1="12" y1="4" x2="4" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+
+    <section class="sol-modal-section">
+      <p class="cm-body">
+        Hand the project to another member. They'll take over branding, defaults, sharing policy, and lifecycle decisions. <strong>You'll become an Editor on this project.</strong> Reversible only if the new owner transfers it back.
+      </p>
+      <p class="cm-field-label">
+        New owner
+      </p>
+      <select class="cm-input" id="transfer-pick" style="font-family: var(--font-body); height: 40px;">
+        <option value="">— Choose a member —</option>
+      </select>
+      <p style="margin-top: 16px; font-size: 12.5px; color: var(--sol-text-3); line-height: 1.55;">
+        Only members already on this project appear here. Add someone in the Members tab first if the right person isn't listed.
+      </p>
+    </section>
+
+    <div class="sol-modal-footer">
+      <span class="spacer"></span>
+      <button class="btn" data-close-transfer>Cancel</button>
+      <button class="btn btn-sm btn-primary" id="transfer-go" disabled>Transfer ownership</button>
+    </div>
+  </div>
+</div><style>
+  #graphsPanel[data-state="empty"] .graphs-grid { display: none; }
+  #graphsPanel:not([data-state="empty"]) .empty-hero { display: none; }
+  #membersPanel[data-state="owner-only"] .members-band,
+  #membersPanel[data-state="owner-only"] .members-card { display: none; }
+  #membersPanel:not([data-state="owner-only"]) #membersEmpty { display: none; }
+</style>
+</body>
+</html>

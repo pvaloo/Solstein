@@ -1,0 +1,963 @@
+/* ============================================================
+   Solstein — Shared App Stylesheet
+   Replaces wizard-tokens.css for Home, New Project, Project Page,
+   Import Wizard and similar shell pages. Inherits design tokens
+   from solstein-tokens.css. Re-maps legacy variable names used
+   inline by the existing pages (--bg, --accent, --cat-*, etc.)
+   onto Solstein values so colour-mix() expressions resolve to
+   the new palette without rewriting every page.
+   ============================================================ */
+
+/* ---------- Legacy variable bridge ------------------------------ */
+:root {
+  /* surfaces */
+  --bg:           var(--sol-bg);
+  --bg-2:         var(--sol-surface);
+  --surface:      var(--sol-surface);
+  --surface-2:    var(--sol-surface-2);
+  --surface-3:    #20242C;
+  --border:       rgba(255, 255, 255, 0.07);
+  --border-2:     rgba(255, 255, 255, 0.12);
+  --border-strong:rgba(255, 255, 255, 0.18);
+
+  /* text */
+  --text:         var(--sol-text);
+  --text-2:       var(--sol-text-2);
+  --text-3:       var(--sol-text-3);
+  --text-4:       var(--sol-text-disabled);
+
+  /* accent — the single Sunstone */
+  --accent:       var(--sol-accent);
+
+  /* base graph categories — restrained, low-chroma so the accent
+     remains the loudest thing on the page. These read as "tinted
+     neutrals" rather than coloured states. */
+  --cat-op:       oklch(0.78 0.06 75);
+  --cat-info:     oklch(0.74 0.06 220);
+  --cat-tech:     oklch(0.74 0.06 280);
+  --cat-gov:      oklch(0.74 0.06 30);
+
+  /* overlay accents — mapped to Solstein's semantic canvas palette */
+  --pii:          var(--sol-pii);
+  --manual:       var(--sol-manual);
+  --risk:         var(--sol-risk);
+  --sor:          var(--sol-systems);
+  --unknown:      var(--sol-unknown);
+
+  /* feedback */
+  --ok:           var(--sol-validated);
+  --warn:         var(--sol-manual);
+  --err:          var(--sol-risk);
+
+  /* type */
+  --font-sans:    var(--font-body);
+  --font-mono:    var(--font-display);  /* tabular labels use Condensed */
+  --font-code:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+/* ---------- Base ------------------------------------------------ */
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--sol-bg);
+  color: var(--sol-text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+body { min-height: 100vh; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; color: inherit; cursor: pointer; }
+input, textarea, select { font-family: inherit; color: inherit; }
+
+::selection { background: var(--sol-accent-25); color: var(--sol-text); }
+
+/* ---------- Topbar ---------------------------------------------- */
+.topbar {
+  display: flex; align-items: center; gap: 28px;
+  min-height: 64px;
+  padding: 12px 32px;
+  border-bottom: 1px solid var(--sol-hairline);
+  background: var(--sol-bg);
+  flex-wrap: wrap;
+}
+.brand {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sol-text);
+  flex-shrink: 0;
+}
+.brand-mark {
+  /* Box for the Crystal SVG slot. The mark itself is inlined per page. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: var(--sol-accent);
+  /* legacy fallback styling stripped — pages now inline the SVG */
+  background: none;
+  box-shadow: none;
+}
+.brand-mark svg { display: block; }
+.topbar-divider { width: 1px; height: 20px; background: var(--sol-hairline-strong); flex-shrink: 0; }
+.topbar-spacer { flex: 1; min-width: 16px; }
+.crumb {
+  display: flex; align-items: center; gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text-3);
+  line-height: 1.4;
+}
+.crumb a:hover { color: var(--sol-text); }
+.crumb .sep { color: var(--sol-text-disabled); }
+.crumb .now { color: var(--sol-text-2); }
+.crumb a, .crumb .now { transition: color var(--transition); }
+
+.user-chip {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 12px 6px 6px;
+  border-radius: var(--radius);
+  border: 1px solid var(--sol-hairline);
+  background: transparent;
+  font-size: 12px;
+  color: var(--sol-text-2);
+}
+.user-chip .avatar {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--sol-surface-2);
+  border: 1px solid var(--sol-hairline-strong);
+  display: grid; place-items: center;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--sol-text);
+}
+
+/* ---------- User menu (topbar dropdown — shared across pages) ----- */
+.user-menu { position: relative; }
+.user-menu .user-chip {
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: inherit;
+  text-transform: none;
+  outline: none;
+  transition: border-color var(--transition), background var(--transition);
+}
+.user-menu .user-chip:focus-visible {
+  outline: none;
+  border-color: var(--sol-accent);
+}
+.user-menu .user-chip:hover,
+.user-menu.is-open .user-chip {
+  border-color: var(--sol-hairline-strong);
+  background: var(--sol-surface);
+}
+.user-menu .user-chip .caret {
+  width: 12px; height: 12px;
+  margin-left: 4px;
+  color: var(--sol-text-3);
+  transition: transform var(--transition), color var(--transition);
+}
+.user-menu.is-open .user-chip .caret {
+  transform: rotate(180deg);
+  color: var(--sol-accent);
+}
+
+.user-menu-pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 280px;
+  background: var(--sol-bg);
+  border: 1px solid var(--sol-hairline-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 16px 48px -8px rgba(0,0,0,0.6), 0 2px 12px rgba(0,0,0,0.3);
+  padding: 6px;
+  z-index: 200;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+.user-menu.is-open .user-menu-pop {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.um-identity {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 12px 14px;
+  border-bottom: 1px solid var(--sol-hairline);
+  margin-bottom: 6px;
+}
+.um-identity .avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--sol-surface-2);
+  border: 1px solid var(--sol-hairline-strong);
+  display: grid; place-items: center;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--sol-text);
+  flex-shrink: 0;
+}
+.um-identity .who { min-width: 0; }
+.um-identity .name {
+  font-size: 13px;
+  color: var(--sol-text);
+  font-weight: 500;
+  line-height: 1.3;
+}
+.um-identity .email {
+  font-size: 11px;
+  color: var(--sol-text-3);
+  font-weight: 300;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.um-section {
+  padding: 8px 12px 4px;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--sol-accent-55);
+}
+
+.um-item {
+  display: flex; align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--radius) - 2px);
+  font: inherit;
+  font-size: 13px;
+  color: var(--sol-text-2);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.um-item:hover, .um-item:focus-visible {
+  background: var(--sol-surface-2);
+  color: var(--sol-text);
+  outline: none;
+}
+.um-item:focus-visible {
+  box-shadow: inset 2px 0 0 var(--sol-accent);
+}
+.um-item.is-danger { color: var(--sol-text-2); }
+.um-item.is-danger:hover, .um-item.is-danger:focus-visible {
+  color: var(--sol-risk);
+  background: var(--sol-surface-2);
+}
+
+.um-divider {
+  height: 1px;
+  background: var(--sol-hairline);
+  margin: 6px 0;
+}
+
+/* ---------- Page wrapper ---------------------------------------- */
+.page { max-width: 1280px; margin: 0 auto; padding: 48px 32px 96px; }
+.page-narrow { max-width: 720px; }
+
+.kicker {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--sol-accent-55);
+  margin-bottom: 14px;
+}
+.page-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 36px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  color: var(--sol-text);
+  margin: 0 0 8px;
+}
+.page-sub {
+  color: var(--sol-text-2);
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.7;
+  margin: 0 0 36px;
+  max-width: 64ch;
+}
+
+/* ---------- Buttons --------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  height: 40px; padding: 0 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--sol-hairline-strong);
+  background: transparent;
+  color: var(--sol-text);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+.btn:hover { border-color: var(--sol-accent-40); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; border-color: var(--sol-hairline); }
+.btn:disabled.btn-primary::before { box-shadow: none; }
+.btn-primary {
+  border-color: var(--sol-accent-40);
+  color: var(--sol-text);
+  background: transparent;
+}
+.btn-primary::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--sol-accent);
+  box-shadow: 0 0 8px var(--sol-accent-40);
+}
+.btn-primary:hover {
+  border-color: var(--sol-accent);
+  background: var(--sol-accent-10);
+  box-shadow: none;
+}
+.btn-ghost {
+  border-color: transparent;
+  color: var(--sol-text-2);
+}
+.btn-ghost:hover { color: var(--sol-text); border-color: var(--sol-hairline); }
+.btn-sm { height: 30px; padding: 0 12px; font-size: 10px; }
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: none; border: none; padding: 6px 0;
+  color: var(--sol-text-3);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-bottom: var(--space-5);
+  transition: color var(--transition);
+}
+.back-link:hover { color: var(--sol-text); }
+
+/* ---------- Form primitives ------------------------------------- */
+.field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
+.field-label {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text-2);
+  display: flex; align-items: center; gap: 8px;
+}
+.field-label .req { color: var(--sol-accent); font-size: 12px; letter-spacing: 0; }
+.field-hint {
+  font-size: 12px;
+  color: var(--sol-text-3);
+  margin-top: 2px;
+  font-weight: 300;
+}
+.input, .textarea, .select {
+  height: 40px;
+  padding: 0 14px;
+  background: transparent;
+  border: 1px solid var(--sol-hairline-strong);
+  border-radius: var(--radius);
+  color: var(--sol-text);
+  font-size: 14px;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color var(--transition), background var(--transition);
+}
+.textarea {
+  height: auto;
+  padding: 12px 14px;
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+.input:focus, .textarea:focus, .select:focus {
+  border-color: var(--sol-accent);
+  background: var(--sol-surface);
+}
+.input::placeholder, .textarea::placeholder { color: var(--sol-text-disabled); }
+
+/* ---------- Card primitives ------------------------------------- */
+.card {
+  background: var(--sol-surface);
+  border: 1px solid var(--sol-hairline);
+  border-radius: var(--radius);
+  padding: 24px 26px;
+}
+.card-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--sol-accent-55);
+  margin: 0 0 16px;
+}
+
+/* Project card (Home + Project Page) */
+.proj-card {
+  display: block;
+  padding: 26px 28px 22px;
+  border-radius: var(--radius);
+  border: 1px solid var(--sol-hairline);
+  background: var(--sol-surface);
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.proj-card:hover { border-color: var(--sol-accent-40); background: var(--sol-surface-2); }
+.proj-card .pc-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sol-text);
+  margin: 0 0 14px;
+  line-height: 1.3;
+  padding-right: 80px;
+  overflow-wrap: anywhere;
+}
+.proj-card .pc-client {
+  font-size: 13px;
+  color: var(--sol-text-2);
+  font-weight: 300;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+.proj-card .pc-meta {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  color: var(--sol-text-3);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.proj-card .pc-meta .dot { width: 2px; height: 2px; border-radius: 50%; background: var(--sol-text-disabled); }
+.proj-card .pc-domain { color: var(--sol-accent-55); }
+.proj-card .pc-graphs { color: var(--sol-text-2); }
+.proj-card .pc-stack {
+  position: absolute; top: 22px; right: 22px;
+  display: flex;
+}
+.proj-card .pc-stack .swatch {
+  width: 14px; height: 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--sol-surface);
+  margin-left: -4px;
+}
+.proj-card .pc-stack .swatch:first-child { margin-left: 0; }
+
+.add-card {
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between;
+  padding: 26px 28px;
+  border-radius: var(--radius);
+  border: 1px dashed var(--sol-hairline-strong);
+  background: transparent;
+  color: var(--sol-text-3);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+  min-height: 178px;
+  text-align: left;
+}
+.add-card:hover {
+  background: var(--sol-surface);
+  border-color: var(--sol-accent-40);
+  border-style: solid;
+  color: var(--sol-text);
+}
+.add-card .plus {
+  width: 28px; height: 28px;
+  border-radius: var(--radius);
+  display: grid; place-items: center;
+  background: transparent;
+  color: var(--sol-accent);
+  border: 1px solid var(--sol-accent-40);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+}
+.add-card .label {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sol-text);
+}
+.add-card .sub {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  color: var(--sol-text-3);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.add-card > * + * { margin-top: 4px; }
+.add-card .plus + .label { margin-top: 16px; }
+
+/* ---------- Tag / chip ------------------------------------------ */
+.tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius);
+  background: transparent;
+  border: 1px solid var(--sol-hairline-strong);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text-2);
+}
+.tag .swatch { width: 6px; height: 6px; border-radius: 50%; }
+.tag.op   { color: var(--cat-op);   }
+.tag.info { color: var(--cat-info); }
+.tag.tech { color: var(--cat-tech); }
+.tag.gov  { color: var(--cat-gov);  }
+.tag .count { color: var(--sol-text-3); margin-left: 2px; letter-spacing: 0.1em; }
+
+/* ---------- Status banners -------------------------------------- */
+.banner {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--sol-hairline);
+  background: var(--sol-surface);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--sol-text-2);
+}
+.banner .ic {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 12px;
+  width: 18px;
+  text-align: center;
+}
+.banner.ok    { border-left: 2px solid var(--sol-validated); }
+.banner.ok    .ic { color: var(--sol-validated); }
+.banner.warn  { border-left: 2px dashed var(--sol-manual); }
+.banner.warn  .ic { color: var(--sol-manual); }
+.banner.err   { border-left: 2px double var(--sol-risk); }
+.banner.err   .ic { color: var(--sol-risk); }
+.banner.info  { border-left: 2px solid var(--sol-accent); }
+.banner.info  .ic { color: var(--sol-accent); }
+.banner .body { color: var(--sol-text-2); }
+.banner .body strong { color: var(--sol-text); font-weight: 500; }
+
+/* ---------- Scrollbars ------------------------------------------ */
+.scrollbox { scrollbar-width: thin; scrollbar-color: var(--sol-hairline-strong) transparent; }
+.scrollbox::-webkit-scrollbar { width: 8px; height: 8px; }
+.scrollbox::-webkit-scrollbar-thumb { background: var(--sol-hairline-strong); border-radius: var(--radius); }
+.scrollbox::-webkit-scrollbar-thumb:hover { background: var(--sol-text-disabled); }
+.scrollbox::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- Crystal mark — reusable inline class ---------------- */
+.sol-mark {
+  display: inline-block;
+  color: var(--sol-accent);
+  flex-shrink: 0;
+}
+.sol-mark svg { display: block; }
+
+/* Subtle ambient idle for prominent marks only.
+   Applied via .sol-mark--ambient (opt-in). Disabled by the global
+   prefers-reduced-motion rule in solstein-tokens.css. */
+.sol-mark--ambient .refraction {
+  transform-origin: 26px 26px;
+  animation: solstein-refraction var(--transition-ambient-refraction) linear infinite;
+}
+.sol-mark--ambient .glow {
+  animation: solstein-glow var(--transition-ambient-glow) ease-in-out infinite;
+}
+@keyframes solstein-refraction {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes solstein-glow {
+  0%, 100% { opacity: 0.20; }
+  50%      { opacity: 0.42; }
+}
+
+/* ============================================================
+   Solstein dropdown (custom listbox — see solstein-dropdown.js)
+   ============================================================ */
+.sol-dropdown { position: relative; display: block; width: 100%; }
+
+.sol-dropdown-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  height: 40px;
+  padding: 0 14px;
+  background: transparent;
+  border: 1px solid var(--sol-hairline-strong);
+  border-radius: var(--radius);
+  color: var(--sol-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition), background var(--transition);
+}
+.sol-dropdown-trigger:hover { border-color: var(--sol-text-3); }
+.sol-dropdown-trigger:focus-visible,
+.sol-dropdown.is-open .sol-dropdown-trigger {
+  border-color: var(--sol-accent);
+  background: var(--sol-surface);
+  outline: none;
+}
+.sol-dropdown-value {
+  flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.sol-dropdown-chev {
+  width: 12px; height: 12px;
+  color: var(--sol-text-3);
+  flex-shrink: 0;
+  transition: transform var(--transition), color var(--transition);
+}
+.sol-dropdown.is-open .sol-dropdown-chev {
+  transform: rotate(180deg);
+  color: var(--sol-accent);
+}
+
+.sol-dropdown-list {
+  position: absolute;
+  z-index: 250;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: var(--sol-bg);
+  border: 1px solid var(--sol-hairline-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 16px 48px -8px rgba(0,0,0,0.6), 0 2px 12px rgba(0,0,0,0.3);
+  max-height: 240px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sol-hairline-strong) transparent;
+  display: none;
+}
+.sol-dropdown.is-open > .sol-dropdown-list { display: block; }
+.sol-dropdown-list::-webkit-scrollbar { width: 6px; }
+.sol-dropdown-list::-webkit-scrollbar-thumb { background: var(--sol-hairline-strong); border-radius: 3px; }
+.sol-dropdown-list.is-above {
+  top: auto;
+  bottom: calc(100% + 4px);
+}
+
+.sol-dropdown-list > li[role="option"] {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px 9px 22px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--sol-text);
+  cursor: pointer;
+  position: relative;
+  border-bottom: 1px solid var(--sol-hairline);
+  transition: background var(--transition), color var(--transition);
+}
+.sol-dropdown-list > li[role="option"]:last-child { border-bottom: 0; }
+.sol-dropdown-list > li[role="option"]:hover,
+.sol-dropdown-list > li[role="option"].is-active {
+  background: var(--sol-surface-2);
+}
+.sol-dropdown-list > li[role="option"].is-active {
+  box-shadow: inset 2px 0 0 var(--sol-accent);
+}
+.sol-dropdown-list > li[role="option"][aria-selected="true"]::before {
+  content: "";
+  position: absolute;
+  left: 10px; top: 50%;
+  width: 4px; height: 4px;
+  margin-top: -2px;
+  border-radius: 50%;
+  background: var(--sol-accent);
+  box-shadow: 0 0 6px var(--sol-accent-40);
+}
+.sol-dropdown-list > li[role="option"][aria-selected="true"] {
+  color: var(--sol-text);
+}
+.sol-dropdown-list > li[role="option"][aria-disabled="true"] {
+  color: var(--sol-text-disabled);
+  cursor: not-allowed;
+}
+
+/* Optional supporting glyph + sub-label inside an option */
+.sol-dropdown-list .opt-meta {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text-3);
+  padding-left: 10px;
+}
+.sol-dropdown-list .opt-pip {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Compact variant — used in tight rows like the wizard's conditions */
+.sol-dropdown--sm .sol-dropdown-trigger {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.sol-dropdown--sm .sol-dropdown-list > li[role="option"] {
+  padding: 8px 12px 8px 22px;
+  font-size: 13px;
+}
+.sol-dropdown--sm .sol-dropdown-list { max-height: 200px; }
+
+
+/* ============================================================
+   Empty States — shared EmptyBlock primitive
+   Pattern: glyph · 80px amber rule · § eyebrow · lede · helper · CTA
+   ============================================================ */
+
+.empty-block {
+  text-align: center;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+.empty-block .e-glyph {
+  color: var(--sol-accent);
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 18px;
+  opacity: 0.9;
+  display: block;
+}
+.empty-block .e-rule {
+  width: 80px;
+  height: 1px;
+  background: var(--sol-accent-40);
+  margin: 0 auto 18px;
+}
+.empty-block .e-eyebrow {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  color: var(--sol-accent-55);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.empty-block .e-lede {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  color: var(--sol-text);
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+.empty-block .e-help {
+  color: var(--sol-text-2);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+.empty-block .e-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+.empty-block .e-primary {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 12px 22px;
+  border: 1px solid var(--sol-accent);
+  color: var(--sol-accent);
+  background: transparent;
+  text-decoration: none !important;
+  border-radius: var(--radius);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-block;
+  line-height: 1;
+}
+.empty-block .e-primary:hover,
+.empty-block .e-primary:focus-visible {
+  background: var(--sol-accent-10);
+  color: var(--sol-text);
+}
+
+/* Container for empty states — fills available height, hairline-bordered */
+.empty-hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 360px;
+  padding: 48px 32px;
+  border: 1px solid var(--sol-hairline);
+  background: var(--sol-surface);
+}
+
+
+/* Filter-empty variant — smaller, neutral, inside a table/grid container.
+   See: Empty States Round 2 (§02 Filter-Empty Variant) */
+.empty-inline {
+  text-align: center;
+  padding: 36px 24px 30px;
+  border-top: 1px solid var(--sol-hairline);
+}
+.empty-inline .e-glyph {
+  width: 24px;
+  height: 24px;
+  color: var(--sol-text-3);
+  margin: 0 auto 12px;
+  display: block;
+}
+.empty-inline .e-lede {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--sol-text);
+  margin: 0 0 6px;
+}
+.empty-inline .e-help {
+  font-size: 12.5px;
+  color: var(--sol-text-2);
+  margin: 0 0 14px;
+  line-height: 1.5;
+  max-width: 48ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+.empty-inline .e-link-row {
+  display: inline-flex;
+  gap: 16px;
+  align-items: center;
+}
+.empty-inline .e-link {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-accent);
+  text-decoration: none !important;
+  border: 0;
+  border-bottom: 1px solid var(--sol-accent-40);
+  padding: 0 0 2px;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+.empty-inline .e-link:hover,
+.empty-inline .e-link:focus-visible {
+  color: var(--sol-text);
+  border-bottom-color: var(--sol-accent);
+}
+.empty-inline .e-link.is-muted {
+  color: var(--sol-text-3);
+  border-bottom-color: var(--sol-hairline);
+}
+.empty-inline .e-link.is-muted:hover {
+  color: var(--sol-text-2);
+  border-bottom-color: var(--sol-hairline-strong);
+}
+
+
+/* ============================================================
+   Responsive — shared
+   Scope: Home + Project + Auth shells. Canvas + Wizard are
+   desktop-only (no breakpoint adjustments here).
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* Page wrapper */
+  .page { padding: 28px 18px 64px; }
+  .page-title { font-size: 28px; line-height: 1.2; }
+
+  /* Topbar — wrap so the user-chip drops below the brand on narrow screens */
+  .topbar {
+    flex-wrap: wrap;
+    gap: 14px 18px;
+    padding: 12px 18px;
+    min-height: 0;
+  }
+  .topbar .crumb { width: 100%; order: 3; }
+  .topbar-spacer { flex: 1; }
+  .topbar-divider { display: none; }
+  .back-link { font-size: 10px; padding: 4px 8px; }
+
+  /* User chip on mobile — keep the avatar+name visible, hide caret affordance */
+  .user-menu .user-chip { padding: 4px 10px 4px 4px; font-size: 12px; }
+  .user-menu-pop {
+    position: fixed;
+    top: auto;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    min-width: 0;
+  }
+
+  /* Buttons keep usable hit targets but tighten padding */
+  .btn { padding: 0 14px; }
+  .btn-sm { font-size: 9px; }
+
+  /* Cards — already grid-collapsed by Home's own breakpoints */
+}
+
+@media (max-width: 540px) {
+  .page { padding: 22px 14px 56px; }
+  .page-title { font-size: 24px; letter-spacing: 0.04em; }
+  .kicker { font-size: 10px; }
+  .topbar .brand { font-size: 12px; }
+}
