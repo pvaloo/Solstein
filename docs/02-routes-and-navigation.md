@@ -30,9 +30,9 @@ The prototype is filesystem-flat — every screen is its own HTML file at the pr
 |---|---|---|
 | `home.html` | `/` | Workspace dashboard — project list, active + archived tabs |
 | `new-project.html` | `/new-project` | Create project wizard |
-| `project.html` | `/p/:projectId` | Project hub: graphs, members, settings |
-| `import-wizard.html` | `/p/:projectId/import` | 6-step graph ingestion |
-| `canvas.html` | `/p/:projectId/g/:graphId` | The main product surface |
+| `project.html` | `/project/:projectId` | Project hub: graphs, members, settings |
+| `import-wizard.html` | `/project/:projectId/import` | 6-step graph ingestion |
+| `canvas.html` | `/project/:projectId/graph/:graphId` | The main product surface |
 | `profile.html` | `/profile` | User account settings |
 
 ### Operator portal (separate subdomain)
@@ -53,7 +53,7 @@ Operator is a separate product persona with its own sign-in. In production, expo
 | Marketing pages (`terms`, `privacy`, `404`, `500`) | Public |
 | Auth pages | Public (redirect signed-in users to `/`) |
 | Workspace pages | Authenticated user |
-| `/p/:projectId/*` | Authenticated **AND** has access to the project (see `03-roles-and-permissions.md`) |
+| `/project/:projectId/*` | Authenticated **AND** has access to the project (see `03-roles-and-permissions.md`) |
 | Operator subdomain | Authenticated **as operator** — separate role, separate session |
 
 ## Navigation chrome
@@ -61,14 +61,14 @@ Operator is a separate product persona with its own sign-in. In production, expo
 Three distinct chrome variants:
 
 1. **Auth chrome** (`solstein-auth.css`) — bare wordmark + footer. Used on all `/sign-in`, `/forgot`, `/reset`, `/verify`, error, and legal pages.
-2. **Workspace chrome** (`solstein-app.css`) — top bar with workspace switcher (future), `+ New project`, user menu. Used on `/`, `/new-project`, `/p/*`, `/profile`.
+2. **Workspace chrome** (`solstein-app.css`) — top bar with workspace switcher (future), `+ New project`, user menu. Used on `/`, `/new-project`, `/project/*`, `/profile`.
 3. **Operator chrome** (`solstein-operator.css` + `operator-chrome.js`) — operator-specific top bar with section nav. Used on every `operator-*.html` page.
 
 The canvas (`canvas.html`) uses a stripped-down version of workspace chrome — no top bar, just an in-canvas control strip — because the canvas takes the full viewport.
 
 ## Cross-page navigation patterns
 
-- **Breadcrumb back from canvas** → project page (`/p/:projectId`)
+- **Breadcrumb back from canvas** → project page (`/project/:projectId`)
 - **Project deletion** → toast on workspace; the project disappears from active list
 - **Invitation accept** → either lands signed-in user on workspace, or routes through sign-up first if they don't have an account
 - **Operator user view → impersonate flag** is not in the prototype but is likely needed in production for support

@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solstein — Operator Invitations</title>
+<link rel="stylesheet" href="solstein-tokens.css">
+<link rel="stylesheet" href="solstein-app.css">
+<link rel="stylesheet" href="solstein-toast.css">
+<link rel="stylesheet" href="solstein-operator.css">
+<style>
+  /* Empty-state toggle for invitations container */
+  #invitesContainer[data-state="empty"] .op-table { display: none; }
+  #invitesContainer:not([data-state="empty"]) #invitesEmpty { display: none; }
+</style>
+<script src="solstein-toast.js" defer></script>
+</head>
+<body data-op-page="invitations">
+<div class="op-shell">
+  <main class="op-main">
+    <div class="op-page-head">
+      <div>
+        <div class="kicker">§ Operator Console</div>
+        <h1>Invitations</h1>
+      </div>
+      <div class="right">
+        <button class="btn btn-primary" onclick="openSendModal()" style="height: 36px;">Send Invite…</button>
+      </div>
+    </div>
+
+    <div class="op-filter">
+      <input class="search" type="text" placeholder="Search by email…" id="i-search">
+      <div class="seg" data-filter-group="i-status">
+        <button class="is-here" data-status="pending">Pending</button>
+        <button data-status="accepted">Accepted</button>
+        <button data-status="revoked">Revoked</button>
+        <button data-status="expired">Expired</button>
+      </div>
+    </div>
+
+    <div id="invitesContainer" data-state="has-rows">
+    <table class="op-table">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Class on accept</th>
+          <th>Note</th>
+          <th>Sent</th>
+          <th>Expires</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- PENDING (7) -->
+        <tr data-status="pending">
+          <td class="text">tom.wright@wright-advisory.com</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">Lead consultant referral.</td>
+          <td class="faint">1d ago</td>
+          <td class="faint">in 6 days</td>
+          <td style="text-align: right;">
+            <button class="row-action">Copy link</button>
+            <button class="row-action">Resend</button>
+            <button class="row-action danger">Revoke</button>
+          </td>
+        </tr>
+        <tr data-status="pending">
+          <td class="text">k.henderson@henderson.io</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">—</td>
+          <td class="faint">3d ago</td>
+          <td class="faint" style="color: var(--sol-manual);">in 4 days</td>
+          <td style="text-align: right;">
+            <button class="row-action">Copy link</button>
+            <button class="row-action">Resend</button>
+            <button class="row-action danger">Revoke</button>
+          </td>
+        </tr>
+        <tr data-status="pending">
+          <td class="text">contact@morrison-partners.com</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">Met at Risk Summit.</td>
+          <td class="faint">5d ago</td>
+          <td class="faint" style="color: var(--sol-risk);">in 2 days</td>
+          <td style="text-align: right;">
+            <button class="row-action">Copy link</button>
+            <button class="row-action">Resend</button>
+            <button class="row-action danger">Revoke</button>
+          </td>
+        </tr>
+        <tr data-status="pending">
+          <td class="text">e.takeda@takeda-ops.com</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">—</td>
+          <td class="faint">6d ago</td>
+          <td class="faint" style="color: var(--sol-risk);">in 1 day</td>
+          <td style="text-align: right;">
+            <button class="row-action">Copy link</button>
+            <button class="row-action">Resend</button>
+            <button class="row-action danger">Revoke</button>
+          </td>
+        </tr>
+        <tr data-status="pending">
+          <td class="text">john@johncampbell.uk</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">Audit firm intro.</td>
+          <td class="faint">2h ago</td>
+          <td class="faint">in 7 days</td>
+          <td style="text-align: right;">
+            <button class="row-action">Copy link</button>
+            <button class="row-action">Resend</button>
+            <button class="row-action danger">Revoke</button>
+          </td>
+        </tr>
+        <tr data-status="pending">
+          <td class="text">hello@navarre-co.com</td>
+          <td><span class="pill is-limited">External</span></td>
+          <td class="mut">Reviewer access only.</td>
+          <td class="faint">4d ago</td>
+          <td class="faint">in 3 days</td>
+          <td style="text-align: right;">
+            <button class="row-action">Copy link</button>
+            <button class="row-action">Resend</button>
+            <button class="row-action danger">Revoke</button>
+          </td>
+        </tr>
+        <tr data-status="pending">
+          <td class="text">m.choi@choi-strategy.com</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">—</td>
+          <td class="faint">5h ago</td>
+          <td class="faint">in 7 days</td>
+          <td style="text-align: right;">
+            <button class="row-action">Copy link</button>
+            <button class="row-action">Resend</button>
+            <button class="row-action danger">Revoke</button>
+          </td>
+        </tr>
+
+        <!-- ACCEPTED -->
+        <tr data-status="accepted">
+          <td class="text">sarah.chen@northern-co.com</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">Onboarding cohort May.</td>
+          <td class="faint">May 21</td>
+          <td class="faint" style="color: var(--sol-validated);">accepted in 14h</td>
+          <td style="text-align: right;">
+            <a href="operator-users.html" class="row-action" style="text-decoration: none;">View user →</a>
+          </td>
+        </tr>
+        <tr data-status="accepted">
+          <td class="text">mei.tanaka@morrison-partners.com</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">—</td>
+          <td class="faint">May 20</td>
+          <td class="faint" style="color: var(--sol-validated);">accepted in 6h</td>
+          <td style="text-align: right;">
+            <a href="operator-users.html" class="row-action" style="text-decoration: none;">View user →</a>
+          </td>
+        </tr>
+        <tr data-status="accepted">
+          <td class="text">p.nair@nair-strategy.com</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">Partner intro.</td>
+          <td class="faint">May 18</td>
+          <td class="faint" style="color: var(--sol-validated);">accepted in 2 days</td>
+          <td style="text-align: right;">
+            <a href="operator-users.html" class="row-action" style="text-decoration: none;">View user →</a>
+          </td>
+        </tr>
+        <tr data-status="accepted">
+          <td class="text">rachel@hollow-co.com</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">Hollow Co engagement.</td>
+          <td class="faint">May 14</td>
+          <td class="faint" style="color: var(--sol-validated);">accepted in 1 day</td>
+          <td style="text-align: right;">
+            <a href="operator-users.html" class="row-action" style="text-decoration: none;">View user →</a>
+          </td>
+        </tr>
+        <tr data-status="accepted">
+          <td class="text">e.park@parkadvisory.com</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">—</td>
+          <td class="faint">May 17</td>
+          <td class="faint" style="color: var(--sol-validated);">accepted in 10h</td>
+          <td style="text-align: right;">
+            <a href="operator-users.html" class="row-action" style="text-decoration: none;">View user →</a>
+          </td>
+        </tr>
+        <tr data-status="accepted">
+          <td class="text">aisha.khan@khan-strategy.com</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">—</td>
+          <td class="faint">May 14</td>
+          <td class="faint" style="color: var(--sol-validated);">accepted in 22h</td>
+          <td style="text-align: right;">
+            <a href="operator-users.html" class="row-action" style="text-decoration: none;">View user →</a>
+          </td>
+        </tr>
+
+        <!-- REVOKED -->
+        <tr data-status="revoked">
+          <td class="text" style="text-decoration: line-through; color: var(--sol-text-3);">duplicate-account@spam.example</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">Mistaken send.</td>
+          <td class="faint">May 19</td>
+          <td class="faint" style="color: var(--sol-risk);">revoked 3 days ago</td>
+          <td style="text-align: right;">
+            <button class="row-action">Send new</button>
+          </td>
+        </tr>
+        <tr data-status="revoked">
+          <td class="text" style="text-decoration: line-through; color: var(--sol-text-3);">a.fernandez@old-firm.com</td>
+          <td><span class="pill is-limited">External</span></td>
+          <td class="mut">Departed company.</td>
+          <td class="faint">May 10</td>
+          <td class="faint" style="color: var(--sol-risk);">revoked 8 days ago</td>
+          <td style="text-align: right;">
+            <button class="row-action">Send new</button>
+          </td>
+        </tr>
+
+        <!-- EXPIRED -->
+        <tr data-status="expired">
+          <td class="text" style="color: var(--sol-text-3);">b.delacroix@delacroix-co.com</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">No follow-up.</td>
+          <td class="faint">Apr 28</td>
+          <td class="faint" style="color: var(--sol-text-3);">expired 17d ago</td>
+          <td style="text-align: right;">
+            <button class="row-action">Send new</button>
+          </td>
+        </tr>
+        <tr data-status="expired">
+          <td class="text" style="color: var(--sol-text-3);">jana@jana-ops.de</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">—</td>
+          <td class="faint">Apr 22</td>
+          <td class="faint" style="color: var(--sol-text-3);">expired 23d ago</td>
+          <td style="text-align: right;">
+            <button class="row-action">Send new</button>
+          </td>
+        </tr>
+        <tr data-status="expired">
+          <td class="text" style="color: var(--sol-text-3);">contact@stillman-co.uk</td>
+          <td><span class="pill is-limited">External</span></td>
+          <td class="mut">Initial outreach.</td>
+          <td class="faint">Apr 18</td>
+          <td class="faint" style="color: var(--sol-text-3);">expired 27d ago</td>
+          <td style="text-align: right;">
+            <button class="row-action">Send new</button>
+          </td>
+        </tr>
+        <tr data-status="expired">
+          <td class="text" style="color: var(--sol-text-3);">m.weiss@weiss-strategy.at</td>
+          <td><span class="pill is-full">Member</span></td>
+          <td class="mut">—</td>
+          <td class="faint">Apr 15</td>
+          <td class="faint" style="color: var(--sol-text-3);">expired 30d ago</td>
+          <td style="text-align: right;">
+            <button class="row-action">Send new</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-hero" id="invitesEmpty" style="border: 1px solid var(--sol-hairline); background: var(--sol-surface);">
+      <div class="empty-block">
+        <svg class="e-glyph" viewBox="0 0 52 52" aria-hidden="true">
+          <rect x="10" y="16" width="32" height="22" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"></rect>
+          <path d="M10 16 L26 30 L42 16" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+        </svg>
+        <div class="e-rule"></div>
+        <div class="e-eyebrow" id="invitesEmptyEyebrow">§ All Clear</div>
+        <h2 class="e-lede" id="invitesEmptyLede">No pending invitations</h2>
+        <p class="e-help" id="invitesEmptyHelp">Everyone you've invited has accepted or been revoked. Issue a new invitation when you're ready.</p>
+        <div class="e-actions" id="invitesEmptyActions">
+          <button class="e-primary" type="button" onclick="openSendModal()">Issue Invitation</button>
+        </div>
+      </div>
+    </div>
+    </div>
+  </main>
+</div>
+
+<!-- Send Invite modal -->
+<div class="op-modal-backdrop" id="send-modal" onclick="if (event.target === this) closeSendModal()">
+  <div class="op-modal">
+    <div class="op-modal-head">
+      <div class="lbl">§ Invite</div>
+      <h3>Send Operator Invitation</h3>
+    </div>
+    <div class="op-modal-body">
+      <div class="field">
+        <label class="field-label">Email Addresses</label>
+        <div class="pill-input">
+          <span class="ep">tom.wright@wright-advisory.com <span class="x">×</span></span>
+          <span class="ep">k.henderson@henderson.io <span class="x">×</span></span>
+          <input type="text" placeholder="Add another, paste a list, or press enter…">
+        </div>
+        <div class="field-hint" style="margin-top: 6px;">Comma, semicolon, or newline-separated. Up to 100 per send.</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Account Class On Acceptance</label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px;">
+          <label style="border: 1px solid var(--sol-accent-40); background: var(--sol-surface); padding: 14px; cursor: pointer; border-radius: 2px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+              <input type="radio" name="class" checked style="margin: 0;">
+              <span class="pill is-full">Member</span>
+            </div>
+            <div style="font-size: 12px; color: var(--sol-text-2); line-height: 1.45;">Workspace seat. Can create projects, invite collaborators, manage all their own work.</div>
+          </label>
+          <label style="border: 1px solid var(--sol-hairline-strong); padding: 14px; cursor: pointer; border-radius: 2px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+              <input type="radio" name="class" style="margin: 0;">
+              <span class="pill is-limited">External</span>
+            </div>
+            <div style="font-size: 12px; color: var(--sol-text-2); line-height: 1.45;">Client / external user. Invited to specific projects only — never gains workspace access or the ability to create projects.</div>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Personal Note (optional)</label>
+        <textarea class="input" style="width: 100%; min-height: 60px; padding: 10px 14px; resize: vertical; line-height: 1.5;" placeholder="Lead consultant referral from Sarah…" maxlength="280"></textarea>
+        <div class="field-hint" style="margin-top: 6px;">Appears in the invite email. 280 chars max.</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Expiry</label>
+        <div class="seg" style="display: inline-flex;">
+          <button>24h</button>
+          <button>3 days</button>
+          <button class="is-here" style="background: var(--sol-surface); color: var(--sol-text);">7 days (default)</button>
+          <button>14 days</button>
+        </div>
+      </div>
+    </div>
+    <div class="op-modal-foot">
+      <button class="row-action" onclick="closeSendModal()">Cancel</button>
+      <button class="btn btn-primary" style="height: 36px;">Send 2 invitations</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ----- Filter wiring + counts computed from the table -----
+(function () {
+  var rows = document.querySelectorAll('.op-table tbody tr[data-status]');
+  var state = { status: 'pending', q: '' };
+
+  function counts() {
+    var c = { pending: 0, accepted: 0, revoked: 0, expired: 0 };
+    rows.forEach(function (r) { c[r.getAttribute('data-status')]++; });
+    return c;
+  }
+
+  function paintCounts() {
+    var c = counts();
+    document.querySelectorAll('[data-filter-group="i-status"] button').forEach(function (b) {
+      var s = b.getAttribute('data-status');
+      var label = s.charAt(0).toUpperCase() + s.slice(1);
+      b.textContent = label + ' · ' + (c[s] || 0);
+    });
+  }
+
+  function apply() {
+    var visible = 0;
+    rows.forEach(function (r) {
+      var s  = r.getAttribute('data-status');
+      var ok = (s === state.status);
+      if (state.q) ok = ok && (r.textContent.toLowerCase().indexOf(state.q) !== -1);
+      r.style.display = ok ? '' : 'none';
+      if (ok) visible++;
+    });
+    paintEmptyState(visible);
+  }
+
+  function paintEmptyState(visible) {
+    var container = document.getElementById('invitesContainer');
+    if (!container) return;
+    container.setAttribute('data-state', visible === 0 ? 'empty' : 'has-rows');
+    if (visible !== 0) return;
+
+    var eyebrow = document.getElementById('invitesEmptyEyebrow');
+    var lede    = document.getElementById('invitesEmptyLede');
+    var help    = document.getElementById('invitesEmptyHelp');
+    var actions = document.getElementById('invitesEmptyActions');
+    var label = state.status.charAt(0).toUpperCase() + state.status.slice(1);
+
+    if (state.status === 'pending' && !state.q) {
+      eyebrow.textContent = '§ All Clear';
+      lede.textContent    = 'No pending invitations';
+      help.textContent    = "Everyone you've invited has accepted or been revoked. Issue a new invitation when you're ready.";
+      actions.style.display = '';
+    } else if (state.q) {
+      eyebrow.textContent = '§ No Matches';
+      lede.textContent    = 'No ' + label.toLowerCase() + ' invitations match "' + state.q + '"';
+      help.textContent    = 'Try a different email fragment, or change the status tab.';
+      actions.style.display = 'none';
+    } else {
+      eyebrow.textContent = '§ None';
+      lede.textContent    = 'No ' + label.toLowerCase() + ' invitations';
+      help.textContent    = 'When invitations move to ' + label.toLowerCase() + ', they\u2019ll appear here.';
+      actions.style.display = 'none';
+    }
+  }
+
+  document.querySelectorAll('[data-filter-group="i-status"] button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      b.parentElement.querySelectorAll('button').forEach(function (x) { x.classList.remove('is-here'); });
+      b.classList.add('is-here');
+      state.status = b.getAttribute('data-status');
+      apply();
+    });
+  });
+  var search = document.getElementById('i-search');
+  if (search) {
+    search.addEventListener('input', function (e) {
+      state.q = e.target.value.trim().toLowerCase();
+      apply();
+    });
+  }
+
+  paintCounts();
+  apply();
+})();
+</script>
+
+<script>
+function openSendModal()  { document.getElementById('send-modal').classList.add('is-open'); }
+function closeSendModal() { document.getElementById('send-modal').classList.remove('is-open'); }
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSendModal(); });
+</script>
+
+<script src="operator-chrome.js"></script>
+</body>
+</html>

@@ -64,7 +64,7 @@ The prototype has none. Production needs:
 
 Server-side enforcement of the two-axis role matrix (`03-roles-and-permissions.md`). Don't trust the client.
 
-- Every `/p/:projectId/*` endpoint checks (workspace status × project role) against the action being performed
+- Every `/project/:projectId/*` endpoint checks (workspace status × project role) against the action being performed
 - Read-only mode for Viewers and archived projects is enforced server-side too — write endpoints reject; don't just hide the UI
 - Operator endpoints (`operator.solstein.app/api/*`) check the operator flag and are entirely separate from the user API
 

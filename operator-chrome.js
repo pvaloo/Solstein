@@ -54,8 +54,8 @@
 
     var user = el('div', { class: 'user' });
     user.innerHTML =
-      '<div class="avatar">JM</div>' +
-      '<span>James Mitchell</span>' +
+      '<div class="avatar">OP</div>' +
+      '<span>Operator</span>' +
       '<span style="color: var(--sol-text-3); font-family: var(--font-display); font-size: 10px; letter-spacing: 0.2em; margin-left: 4px;">OP</span>';
     topbar.appendChild(user);
 

@@ -1,99 +1,13 @@
 <!doctype html>
-<html lang="en" data-state="sent">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Solstein — Verify Email</title>
-<link rel="stylesheet" href="solstein-tokens.css">
-<link rel="stylesheet" href="solstein-app.css">
-<link rel="stylesheet" href="solstein-toast.css">
-<link rel="stylesheet" href="solstein-auth.css">
-
-<style>
-[data-show-on] { display: none; }
-html[data-state="sent"]    [data-show-on="sent"],
-html[data-state="success"] [data-show-on="success"],
-html[data-state="expired"] [data-show-on="expired"] { display: block; }
-</style>
-<script src="solstein-toast.js" defer></script>
-</head>
-<body>
-<div class="auth-shell">
-
-  <div class="auth-shell-top">
-    <svg class="mark" viewBox="0 0 52 52" aria-hidden="true">
-      <polygon points="26,4 40,12 44,26 40,40 26,48 12,40 8,26 12,12" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.9"></polygon>
-      <polygon points="26,10 36,16 39,26 36,36 26,42 16,36 13,26 16,16" fill="none" stroke="currentColor" stroke-width="0.75" opacity="0.4"></polygon>
-      <circle cx="26" cy="26" r="2.5" fill="currentColor"></circle>
-    </svg>
-    <span class="word">SOLSTEIN</span>
-  </div>
-
-  <div class="auth-shell-body">
-    <div class="auth-card">
-
-      <!-- ===== SENT — waiting on confirmation ===== -->
-      <div data-show-on="sent">
-        <p class="auth-card-eyebrow">§ Email Verification</p>
-        <h1>Verify Your New Email</h1>
-        <p class="sub">A verification link was sent to your new address. Until it's verified, you're signed out and your previous email remains in effect.</p>
-
-        <div class="banner is-warn">
-          <div class="banner-mark"></div>
-          <div class="banner-body">
-            <span class="ban-title">Signed out</span>
-            For your safety, Solstein has signed you out. Click the verification link before signing back in.
-          </div>
-        </div>
-
-        <dl style="margin: 4px 0 0; display: grid; grid-template-columns: 100px 1fr; gap: 12px 16px; font-size: 13px; align-items: baseline;">
-          <dt style="font-family: var(--font-display); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sol-text-3);">New email</dt>
-          <dd style="margin: 0; color: var(--sol-text);">james.mitchell@newcompany.com</dd>
-          <dt style="font-family: var(--font-display); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sol-text-3);">Previous</dt>
-          <dd style="margin: 0; color: var(--sol-text-2);">james.mitchell@consultancy.com</dd>
-          <dt style="font-family: var(--font-display); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sol-text-3);">Expires</dt>
-          <dd style="margin: 0; color: var(--sol-text-2);">24 hours from request</dd>
-        </dl>
-
-        <div class="aux" style="margin-top: 28px;">
-          Didn't receive it? <a href="#">Send again</a> · <a href="#">Cancel email change</a>
-        </div>
-      </div>
-
-      <!-- ===== SUCCESS — link handler succeeded ===== -->
-      <div data-show-on="success">
-        <div class="token-state is-success">
-          <div class="glyph">✓</div>
-          <p class="auth-card-eyebrow">§ Email Verified</p>
-          <h1>Email Verified</h1>
-          <p class="sub" style="margin-bottom: 22px;">Your account now uses <strong style="color:var(--sol-text);">james.mitchell@newcompany.com</strong>. Sign in to continue.</p>
-          <a class="btn btn-primary" href="sign-in.html" style="text-decoration: none; display: inline-flex;">Sign In</a>
-        </div>
-      </div>
-
-      <!-- ===== EXPIRED ===== -->
-      <div data-show-on="expired">
-        <div class="token-state is-expired">
-          <div class="glyph">↻</div>
-          <p class="auth-card-eyebrow">§ Link Expired</p>
-          <h1>Link Expired</h1>
-          <p class="sub" style="margin-bottom: 22px;">Verification links are valid for 24 hours. Sign in to request a new one from your profile.</p>
-          <a class="btn btn-primary" href="sign-in.html" style="text-decoration: none; display: inline-flex;">Sign In</a>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="auth-shell-foot">
-    <span>© 2026 Solstein</span>
-    <div class="links">
-      <a href="terms.html">Terms</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="https://status.solstein.app" target="_blank" rel="noopener">Status</a>
-    </div>
-  </div>
-
-</div>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="refresh" content="0; url=/sign-in" />
+    <title>Verify Email | Solstein</title>
+    <script>window.location.replace("/sign-in");</script>
+  </head>
+  <body>
+    <p>Redirecting to <a href="/sign-in">/sign-in</a>.</p>
+  </body>
 </html>

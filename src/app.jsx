@@ -1,4 +1,6 @@
-/* global React, ReactDOM, NodeCard, Edge, Canvas, Inspector, ControlPanels, ExportModal, SettingsPage, useReplay, precomputeAllLayouts, precomputeAllLanes */
+/* global React */
+import React from 'react';
+
 const { useState, useEffect, useMemo, useRef } = React;
 
 // Hard-coded design constants
@@ -25,8 +27,14 @@ function overlayHasMatches(overlay, nodes, edges, nodeMap, view) {
   return visibleEdges.some(e => window.LensMatch.edgeMatchesLens(e, overlay, nodeMap));
 }
 
-function App() {
-  const data = window.FLOWLENS_DATA;
+function App({ data: graphData, projectPath = '/' }) {
+  const data = graphData || window.FLOWLENS_DATA;
+  window.FLOWLENS_DATA = data;
+  const CanvasComponent = window.Canvas;
+  const ControlPanelsComponent = window.ControlPanels;
+  const SettingsPageComponent = window.SettingsPage;
+  const ExportModalComponent = window.ExportModal;
+  const InspectorComponent = window.Inspector;
 
   const nodeMap = useMemo(() => Object.fromEntries(data.nodes.map(n => [n.id, n])), [data.nodes]);
   const evidenceMap = useMemo(() => Object.fromEntries(data.evidence.map(e => [e.id, e])), [data.evidence]);
@@ -116,7 +124,7 @@ function App() {
   useEffect(() => { editVersionRef.current = editVersion; }, [editVersion]);
   const onEdit = () => setEditVersion(v => v + 1);
   const allLayouts = useMemo(() => {
-    const base = precomputeAllLayouts(data, views);
+    const base = window.precomputeAllLayouts(data, views);
     Object.keys(layoutOverrides).forEach(viewId => {
       if (base[viewId]) {
         base[viewId] = window.LayoutOverrides.applyOverrides(base[viewId], layoutOverrides[viewId]);
@@ -124,7 +132,7 @@ function App() {
     });
     return base;
   }, [data, views, layoutOverrides]);
-  const allLanes   = useMemo(() => precomputeAllLanes  (data, views), [data, views]);
+  const allLanes   = useMemo(() => window.precomputeAllLanes  (data, views), [data, views]);
 
   // ── Categories (runtime-editable list with labels + colors) ────────
   const [categories, setCategories] = useState(() => window.Categories.loadCategories());
@@ -318,7 +326,7 @@ function App() {
     });
   }, [visibleOverlays]);
 
-  const replay = useReplay(data.scenarios);
+  const replay = window.useReplay(data.scenarios);
 
   // ── Migration state ────────────────────────────────────────────────
   // displayedViewId lags behind activeViewId during the migration.
@@ -443,7 +451,7 @@ function App() {
       React.createElement('div', { className: 'topbar-divider' }),
       React.createElement('a', {
         className: 'tb-back',
-        href: 'project.html',
+        href: projectPath,
         title: 'Back to project',
         'aria-label': 'Back to project',
       },
@@ -452,7 +460,7 @@ function App() {
         ),
       ),
       React.createElement('div', { className: 'topbar-meta' },
-        React.createElement('a', { className: 'name', href: 'project.html', title: 'Back to project' }, data.project.name),
+        React.createElement('a', { className: 'name', href: projectPath, title: 'Back to project' }, data.project.name),
       ),
       React.createElement('div', { className: 'topbar-divider' }),
       React.createElement('div', { className: 'tb-stat' },
@@ -489,7 +497,7 @@ function App() {
       )
     ),
 
-    React.createElement(Canvas, {
+    React.createElement(CanvasComponent, {
       nodes: data.nodes,
       edges: data.edges,
       nodeMap,
@@ -515,7 +523,7 @@ function App() {
       categories,
     }),
 
-    React.createElement(ControlPanels, {
+    React.createElement(ControlPanelsComponent, {
       views: views,
       overlays: visibleOverlays,
       activeViewId,
@@ -525,7 +533,7 @@ function App() {
       replay,
     }),
 
-    React.createElement(SettingsPage, {
+    React.createElement(SettingsPageComponent, {
       open: settingsOpen,
       onClose: () => setSettingsOpen(false),
       categories,
@@ -554,7 +562,7 @@ function App() {
       lensMetaFields: metaFields,
     }),
 
-    React.createElement(ExportModal, {
+    React.createElement(ExportModalComponent, {
       open: exportOpen,
       onClose: () => setExportOpen(false),
       data,
@@ -562,7 +570,7 @@ function App() {
       activeOverlays,
     }),
 
-    React.createElement(Inspector, {
+    React.createElement(InspectorComponent, {
       selectedId: sel.id,
       selectedKind: sel.kind,
       nodes: data.nodes,
@@ -582,4 +590,6 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById('app')).render(React.createElement(App));
+window.FlowLensApp = App;
+
+export default App;

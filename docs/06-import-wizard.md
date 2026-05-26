@@ -99,7 +99,7 @@ Summary card with:
 
 On commit:
 - Graph data lands in localStorage under the new project ID
-- User is redirected to `/p/:projectId/g/:graphId` (the canvas)
+- User is redirected to `/project/:projectId/graph/:graphId` (the canvas)
 - Stepper hides (footer hidden after `state.imported === true`)
 
 ## What production needs to change

@@ -162,8 +162,9 @@ function Edge({ edge, sourceNode, targetNode, state, onSelect, migrationActive, 
     }
   }
 
-  // Chip — only on selected / highlight / explicit chip request
-  const showChip = edge.visual.chip && (state.selected || state.highlightOverlay);
+  // Chip — optional presentation metadata, absent from imported/persisted graph edges.
+  const chip = edge.visual?.chip;
+  const showChip = !!chip && (state.selected || state.highlightOverlay);
 
   return React.createElement('g', { className: classes.join(' '), style: groupStyle },
     React.createElement('path', {
@@ -213,10 +214,10 @@ function Edge({ edge, sourceNode, targetNode, state, onSelect, migrationActive, 
     },
       React.createElement('rect', {
         className: 'edge-type-chip-bg',
-        x: -((edge.visual.chip.length * 4.2) + 8) / 2,
+        x: -((chip.length * 4.2) + 8) / 2,
         y: -8,
         rx: 3,
-        width: (edge.visual.chip.length * 4.2) + 8,
+        width: (chip.length * 4.2) + 8,
         height: 14,
       }),
       React.createElement('text', {
@@ -224,7 +225,7 @@ function Edge({ edge, sourceNode, targetNode, state, onSelect, migrationActive, 
         x: 0, y: 1,
         textAnchor: 'middle',
         dominantBaseline: 'middle',
-      }, edge.visual.chip)
+      }, chip)
     ),
     // Invisible hit area for click
     React.createElement('path', {

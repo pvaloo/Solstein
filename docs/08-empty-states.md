@@ -36,7 +36,7 @@ Every state below is reachable in the prototype via the Tweaks panel (`data-stat
 
 **Heading:** "No graphs yet"
 **Copy:** "Import a JSON graph to begin mapping. The wizard walks through validation, views, and overlays."
-**CTA:** Primary button "Import a graph →" linking to `/p/:projectId/import`.
+**CTA:** Primary button "Import a graph →" linking to `/project/:projectId/import`.
 
 ### Project · Members (just owner)
 

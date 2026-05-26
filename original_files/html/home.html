@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solstein — Workspace</title>
+<link rel="stylesheet" href="solstein-tokens.css">
+<link rel="stylesheet" href="solstein-app.css">
+<link rel="stylesheet" href="solstein-toast.css">
+<script src="solstein-toast.js" defer></script><style>
+.v1-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media (max-width: 900px) { .v1-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .v1-grid { grid-template-columns: 1fr; } }
+
+/* User menu (.user-menu / .user-menu-pop / .um-*) is defined in solstein-app.css */
+
+/* Empty state state-toggle wiring (mock-only) */
+.page[data-state="empty"] .v1-grid { display: none; }
+.page[data-state="empty"] .lifecycle-tabs { display: none; }
+.page:not([data-state="empty"]) .empty-hero { display: none; }
+
+/* ---------- Lifecycle tabs (Active / Archived) -------------- */
+.lifecycle-tabs {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin: 0 0 22px;
+  border-bottom: 1px solid var(--sol-hairline);
+}
+.lifecycle-tabs .lt-strip { display: flex; gap: 0; }
+.lifecycle-tabs .lt-tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 12px 22px 16px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text-3);
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--transition), border-color var(--transition);
+}
+.lifecycle-tabs .lt-tab:hover { color: var(--sol-text-2); }
+.lifecycle-tabs .lt-tab.is-on {
+  color: var(--sol-text);
+  border-bottom-color: var(--sol-accent);
+}
+.lifecycle-tabs .lt-tab .ct {
+  display: inline-block;
+  margin-left: 8px;
+  color: var(--sol-text-disabled);
+  letter-spacing: 0.1em;
+}
+.lifecycle-tabs .lt-tab.is-on .ct { color: var(--sol-accent-55); }
+.lifecycle-tabs .lt-meta {
+  padding: 0 0 16px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text-3);
+}
+
+/* Non-owners don't see the Archived tab (or any archived state). */
+body[data-workspace-role="external"] .lt-tab[data-tab="archived"] {
+  display: none;
+}
+body[data-workspace-role="external"] .lifecycle-tabs {
+  display: none;
+}
+
+/* Only workspace members (invited by Solstein) can create new projects. */
+body[data-workspace-role="external"] .add-card { display: none; }
+
+.workspace-gate {
+  display: none;
+  margin: 16px 0 24px;
+  padding: 10px 14px;
+  border: 1px solid var(--sol-hairline);
+  background: var(--sol-surface);
+  font-size: 12.5px;
+  color: var(--sol-text-3);
+  line-height: 1.5;
+  border-radius: var(--radius);
+}
+body[data-workspace-role="external"] .workspace-gate { display: block; }
+body[data-current-role="editor"] .page[data-tab="archived"] .archived-grid,
+body[data-current-role="viewer"] .page[data-tab="archived"] .archived-grid {
+  display: none;
+}
+
+/* Tab content switching */
+.page[data-tab="active"] .archived-grid,
+.page[data-tab="active"] .archived-empty { display: none; }
+.page[data-tab="archived"] .v1-grid,
+.page[data-tab="archived"] .empty-hero { display: none; }
+
+/* ---------- Archived card variant --------------------------- */
+.archived-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+@media (max-width: 900px) { .archived-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .archived-grid { grid-template-columns: 1fr; } }
+
+.proj-card.is-archived {
+  background: transparent;
+  border-style: dashed;
+  position: relative;
+}
+.proj-card.is-archived:hover { border-style: solid; }
+.proj-card.is-archived .pc-name { color: var(--sol-text-2); }
+.proj-card.is-archived .pc-client { color: var(--sol-text-3); }
+.proj-card.is-archived .pc-meta { opacity: 0.7; }
+.proj-card .arc-tag {
+  position: absolute;
+  top: 22px; right: 22px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sol-manual);
+  padding: 2px 8px;
+  border: 1px solid var(--sol-manual);
+  border-radius: 2px;
+  opacity: 0.8;
+}
+.proj-card.is-archived .pc-restore {
+  position: absolute;
+  bottom: 18px; right: 22px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-accent);
+  padding: 6px 10px;
+  border: 1px solid var(--sol-accent-40);
+  border-radius: 2px;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.proj-card.is-archived:hover .pc-restore { opacity: 1; }
+.proj-card.is-archived .pc-restore:hover { color: var(--sol-text); border-color: var(--sol-accent); }
+
+.archived-empty {
+  padding: 60px 24px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sol-text-3);
+  border: 1px dashed var(--sol-hairline);
+  border-radius: var(--radius);
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="sol-crystal" viewBox="0 0 52 52">
+    <polygon points="26,4 40,12 44,26 40,40 26,48 12,40 8,26 12,12" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.9"></polygon>
+    <polygon class="refraction" points="26,10 36,16 39,26 36,36 26,42 16,36 13,26 16,16" fill="none" stroke="currentColor" stroke-width="0.75" opacity="0.4"></polygon>
+    <circle cx="26" cy="26" r="2.5" fill="currentColor" opacity="0.9"></circle>
+    <circle class="glow" cx="26" cy="26" r="6" fill="currentColor" opacity="0.25" style="filter: blur(4px);"></circle>
+    <line x1="26" y1="10" x2="26" y2="42" stroke="currentColor" stroke-width="0.5" opacity="0.25"></line>
+    <line x1="10" y1="26" x2="42" y2="26" stroke="currentColor" stroke-width="0.5" opacity="0.25"></line>
+  </symbol>
+</svg>
+<div class="topbar">
+  <div class="brand">
+    <span class="brand-mark sol-mark sol-mark--ambient" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 52 52" aria-hidden="true">
+        <polygon points="26,4 40,12 44,26 40,40 26,48 12,40 8,26 12,12" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.9"></polygon>
+        <polygon class="refraction" points="26,10 36,16 39,26 36,36 26,42 16,36 13,26 16,16" fill="none" stroke="currentColor" stroke-width="0.75" opacity="0.4"></polygon>
+        <circle cx="26" cy="26" r="2.5" fill="currentColor" opacity="0.9"></circle>
+        <circle class="glow" cx="26" cy="26" r="5" fill="currentColor" opacity="0.25" style="filter: blur(3px);"></circle>
+        <line x1="26" y1="10" x2="26" y2="42" stroke="currentColor" stroke-width="0.5" opacity="0.25"></line>
+        <line x1="10" y1="26" x2="42" y2="26" stroke="currentColor" stroke-width="0.5" opacity="0.25"></line>
+      </svg>
+    </span>
+    SOLSTEIN
+  </div>
+  <div class="topbar-divider"></div>
+  <div class="topbar-spacer"></div>
+  <div class="user-menu" id="userMenu">
+    <button class="user-chip" type="button" id="userMenuTrigger" aria-haspopup="menu" aria-expanded="false">
+      <div class="avatar">JM</div>
+      <span>James Mitchell</span>
+      <svg class="caret" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 4.5l3 3 3-3"></path>
+      </svg>
+    </button>
+    <div class="user-menu-pop" role="menu" aria-labelledby="userMenuTrigger">
+      <div class="um-identity">
+        <div class="avatar">JM</div>
+        <div class="who">
+          <div class="name">James Mitchell</div>
+          <div class="email">james.mitchell@consultancy.com</div>
+        </div>
+      </div>
+
+      <div class="um-section">§ Account</div>
+      <a class="um-item" role="menuitem" href="profile.html">Profile &amp; Security</a>
+<div class="um-divider"></div>
+      <a class="um-item is-danger" role="menuitem" href="signed-out.html">Sign out</a>
+    </div>
+  </div>
+</div>
+
+<script src="user-menu.js" defer></script>
+
+<div class="page" id="workspacePage" data-state="full" data-tab="active">
+  <div class="kicker">§ Workspace</div>
+  <h1 class="page-title">Projects</h1>
+
+  <div class="workspace-gate">
+    You’re an <strong>external collaborator</strong>. You can read and contribute to projects you’ve been invited to. Only workspace members (invited by Solstein) can create new projects.
+  </div>
+
+  <div class="lifecycle-tabs" id="lifecycleTabs">
+    <div class="lt-strip">
+      <button class="lt-tab is-on" data-tab="active" type="button">Active <span class="ct" id="ct-active">3</span></button>
+      <button class="lt-tab" data-tab="archived" type="button">Archived <span class="ct" id="ct-archived">2</span></button>
+    </div>
+    <div class="lt-meta">member view</div>
+  </div>
+
+  <div class="v1-grid">
+    <a class="proj-card" href="project.html">
+      <div class="pc-name">Car Insurance Comparison</div>
+      <div class="pc-client">Acme Insurance Group</div>
+      <div class="pc-meta">
+        <span class="pc-domain">Insurance</span>
+        <span class="dot"></span>
+        <span class="pc-graphs">1 graph</span>
+        <span class="dot"></span>
+        <span>2h ago</span>
+      </div>
+    </a>
+
+    <a class="proj-card" href="project.html">
+      <div class="pc-name">Claims Reconciliation</div>
+      <div class="pc-client">Acme Insurance Group</div>
+      <div class="pc-meta">
+        <span class="pc-domain">Insurance</span>
+        <span class="dot"></span>
+        <span class="pc-graphs">3 graphs</span>
+        <span class="dot"></span>
+        <span>1d ago</span>
+      </div>
+    </a>
+
+    <a class="proj-card" href="project.html">
+      <div class="pc-name">Underwriting Audit</div>
+      <div class="pc-client">Helios Re</div>
+      <div class="pc-meta">
+        <span class="pc-domain">Reinsurance</span>
+        <span class="dot"></span>
+        <span class="pc-graphs">2 graphs</span>
+        <span class="dot"></span>
+        <span>4d ago</span>
+      </div>
+    </a>
+
+    <a class="add-card" href="new-project.html">
+      <div class="plus">+</div>
+      <div class="label">New project</div>
+    </a>
+  </div>
+
+  <div class="archived-grid" id="archivedGrid">
+    <a class="proj-card is-archived" href="project.html#archived">
+      <div class="arc-tag">Archived</div>
+      <div class="pc-name">Q3 Capacity Review</div>
+      <div class="pc-client">Helios Re</div>
+      <div class="pc-meta">
+        <span class="pc-domain">Reinsurance</span>
+        <span class="dot"></span>
+        <span class="pc-graphs">4 graphs</span>
+        <span class="dot"></span>
+        <span>Archived 2w ago</span>
+      </div>
+      <button class="pc-restore" type="button" data-unarchive="Q3 Capacity Review">Unarchive</button>
+    </a>
+
+    <a class="proj-card is-archived" href="project.html#archived">
+      <div class="arc-tag">Archived</div>
+      <div class="pc-name">Legacy Quote Engine Mapping</div>
+      <div class="pc-client">Acme Insurance Group</div>
+      <div class="pc-meta">
+        <span class="pc-domain">Insurance</span>
+        <span class="dot"></span>
+        <span class="pc-graphs">2 graphs</span>
+        <span class="dot"></span>
+        <span>Archived 6w ago</span>
+      </div>
+      <button class="pc-restore" type="button" data-unarchive="Legacy Quote Engine Mapping">Unarchive</button>
+    </a>
+  </div>
+
+  <div class="empty-hero">
+    <div class="empty-block">
+      <svg class="e-glyph" viewBox="0 0 52 52" aria-hidden="true">
+        <polygon points="26,4 40,12 44,26 40,40 26,48 12,40 8,26 12,12" fill="none" stroke="currentColor" stroke-width="1.5"></polygon>
+        <polygon points="26,12 36,17 39,26 36,35 26,40 16,35 13,26 16,17" fill="none" stroke="currentColor" stroke-width="0.75" opacity="0.45"></polygon>
+        <circle cx="26" cy="26" r="2" fill="currentColor"></circle>
+      </svg>
+      <div class="e-rule"></div>
+      <div class="e-eyebrow">§ Workspace</div>
+      <h2 class="e-lede">Start your first project</h2>
+      <p class="e-help">A project holds the graphs, imports, and shared links for one engagement.</p>
+      <div class="e-actions">
+        <a class="e-primary" href="new-project.html">New Project</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  const page = document.getElementById('workspacePage');
+  if (!page) return;
+
+  // Tab switching
+  document.querySelectorAll('.lt-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      const id = tab.dataset.tab;
+      document.querySelectorAll('.lt-tab').forEach(function (t) {
+        t.classList.toggle('is-on', t === tab);
+      });
+      page.setAttribute('data-tab', id);
+    });
+  });
+
+  // Unarchive from card hover button
+  document.querySelectorAll('[data-unarchive]').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const name = btn.dataset.unarchive;
+      const card = btn.closest('.proj-card');
+      if (card) {
+        card.style.transition = 'opacity 200ms ease';
+        card.style.opacity = '0.3';
+        setTimeout(function () {
+          card.style.opacity = '';
+        }, 1200);
+      }
+      // Update counts
+      const ctA = document.getElementById('ct-active');
+      const ctZ = document.getElementById('ct-archived');
+      if (ctA) ctA.textContent = String(parseInt(ctA.textContent, 10) + 1);
+      if (ctZ) ctZ.textContent = String(parseInt(ctZ.textContent, 10) - 1);
+      window.solToast && window.solToast({
+        msg: 'Unarchived <strong>' + name + '</strong>. Members regain access; share links re-activated.',
+        duration: 5000,
+      });
+      setTimeout(function () {
+        if (ctA) ctA.textContent = String(parseInt(ctA.textContent, 10) - 1);
+        if (ctZ) ctZ.textContent = String(parseInt(ctZ.textContent, 10) + 1);
+      }, 6000);
+    });
+  });
+})();
+</script>
+<!-- Flash-toast pickup: messages stashed by other pages (e.g. project delete) show here. -->
+<script>
+(function () {
+  try {
+    var raw = sessionStorage.getItem('flashToast');
+    if (!raw) return;
+    sessionStorage.removeItem('flashToast');
+    var t = JSON.parse(raw);
+    function show() {
+      if (window.solToast) window.solToast(t);
+      else setTimeout(show, 100);
+    }
+    show();
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
