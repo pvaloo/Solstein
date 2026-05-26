@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en" data-state="idle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solstein — Sign In</title>
+<link rel="stylesheet" href="solstein-tokens.css">
+<link rel="stylesheet" href="solstein-app.css">
+<link rel="stylesheet" href="solstein-toast.css">
+<link rel="stylesheet" href="solstein-auth.css">
+<script src="solstein-toast.js" defer></script>
+
+<style>
+/* Banner / CAPTCHA visibility driven by state attr */
+[data-banner], [data-show-on] { display: none; }
+html[data-state="credentials-error"] [data-banner="credentials-error"],
+html[data-state="rate-limited"]      [data-banner="rate-limited"],
+html[data-state="locked"]            [data-banner="locked"],
+html[data-state="session-expired"]   [data-banner="session-expired"],
+html[data-state="network-error"]     [data-banner="network-error"] { display: flex; }
+
+html[data-state="rate-limited"] [data-show-on="rate-limited"] { display: flex; }
+
+/* When locked: disable form inputs + button visually */
+html[data-state="locked"] .auth-card .input,
+html[data-state="locked"] .auth-card .btn-primary,
+html[data-state="locked"] .pw-toggle,
+html[data-state="locked"] .check input {
+  pointer-events: none;
+  opacity: 0.4;
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- Auth shell                                                   -->
+<!-- ============================================================ -->
+<div class="auth-shell">
+
+  <div class="auth-shell-top">
+    <svg class="mark" viewBox="0 0 52 52" aria-hidden="true">
+      <polygon points="26,4 40,12 44,26 40,40 26,48 12,40 8,26 12,12" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.9"></polygon>
+      <polygon points="26,10 36,16 39,26 36,36 26,42 16,36 13,26 16,16" fill="none" stroke="currentColor" stroke-width="0.75" opacity="0.4"></polygon>
+      <circle cx="26" cy="26" r="2.5" fill="currentColor"></circle>
+    </svg>
+    <span class="word">SOLSTEIN</span>
+  </div>
+
+  <div class="auth-shell-body">
+    <div class="auth-card">
+      <p class="auth-card-eyebrow">§ Workspace Access</p>
+      <h1>Sign In</h1>
+      <p class="sub">Enter your credentials to continue.</p>
+
+      <!-- ===== Banners (one shown at a time based on state) ===== -->
+      <div class="banner is-warn" data-banner="network-error">
+        <div class="banner-mark"></div>
+        <div class="banner-body">
+          <span class="ban-title">Couldn’t reach Solstein</span>
+          Check your connection and try again. If the problem persists, see <a href="https://status.solstein.app" target="_blank" rel="noopener">status.solstein.app</a>.
+        </div>
+      </div>
+
+      <div class="banner is-error" data-banner="credentials-error">
+        <div class="banner-mark"></div>
+        <div class="banner-body">
+          <span class="ban-title">Credentials did not match</span>
+          The email and password combination is not recognised.
+        </div>
+      </div>
+
+      <div class="banner is-warn" data-banner="rate-limited">
+        <div class="banner-mark"></div>
+        <div class="banner-body">
+          <span class="ban-title">Too many attempts</span>
+          Complete the verification below to continue. Further failed attempts may lock this account.
+        </div>
+      </div>
+
+      <div class="banner is-error" data-banner="locked">
+        <div class="banner-mark"></div>
+        <div class="banner-body">
+          <span class="ban-title">Account locked</span>
+          For your safety, sign-in is disabled after repeated failures. <a href="forgot-password.html">Reset your password</a> to unlock.
+        </div>
+      </div>
+
+      <div class="banner is-info" data-banner="session-expired">
+        <div class="banner-mark"></div>
+        <div class="banner-body">
+          <span class="ban-title">Session ended</span>
+          For your safety, you were signed out after a period of inactivity. Sign in to continue.
+        </div>
+      </div>
+
+      <!-- ===== Form ===== -->
+      <form class="form" onsubmit="event.preventDefault();">
+        <div class="field">
+          <label class="field-label" for="si-email">Email</label>
+          <input class="input" id="si-email" type="email" autocomplete="email" value="james.mitchell@consultancy.com">
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="si-password">Password</label>
+          <div class="pw-wrap">
+            <input class="input" id="si-password" type="password" autocomplete="current-password" value="">
+            <button type="button" class="pw-toggle" data-pw-toggle aria-label="Show password">Show</button>
+          </div>
+        </div>
+
+        <div class="form-row" style="justify-content: flex-end;">
+          <a class="link" href="forgot-password.html">Forgot password?</a>
+        </div>
+
+        <!-- Inline CAPTCHA (only rate-limited) -->
+        <div class="captcha" data-show-on="rate-limited">
+          <div class="cap-box"></div>
+          <div class="cap-copy">Confirm you're not an automated agent.</div>
+          <div class="cap-mark">Cloudflare<br>Turnstile</div>
+        </div>
+
+        <button class="btn btn-primary" type="submit" id="sign-in-submit">Sign In</button>
+      </form>
+
+      <div class="aux">
+        New to Solstein? Access is invite-only.
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-shell-foot">
+    <span>© 2026 Solstein</span>
+    <div class="links">
+      <a href="terms.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="https://status.solstein.app" target="_blank" rel="noopener">Status</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- Password toggle (vanilla)                                    -->
+<!-- ============================================================ -->
+<script>
+document.querySelectorAll('[data-pw-toggle]').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var inp = btn.parentElement.querySelector('input');
+    if (!inp) return;
+    var shown = inp.type === 'text';
+    inp.type = shown ? 'password' : 'text';
+    btn.textContent = shown ? 'Show' : 'Hide';
+  });
+});
+</script>
+
+<!-- ============================================================ --><!-- ============================================================ -->
+</body>
+</html>
