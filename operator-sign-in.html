@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solstein — Operator Sign In</title>
+<link rel="stylesheet" href="solstein-tokens.css">
+<link rel="stylesheet" href="solstein-app.css">
+<link rel="stylesheet" href="solstein-toast.css">
+<link rel="stylesheet" href="solstein-auth.css">
+
+<style>
+  /* Operator sign-in is the same shell as customer auth, with
+     a single visual differentiator: amber rail at top of viewport
+     and an OPERATOR ribbon above the wordmark. */
+  .auth-shell { position: relative; }
+  .auth-shell::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--sol-accent);
+    opacity: 0.7;
+    z-index: 300;
+    pointer-events: none;
+  }
+  .op-ribbon {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-left: 14px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--sol-accent);
+    border: 1px solid var(--sol-accent-40);
+    padding: 3px 9px;
+    border-radius: 2px;
+  }
+  .op-ribbon::before {
+    content: "";
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--sol-accent);
+    box-shadow: 0 0 6px var(--sol-accent-40);
+  }
+
+  /* MFA code field */
+  .mfa-field { display: flex; gap: 8px; }
+  .mfa-field .input {
+    flex: 1;
+    text-align: center;
+    font-family: var(--font-code, ui-monospace, monospace);
+    font-size: 18px;
+    letter-spacing: 0.3em;
+  }
+</style>
+<script src="solstein-toast.js" defer></script>
+</head>
+<body>
+<div class="auth-shell">
+
+  <div class="auth-shell-top">
+    <svg class="mark" viewBox="0 0 52 52" aria-hidden="true">
+      <polygon points="26,4 40,12 44,26 40,40 26,48 12,40 8,26 12,12" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.9"></polygon>
+      <polygon points="26,10 36,16 39,26 36,36 26,42 16,36 13,26 16,16" fill="none" stroke="currentColor" stroke-width="0.75" opacity="0.4"></polygon>
+      <circle cx="26" cy="26" r="2.5" fill="currentColor"></circle>
+    </svg>
+    <span class="word">SOLSTEIN</span>
+    <span class="op-ribbon">Operator</span>
+  </div>
+
+  <div class="auth-shell-body">
+    <div class="auth-card">
+      <p class="auth-card-eyebrow">§ Privileged Access</p>
+      <h1>Operator Sign In</h1>
+      <p class="sub">Solstein team only. All sign-ins are audited.</p>
+
+      <form class="form" action="operator-dashboard.html">
+        <div class="field">
+          <label class="field-label" for="op-email">Email</label>
+          <input class="input" id="op-email" type="email" autocomplete="email" value="james@solstein.com">
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="op-password">Password</label>
+          <div class="pw-wrap">
+            <input class="input" id="op-password" type="password" autocomplete="current-password" value="••••••••••••">
+            <button type="button" class="pw-toggle" data-pw-toggle>Show</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Sign In</button>
+      </form>
+
+      <div class="aux">
+        Trouble signing in? Operator credentials are managed manually — contact a fellow operator or recover via the<br>
+        <a href="forgot-password.html">customer reset flow</a> using your operator email.
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-shell-foot">
+    <span>© 2026 Solstein</span>
+    <div class="links">
+      <a href="#">Operator Docs</a>
+      <a href="https://status.solstein.app" target="_blank" rel="noopener">Status</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+document.querySelectorAll('[data-pw-toggle]').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var inp = btn.parentElement.querySelector('input');
+    if (!inp) return;
+    var shown = inp.type === 'text';
+    inp.type = shown ? 'password' : 'text';
+    btn.textContent = shown ? 'Show' : 'Hide';
+  });
+});
+</script>
+</body>
+</html>

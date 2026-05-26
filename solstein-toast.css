@@ -1,0 +1,92 @@
+/* ─── Solstein Toast ─────────────────────────────────────────────
+   Bottom-right toast primitive. One pattern, four payloads.
+   API:  window.solToast({ msg, action, onAction, duration = 10000 })
+         msg       — string or HTML (small set of <strong> tags ok)
+         action    — optional action-button label
+         onAction  — optional click handler
+         duration  — ms before auto-dismiss; hover pauses the timer
+   Returns a dismiss() function so callers can close early.
+   ───────────────────────────────────────────────────────────── */
+
+.sol-toast-stack {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.sol-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 18px 12px 20px;
+  border: 1px solid var(--sol-hairline-strong);
+  background: var(--sol-surface);
+  border-radius: 2px;
+  box-shadow: 0 10px 32px -6px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.25);
+  pointer-events: auto;
+  transform: translateY(8px);
+  opacity: 0;
+  transition: opacity 180ms ease, transform 180ms ease;
+  max-width: 480px;
+}
+.sol-toast.is-in {
+  transform: translateY(0);
+  opacity: 1;
+}
+.sol-toast.is-out {
+  transform: translateY(8px);
+  opacity: 0;
+}
+
+.sol-toast .st-msg {
+  font-size: 13px;
+  color: var(--sol-text);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.sol-toast .st-msg strong { font-weight: 500; color: var(--sol-text); }
+.sol-toast .st-msg em {
+  font-style: normal;
+  color: var(--sol-text-3);
+}
+
+.sol-toast .st-action {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-accent);
+  padding-left: 16px;
+  border-left: 1px solid var(--sol-hairline);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--transition);
+}
+.sol-toast .st-action:hover { color: var(--sol-text); }
+
+.sol-toast .st-close {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin-left: -6px;
+  width: 22px; height: 22px;
+  display: grid; place-items: center;
+  color: var(--sol-text-3);
+  cursor: pointer;
+  border-radius: 2px;
+  transition: color var(--transition), background var(--transition);
+}
+.sol-toast .st-close:hover { color: var(--sol-text); background: var(--sol-surface-2); }
+
+/* Risk-tinted variant for delete confirmations */
+.sol-toast.is-risk { border-left: 2px solid var(--sol-risk); }
