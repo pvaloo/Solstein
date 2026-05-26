@@ -1,0 +1,1653 @@
+{
+  "project": {
+    "id": "car_insurance_comparison",
+    "name": "Car Insurance Comparison Market",
+    "domain": "Insurance / Comparison",
+    "version": "0.1",
+    "createdAt": "2026-05-19",
+    "description": "End-to-end operational and technical map of a car insurance comparison website, from customer data entry through quote generation to results display, including downstream data consumers."
+  },
+
+  "nodes": [
+    {
+      "id": "customer",
+      "type": "actor",
+      "label": "Customer",
+      "description": "Individual seeking car insurance quotes via the comparison site.",
+      "metadata": {
+        "containsPii": false,
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "enter_details",
+      "type": "process",
+      "label": "Enter Details",
+      "description": "Customer provides personal information, vehicle details, and cover preferences across a multi-step form.",
+      "metadata": {
+        "businessOwner": "Product",
+        "automationLevel": "self_service",
+        "confidence": "high",
+        "evidencedBy": ["e004"]
+      }
+    },
+    {
+      "id": "reg_lookup",
+      "type": "process",
+      "label": "Reg Lookup",
+      "description": "Customer enters vehicle registration plate, triggering auto-population of vehicle details from an external data provider.",
+      "metadata": {
+        "businessOwner": "Product",
+        "automationLevel": "automated",
+        "confidence": "high",
+        "evidencedBy": ["e001"]
+      }
+    },
+    {
+      "id": "comparison_frontend",
+      "type": "application",
+      "label": "Comparison Frontend",
+      "description": "Customer-facing web and mobile application for the comparison site.",
+      "metadata": {
+        "technicalOwner": "Platform Engineering",
+        "hosting": "AWS",
+        "technology": "React / Next.js",
+        "containsPii": true,
+        "riskLevel": "medium",
+        "maturity": "validated",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "comparison_backend",
+      "type": "application",
+      "label": "Comparison Backend",
+      "description": "API layer handling form submissions, enrichment orchestration, quote distribution, and session management.",
+      "metadata": {
+        "technicalOwner": "Platform Engineering",
+        "hosting": "AWS",
+        "technology": "Node.js",
+        "containsPii": true,
+        "riskLevel": "medium",
+        "maturity": "validated",
+        "confidence": "high",
+        "evidencedBy": ["e001"]
+      }
+    },
+    {
+      "id": "vehicle_data_provider",
+      "type": "external_saas",
+      "label": "Vehicle Data Provider",
+      "description": "Third-party service returning vehicle details from a registration plate (e.g. HPI, CDL). Returns make, model, year, engine size, fuel type, insurance group, estimated value.",
+      "metadata": {
+        "technicalOwner": "External",
+        "hosting": "external",
+        "containsPii": false,
+        "confidence": "high",
+        "riskLevel": "low"
+      }
+    },
+    {
+      "id": "customer_profile",
+      "type": "data_object",
+      "label": "Customer Profile",
+      "description": "Name, date of birth, address, licence number, employment status, driving history declarations.",
+      "metadata": {
+        "dataClassification": "personal_sensitive",
+        "containsPii": true,
+        "systemOfRecord": "session_database",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "vehicle_data",
+      "type": "data_object",
+      "label": "Vehicle Data",
+      "description": "Registration, make, model, year, engine size, fuel type, insurance group, estimated value.",
+      "metadata": {
+        "dataClassification": "non_personal",
+        "containsPii": false,
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "cover_preferences",
+      "type": "data_object",
+      "label": "Cover Preferences",
+      "description": "Desired start date, cover type (comprehensive / third party / third party fire and theft), voluntary excess, add-on preferences.",
+      "metadata": {
+        "dataClassification": "non_personal",
+        "containsPii": false,
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "session_database",
+      "type": "database",
+      "label": "Session Database",
+      "description": "Stores the in-progress quote request against a session or anonymous identifier.",
+      "metadata": {
+        "technicalOwner": "Platform Engineering",
+        "hosting": "AWS",
+        "technology": "PostgreSQL or DynamoDB",
+        "containsPii": true,
+        "systemOfRecord": true,
+        "riskLevel": "medium",
+        "monitoring": "assumed_unverified",
+        "confidence": "high",
+        "openQuestions": ["How long are sessions retained?", "Are incomplete sessions purged or archived?"]
+      }
+    },
+
+    {
+      "id": "enrichment_orchestration",
+      "type": "process",
+      "label": "Enrichment Orchestration",
+      "description": "Backend coordinates parallel calls to external data providers to enrich the customer's declared information before generating quotes.",
+      "metadata": {
+        "businessOwner": "Product",
+        "automationLevel": "automated",
+        "confidence": "high",
+        "evidencedBy": ["e001"]
+      }
+    },
+    {
+      "id": "claims_history_check",
+      "type": "process",
+      "label": "Claims History Check",
+      "description": "Customer's declared claims history is verified against the industry shared claims database (CUE).",
+      "metadata": {
+        "businessOwner": "Operations",
+        "automationLevel": "automated",
+        "confidence": "high",
+        "evidencedBy": ["e002"]
+      }
+    },
+    {
+      "id": "licence_validation",
+      "type": "process",
+      "label": "Licence Validation",
+      "description": "Customer's licence details are verified against DVLA records, confirming status, entitlements, endorsements, and penalty points.",
+      "metadata": {
+        "businessOwner": "Operations",
+        "automationLevel": "automated",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "address_verification",
+      "type": "process",
+      "label": "Address Verification",
+      "description": "Customer's declared address is verified against a third-party address database.",
+      "metadata": {
+        "businessOwner": "Operations",
+        "automationLevel": "automated",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "fraud_scoring",
+      "type": "process",
+      "label": "Fraud Scoring",
+      "description": "Pre-quote fraud risk assessment based on the enriched customer profile.",
+      "metadata": {
+        "businessOwner": "Risk",
+        "automationLevel": "automated",
+        "confidence": "medium",
+        "openQuestions": ["Which provider is actually used?", "Is this a hard gate or just a flag for downstream underwriters?"]
+      }
+    },
+    {
+      "id": "claims_discrepancy_check",
+      "type": "decision",
+      "label": "Claims Discrepancy Check",
+      "description": "Do the claims returned by CUE match what the customer declared? If not, the customer must confirm or explain before quotes can proceed.",
+      "metadata": {
+        "confidence": "high",
+        "evidencedBy": ["e004"]
+      }
+    },
+    {
+      "id": "resolve_discrepancy",
+      "type": "process",
+      "label": "Resolve Discrepancy",
+      "description": "Customer is presented with the claims discrepancy and asked to confirm, amend, or explain before the journey can continue.",
+      "metadata": {
+        "businessOwner": "Product",
+        "automationLevel": "self_service",
+        "confidence": "high",
+        "evidencedBy": ["e004"]
+      }
+    },
+    {
+      "id": "cue",
+      "type": "external_saas",
+      "label": "CUE",
+      "description": "Claims and Underwriting Exchange — shared industry database of motor claims history, operated by the Motor Insurers' Bureau.",
+      "metadata": {
+        "technicalOwner": "External (MIB)",
+        "hosting": "external",
+        "containsPii": true,
+        "confidence": "high",
+        "riskLevel": "low",
+        "evidencedBy": ["e002"]
+      }
+    },
+    {
+      "id": "mylicence_dvla",
+      "type": "external_saas",
+      "label": "MyLicence / DVLA",
+      "description": "DVLA licence validation service returning licence status, endorsements, penalty points, and entitlements.",
+      "metadata": {
+        "technicalOwner": "External (DVLA)",
+        "hosting": "external",
+        "containsPii": true,
+        "confidence": "high",
+        "riskLevel": "low"
+      }
+    },
+    {
+      "id": "address_verification_service",
+      "type": "external_saas",
+      "label": "Address Verification Service",
+      "description": "Third-party address lookup and verification service (e.g. Loqate, Experian QAS).",
+      "metadata": {
+        "technicalOwner": "External",
+        "hosting": "external",
+        "containsPii": true,
+        "confidence": "high",
+        "riskLevel": "low"
+      }
+    },
+    {
+      "id": "fraud_scoring_service",
+      "type": "external_saas",
+      "label": "Fraud Scoring Service",
+      "description": "Third-party fraud risk scoring engine (e.g. LexisNexis, Synectics). Consumes enriched personal data and returns a risk score.",
+      "metadata": {
+        "technicalOwner": "External",
+        "hosting": "external",
+        "containsPii": true,
+        "confidence": "medium",
+        "riskLevel": "medium",
+        "openQuestions": ["Which provider is actually used?", "Is this a hard gate or just a flag for downstream underwriters?"]
+      }
+    },
+    {
+      "id": "claims_history",
+      "type": "data_object",
+      "label": "Claims History",
+      "description": "Verified claims records returned from CUE — claim dates, types, fault status, amounts.",
+      "metadata": {
+        "dataClassification": "personal_sensitive",
+        "containsPii": true,
+        "confidence": "high",
+        "evidencedBy": ["e002"]
+      }
+    },
+    {
+      "id": "licence_record",
+      "type": "data_object",
+      "label": "Licence Record",
+      "description": "Verified licence details — status, categories, endorsements, penalty points, disqualifications.",
+      "metadata": {
+        "dataClassification": "personal_sensitive",
+        "containsPii": true,
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "fraud_score",
+      "type": "data_object",
+      "label": "Fraud Score",
+      "description": "Numerical risk score and flag indicators from fraud screening.",
+      "metadata": {
+        "dataClassification": "internal_sensitive",
+        "containsPii": false,
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "enriched_quote_request",
+      "type": "data_object",
+      "label": "Enriched Quote Request",
+      "description": "The final assembled object combining customer-declared data, vehicle data, cover preferences, and all enrichment results. This is what gets sent to insurers.",
+      "metadata": {
+        "dataClassification": "personal_sensitive",
+        "containsPii": true,
+        "systemOfRecord": "session_database",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "pending_verification",
+      "type": "state",
+      "label": "Pending Verification",
+      "description": "Quote request is paused because enrichment data conflicts with customer declarations.",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "verified",
+      "type": "state",
+      "label": "Verified",
+      "description": "All enrichment checks complete, discrepancies resolved, quote request ready for distribution.",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+
+    {
+      "id": "quote_distribution",
+      "type": "process",
+      "label": "Quote Distribution",
+      "description": "The enriched quote request is packaged into a standardised format and sent simultaneously to the insurer panel.",
+      "metadata": {
+        "businessOwner": "Commercial / Product",
+        "automationLevel": "automated",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "quote_engine",
+      "type": "application",
+      "label": "Quote Engine",
+      "description": "Internal service managing the fan-out to insurers — handles request formatting, parallel dispatch, timeout management, and response collection.",
+      "metadata": {
+        "technicalOwner": "Platform Engineering",
+        "hosting": "AWS",
+        "technology": "Node.js / message queue",
+        "containsPii": true,
+        "riskLevel": "medium",
+        "maturity": "validated",
+        "confidence": "high",
+        "evidencedBy": ["e001"]
+      }
+    },
+    {
+      "id": "insurer_a_quotefast",
+      "type": "external_saas",
+      "label": "Insurer A — QuoteFast Insurance",
+      "description": "Representative insurer that returns a successful quote. Stands in for the ~20 insurers on the panel.",
+      "metadata": {
+        "technicalOwner": "External",
+        "hosting": "external",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "insurer_b_secureguard",
+      "type": "external_saas",
+      "label": "Insurer B — SecureGuard Insurance",
+      "description": "Representative insurer that declines to quote.",
+      "metadata": {
+        "technicalOwner": "External",
+        "hosting": "external",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "insurer_c_budgetcover",
+      "type": "external_saas",
+      "label": "Insurer C — BudgetCover Insurance",
+      "description": "Representative insurer that times out without responding.",
+      "metadata": {
+        "technicalOwner": "External",
+        "hosting": "external",
+        "confidence": "high",
+        "openQuestions": ["Is there monitoring on insurer response times?", "Are persistently slow insurers flagged or removed from the panel?"]
+      }
+    },
+    {
+      "id": "standardised_quote_request",
+      "type": "data_object",
+      "label": "Standardised Quote Request",
+      "description": "The enriched customer data reformatted into the common schema expected by insurer APIs.",
+      "metadata": {
+        "dataClassification": "personal_sensitive",
+        "containsPii": true,
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "quote_response_quotefast",
+      "type": "data_object",
+      "label": "Quote Response — QuoteFast",
+      "description": "Successful quote — annual premium, cover details, excess, included features, optional add-ons, quote reference.",
+      "metadata": {
+        "dataClassification": "commercial",
+        "containsPii": false,
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "decline_response_secureguard",
+      "type": "data_object",
+      "label": "Decline Response — SecureGuard",
+      "description": "Decline notification — insurer chose not to quote. May include a reason code.",
+      "metadata": {
+        "dataClassification": "internal",
+        "containsPii": false,
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "timeout_event_budgetcover",
+      "type": "event",
+      "label": "Timeout — BudgetCover",
+      "description": "No response received from BudgetCover Insurance within the timeout window.",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "response_evaluation",
+      "type": "decision",
+      "label": "Response Evaluation",
+      "description": "For each insurer — did they return a quote, a decline, or nothing within the timeout window?",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "quotes_collected",
+      "type": "state",
+      "label": "Quotes Collected",
+      "description": "All insurer responses received or timed out. The system is ready to process and display results.",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "quotes_database",
+      "type": "database",
+      "label": "Quotes Database",
+      "description": "Stores all insurer responses — successful quotes, declines, and timeout records — linked to the customer session.",
+      "metadata": {
+        "technicalOwner": "Platform Engineering",
+        "hosting": "AWS",
+        "technology": "PostgreSQL",
+        "containsPii": false,
+        "systemOfRecord": true,
+        "riskLevel": "low",
+        "confidence": "high"
+      }
+    },
+
+    {
+      "id": "response_normalisation",
+      "type": "process",
+      "label": "Response Normalisation",
+      "description": "Successful quotes are transformed into a consistent display format — premium, cover level, excess, key features, insurer brand, add-on options.",
+      "metadata": {
+        "businessOwner": "Product",
+        "automationLevel": "automated",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "ranking",
+      "type": "process",
+      "label": "Ranking",
+      "description": "Normalised quotes are sorted for display. Primary sort is price, but commercial weighting may also apply — commission rates, preferred partnerships, promotional placements.",
+      "metadata": {
+        "businessOwner": "Commercial",
+        "automationLevel": "automated",
+        "confidence": "medium",
+        "riskLevel": "low",
+        "openQuestions": ["Does ranking factor in commission?", "Are there paid placements?", "How transparent is this to the customer?"]
+      }
+    },
+    {
+      "id": "display_results",
+      "type": "process",
+      "label": "Display Results",
+      "description": "Customer sees the ranked list of quotes and can browse, compare, and select.",
+      "metadata": {
+        "businessOwner": "Product",
+        "automationLevel": "self_service",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "ranked_quote_list",
+      "type": "data_object",
+      "label": "Ranked Quote List",
+      "description": "The ordered set of quotes ready for display, with normalised fields for comparison.",
+      "metadata": {
+        "dataClassification": "commercial",
+        "containsPii": false,
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "results_presented",
+      "type": "state",
+      "label": "Results Presented",
+      "description": "Customer is viewing available quotes. Journey is complete from the comparison site's perspective unless the customer selects a quote for referral.",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+
+    {
+      "id": "event_logging",
+      "type": "process",
+      "label": "Event Logging",
+      "description": "Every significant action in the journey — form submissions, enrichment results, insurer responses, customer interactions — is logged as an event for downstream consumption.",
+      "metadata": {
+        "businessOwner": "Data",
+        "automationLevel": "automated",
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "data_pipeline",
+      "type": "pipeline",
+      "label": "Data Pipeline",
+      "description": "ETL/ELT process moving event and transactional data from operational databases into the data warehouse.",
+      "metadata": {
+        "technicalOwner": "Data Engineering",
+        "hosting": "AWS",
+        "technology": "dbt / Airflow / Glue (assumed)",
+        "confidence": "medium",
+        "riskLevel": "low"
+      }
+    },
+    {
+      "id": "data_warehouse",
+      "type": "data_warehouse",
+      "label": "Data Warehouse",
+      "description": "Central analytical store containing quote journeys, enrichment data, insurer responses, conversion events, and session metadata.",
+      "metadata": {
+        "technicalOwner": "Data Engineering",
+        "hosting": "AWS",
+        "technology": "Snowflake / Redshift (assumed)",
+        "containsPii": true,
+        "systemOfRecord": true,
+        "confidence": "medium",
+        "openQuestions": ["What PII retention policy applies to customer journey data?", "Is there automated purging?"]
+      }
+    },
+    {
+      "id": "analytics_dashboard",
+      "type": "bi_tool",
+      "label": "Analytics Dashboard",
+      "description": "Business intelligence dashboards consumed by product, commercial, and operations teams — conversion funnels, quote volumes, insurer performance, drop-off analysis, average premiums.",
+      "metadata": {
+        "technicalOwner": "Data / BI",
+        "technology": "Looker / Tableau / Power BI (assumed)",
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "conversion_metrics",
+      "type": "metric",
+      "label": "Conversion Metrics",
+      "description": "Key performance indicators — quote-to-click-through rate, stage drop-off rates, average quotes per session, insurer win rates.",
+      "metadata": {
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "abandoned_journey_detection",
+      "type": "process",
+      "label": "Abandoned Journey Detection",
+      "description": "Identifies customers who received quotes but did not click through to an insurer within a defined time window.",
+      "metadata": {
+        "businessOwner": "Marketing",
+        "automationLevel": "automated",
+        "confidence": "medium",
+        "openQuestions": ["What is the abandonment time window?", "Is this real-time or batch?"]
+      }
+    },
+    {
+      "id": "crm_marketing_platform",
+      "type": "application",
+      "label": "CRM / Marketing Platform",
+      "description": "Marketing automation system that triggers re-engagement campaigns based on abandoned journey signals.",
+      "metadata": {
+        "technicalOwner": "Marketing / MarTech",
+        "technology": "Braze / Salesforce Marketing Cloud / HubSpot (assumed)",
+        "hosting": "SaaS",
+        "containsPii": true,
+        "confidence": "medium",
+        "riskLevel": "medium",
+        "openQuestions": ["What consent model governs re-engagement emails?", "Is consent captured at form entry or assumed?", "Is PII pushed to CRM or does it pull from the warehouse?"]
+      }
+    },
+    {
+      "id": "reengagement_email",
+      "type": "output",
+      "label": "Re-engagement Email",
+      "description": "Automated email sent to customers who abandoned after receiving quotes — may include a link back to their saved results.",
+      "metadata": {
+        "dataClassification": "personal",
+        "containsPii": true,
+        "confidence": "medium"
+      }
+    },
+
+    {
+      "id": "finance_team_member",
+      "type": "actor",
+      "label": "Finance Team Member",
+      "description": "Person in the finance team responsible for monthly commission reconciliation.",
+      "metadata": {
+        "confidence": "medium",
+        "evidencedBy": ["e003"]
+      }
+    },
+    {
+      "id": "commission_reconciliation",
+      "type": "process",
+      "label": "Commission Reconciliation",
+      "description": "Finance team manually reconciles insurer commission statements against internal referral records to verify payments.",
+      "metadata": {
+        "businessOwner": "Finance",
+        "automationLevel": "manual",
+        "confidence": "medium",
+        "riskLevel": "high",
+        "evidencedBy": ["e003"],
+        "openQuestions": ["How often does this break?", "Is there a plan to automate?"]
+      }
+    },
+    {
+      "id": "commission_spreadsheet",
+      "type": "spreadsheet",
+      "label": "Commission Spreadsheet",
+      "description": "Excel workbook maintained by the finance team, pulling data from the warehouse export and matching against insurer PDF statements.",
+      "metadata": {
+        "technicalOwner": "Finance (no engineering ownership)",
+        "technology": "Excel",
+        "hosting": "local / SharePoint",
+        "containsPii": false,
+        "systemOfRecord": true,
+        "riskLevel": "high",
+        "confidence": "medium",
+        "evidencedBy": ["e003"],
+        "openQuestions": ["How many people can edit this?", "Is there version control?", "What happens if it corrupts?"]
+      }
+    },
+    {
+      "id": "commission_data_export",
+      "type": "data_object",
+      "label": "Commission Data Export",
+      "description": "CSV or Excel export pulled from the data warehouse containing referral volumes, click-throughs, and attributed sales per insurer.",
+      "metadata": {
+        "dataClassification": "commercial_internal",
+        "containsPii": false,
+        "confidence": "medium"
+      }
+    }
+  ],
+
+  "edges": [
+    {
+      "id": "customer_performs_enter_details",
+      "from": "customer",
+      "to": "enter_details",
+      "type": "performs",
+      "label": "Fills in quote form",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "enter_details_implemented_by_frontend",
+      "from": "enter_details",
+      "to": "comparison_frontend",
+      "type": "implemented_by",
+      "label": "Form delivered via frontend",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "reg_lookup_implemented_by_frontend",
+      "from": "reg_lookup",
+      "to": "comparison_frontend",
+      "type": "implemented_by",
+      "label": "Reg lookup triggered from frontend",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "frontend_calls_backend",
+      "from": "comparison_frontend",
+      "to": "comparison_backend",
+      "type": "api_call",
+      "label": "Form submissions and interactions",
+      "metadata": {
+        "protocol": "REST",
+        "format": "JSON",
+        "latency": "real_time",
+        "security": "HTTPS, session token",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "backend_calls_vehicle_data",
+      "from": "comparison_backend",
+      "to": "vehicle_data_provider",
+      "type": "api_call",
+      "label": "Reg plate lookup",
+      "metadata": {
+        "protocol": "REST",
+        "format": "JSON",
+        "latency": "real_time",
+        "security": "API key",
+        "confidence": "high",
+        "dataObjectsMoved": ["registration plate (out)", "vehicle details (back)"]
+      }
+    },
+    {
+      "id": "enter_details_creates_customer_profile",
+      "from": "enter_details",
+      "to": "customer_profile",
+      "type": "creates",
+      "label": "Customer provides personal details",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "enter_details_creates_cover_preferences",
+      "from": "enter_details",
+      "to": "cover_preferences",
+      "type": "creates",
+      "label": "Customer selects cover options",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "reg_lookup_creates_vehicle_data",
+      "from": "reg_lookup",
+      "to": "vehicle_data",
+      "type": "creates",
+      "label": "Vehicle details returned from lookup",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "backend_writes_session",
+      "from": "comparison_backend",
+      "to": "session_database",
+      "type": "db_write",
+      "label": "Stores quote request data",
+      "metadata": {
+        "dataObjectsMoved": ["customer_profile", "vehicle_data", "cover_preferences"],
+        "containsPii": true,
+        "confidence": "high"
+      }
+    },
+
+    {
+      "id": "enter_details_triggers_enrichment",
+      "from": "enter_details",
+      "to": "enrichment_orchestration",
+      "type": "triggers",
+      "label": "Form completion triggers enrichment",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "enrichment_triggers_claims_check",
+      "from": "enrichment_orchestration",
+      "to": "claims_history_check",
+      "type": "triggers",
+      "label": "Initiates claims verification",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "enrichment_triggers_licence_validation",
+      "from": "enrichment_orchestration",
+      "to": "licence_validation",
+      "type": "triggers",
+      "label": "Initiates licence verification",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "enrichment_triggers_address_verification",
+      "from": "enrichment_orchestration",
+      "to": "address_verification",
+      "type": "triggers",
+      "label": "Initiates address verification",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "enrichment_triggers_fraud_scoring",
+      "from": "enrichment_orchestration",
+      "to": "fraud_scoring",
+      "type": "triggers",
+      "label": "Initiates fraud screening",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "claims_check_implemented_by_cue",
+      "from": "claims_history_check",
+      "to": "cue",
+      "type": "implemented_by",
+      "label": "Claims check uses CUE",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "licence_validation_implemented_by_dvla",
+      "from": "licence_validation",
+      "to": "mylicence_dvla",
+      "type": "implemented_by",
+      "label": "Licence check uses DVLA",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "address_verification_implemented_by_service",
+      "from": "address_verification",
+      "to": "address_verification_service",
+      "type": "implemented_by",
+      "label": "Address check uses verification service",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "fraud_scoring_implemented_by_service",
+      "from": "fraud_scoring",
+      "to": "fraud_scoring_service",
+      "type": "implemented_by",
+      "label": "Fraud scoring uses external provider",
+      "metadata": {
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "backend_calls_cue",
+      "from": "comparison_backend",
+      "to": "cue",
+      "type": "api_call",
+      "label": "Claims history request",
+      "metadata": {
+        "protocol": "REST or SOAP",
+        "format": "XML/JSON",
+        "latency": "real_time",
+        "security": "mutual TLS, API credentials",
+        "containsPii": true,
+        "confidence": "high",
+        "evidencedBy": ["e002"]
+      }
+    },
+    {
+      "id": "backend_calls_dvla",
+      "from": "comparison_backend",
+      "to": "mylicence_dvla",
+      "type": "api_call",
+      "label": "Licence validation request",
+      "metadata": {
+        "protocol": "REST",
+        "format": "JSON",
+        "latency": "real_time",
+        "security": "API key, TLS",
+        "containsPii": true,
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "backend_calls_address_service",
+      "from": "comparison_backend",
+      "to": "address_verification_service",
+      "type": "api_call",
+      "label": "Address verification request",
+      "metadata": {
+        "protocol": "REST",
+        "format": "JSON",
+        "latency": "real_time",
+        "security": "API key",
+        "containsPii": true,
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "backend_calls_fraud_service",
+      "from": "comparison_backend",
+      "to": "fraud_scoring_service",
+      "type": "api_call",
+      "label": "Fraud scoring request",
+      "metadata": {
+        "protocol": "REST",
+        "format": "JSON",
+        "latency": "real_time",
+        "security": "API key, TLS",
+        "containsPii": true,
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "claims_check_creates_claims_history",
+      "from": "claims_history_check",
+      "to": "claims_history",
+      "type": "creates",
+      "label": "Claims records returned",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "licence_validation_creates_licence_record",
+      "from": "licence_validation",
+      "to": "licence_record",
+      "type": "creates",
+      "label": "Licence details returned",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "fraud_scoring_creates_fraud_score",
+      "from": "fraud_scoring",
+      "to": "fraud_score",
+      "type": "creates",
+      "label": "Fraud score generated",
+      "metadata": {
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "claims_history_read_by_discrepancy_check",
+      "from": "claims_history",
+      "to": "claims_discrepancy_check",
+      "type": "reads",
+      "label": "CUE claims compared against declared claims",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "customer_profile_read_by_discrepancy_check",
+      "from": "customer_profile",
+      "to": "claims_discrepancy_check",
+      "type": "reads",
+      "label": "Declared claims read for comparison",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "discrepancy_check_to_pending",
+      "from": "claims_discrepancy_check",
+      "to": "pending_verification",
+      "type": "changes_state",
+      "label": "Discrepancy found — paused",
+      "metadata": {
+        "condition": "Discrepancy between declared and verified claims",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "discrepancy_check_to_verified",
+      "from": "claims_discrepancy_check",
+      "to": "verified",
+      "type": "changes_state",
+      "label": "No discrepancy — proceed",
+      "metadata": {
+        "condition": "Declared claims match CUE records",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "pending_triggers_resolve",
+      "from": "pending_verification",
+      "to": "resolve_discrepancy",
+      "type": "triggers",
+      "label": "Customer prompted to resolve",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "resolve_discrepancy_implemented_by_frontend",
+      "from": "resolve_discrepancy",
+      "to": "comparison_frontend",
+      "type": "implemented_by",
+      "label": "Discrepancy UI shown to customer",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "resolve_discrepancy_to_verified",
+      "from": "resolve_discrepancy",
+      "to": "verified",
+      "type": "changes_state",
+      "label": "Customer confirms or amends — proceed",
+      "metadata": {
+        "condition": "Customer resolves the discrepancy",
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "enrichment_creates_enriched_request",
+      "from": "enrichment_orchestration",
+      "to": "enriched_quote_request",
+      "type": "creates",
+      "label": "Assembles enriched quote request",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "enriched_request_stored_in_session",
+      "from": "enriched_quote_request",
+      "to": "session_database",
+      "type": "stores",
+      "label": "Enriched request persisted",
+      "metadata": {
+        "containsPii": true,
+        "confidence": "high"
+      }
+    },
+
+    {
+      "id": "verified_triggers_distribution",
+      "from": "verified",
+      "to": "quote_distribution",
+      "type": "triggers",
+      "label": "Enrichment complete — distribute quotes",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "quote_distribution_implemented_by_engine",
+      "from": "quote_distribution",
+      "to": "quote_engine",
+      "type": "implemented_by",
+      "label": "Distribution managed by quote engine",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "enriched_request_transforms_to_standardised",
+      "from": "enriched_quote_request",
+      "to": "standardised_quote_request",
+      "type": "transforms",
+      "label": "Reformatted for insurer consumption",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "engine_calls_insurer_a",
+      "from": "quote_engine",
+      "to": "insurer_a_quotefast",
+      "type": "api_call",
+      "label": "Quote request to QuoteFast",
+      "metadata": {
+        "protocol": "REST",
+        "format": "JSON",
+        "latency": "real_time",
+        "security": "mutual TLS, API key",
+        "containsPii": true,
+        "confidence": "high",
+        "dataObjectsMoved": ["standardised_quote_request"]
+      }
+    },
+    {
+      "id": "engine_calls_insurer_b",
+      "from": "quote_engine",
+      "to": "insurer_b_secureguard",
+      "type": "api_call",
+      "label": "Quote request to SecureGuard",
+      "metadata": {
+        "protocol": "REST",
+        "format": "JSON",
+        "latency": "real_time",
+        "security": "mutual TLS, API key",
+        "containsPii": true,
+        "confidence": "high",
+        "dataObjectsMoved": ["standardised_quote_request"]
+      }
+    },
+    {
+      "id": "engine_calls_insurer_c",
+      "from": "quote_engine",
+      "to": "insurer_c_budgetcover",
+      "type": "api_call",
+      "label": "Quote request to BudgetCover",
+      "metadata": {
+        "protocol": "REST",
+        "format": "JSON",
+        "latency": "timeout",
+        "security": "mutual TLS, API key",
+        "containsPii": true,
+        "confidence": "high",
+        "dataObjectsMoved": ["standardised_quote_request"]
+      }
+    },
+    {
+      "id": "insurer_a_creates_quote",
+      "from": "insurer_a_quotefast",
+      "to": "quote_response_quotefast",
+      "type": "creates",
+      "label": "Returns successful quote",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "insurer_b_creates_decline",
+      "from": "insurer_b_secureguard",
+      "to": "decline_response_secureguard",
+      "type": "creates",
+      "label": "Returns decline",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "insurer_c_creates_timeout",
+      "from": "insurer_c_budgetcover",
+      "to": "timeout_event_budgetcover",
+      "type": "creates",
+      "label": "No response — timeout",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "quote_response_to_evaluation",
+      "from": "quote_response_quotefast",
+      "to": "response_evaluation",
+      "type": "reads",
+      "label": "Successful quote evaluated",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "decline_response_to_evaluation",
+      "from": "decline_response_secureguard",
+      "to": "response_evaluation",
+      "type": "reads",
+      "label": "Decline evaluated",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "timeout_to_evaluation",
+      "from": "timeout_event_budgetcover",
+      "to": "response_evaluation",
+      "type": "reads",
+      "label": "Timeout evaluated",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "evaluation_to_quotes_collected",
+      "from": "response_evaluation",
+      "to": "quotes_collected",
+      "type": "changes_state",
+      "label": "All responses processed",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "engine_writes_quotes_db",
+      "from": "quote_engine",
+      "to": "quotes_database",
+      "type": "db_write",
+      "label": "Stores all quote responses",
+      "metadata": {
+        "dataObjectsMoved": ["quote_response_quotefast", "decline_response_secureguard", "timeout_event_budgetcover"],
+        "confidence": "high"
+      }
+    },
+
+    {
+      "id": "collected_triggers_normalisation",
+      "from": "quotes_collected",
+      "to": "response_normalisation",
+      "type": "triggers",
+      "label": "Ready for processing",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "normalisation_triggers_ranking",
+      "from": "response_normalisation",
+      "to": "ranking",
+      "type": "triggers",
+      "label": "Normalised quotes ready for ranking",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "normalisation_implemented_by_backend",
+      "from": "response_normalisation",
+      "to": "comparison_backend",
+      "type": "implemented_by",
+      "label": "Normalisation logic in backend",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "ranking_implemented_by_backend",
+      "from": "ranking",
+      "to": "comparison_backend",
+      "type": "implemented_by",
+      "label": "Ranking logic in backend",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "ranking_creates_ranked_list",
+      "from": "ranking",
+      "to": "ranked_quote_list",
+      "type": "creates",
+      "label": "Produces ranked quote list",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "display_results_implemented_by_frontend",
+      "from": "display_results",
+      "to": "comparison_frontend",
+      "type": "implemented_by",
+      "label": "Results page rendered by frontend",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "ranked_list_read_by_display",
+      "from": "ranked_quote_list",
+      "to": "display_results",
+      "type": "reads",
+      "label": "Frontend renders ranked quotes",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "display_results_to_results_presented",
+      "from": "display_results",
+      "to": "results_presented",
+      "type": "changes_state",
+      "label": "Customer viewing quotes",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+    {
+      "id": "customer_performs_display_results",
+      "from": "customer",
+      "to": "display_results",
+      "type": "performs",
+      "label": "Browses and compares quotes",
+      "metadata": {
+        "confidence": "high"
+      }
+    },
+
+    {
+      "id": "session_db_to_pipeline",
+      "from": "session_database",
+      "to": "data_pipeline",
+      "type": "elt_job",
+      "label": "Session data to warehouse",
+      "metadata": {
+        "schedule": "near_real_time_or_hourly",
+        "containsPii": true,
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "quotes_db_to_pipeline",
+      "from": "quotes_database",
+      "to": "data_pipeline",
+      "type": "elt_job",
+      "label": "Quote responses to warehouse",
+      "metadata": {
+        "schedule": "near_real_time_or_hourly",
+        "containsPii": false,
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "pipeline_writes_warehouse",
+      "from": "data_pipeline",
+      "to": "data_warehouse",
+      "type": "db_write",
+      "label": "Transformed data loaded",
+      "metadata": {
+        "containsPii": true,
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "warehouse_to_dashboard",
+      "from": "data_warehouse",
+      "to": "analytics_dashboard",
+      "type": "report_query",
+      "label": "Dashboard queries warehouse",
+      "metadata": {
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "dashboard_creates_metrics",
+      "from": "analytics_dashboard",
+      "to": "conversion_metrics",
+      "type": "creates",
+      "label": "KPIs computed and displayed",
+      "metadata": {
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "warehouse_read_by_abandonment",
+      "from": "data_warehouse",
+      "to": "abandoned_journey_detection",
+      "type": "reads",
+      "label": "Queries for incomplete journeys",
+      "metadata": {
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "abandonment_implemented_by_crm",
+      "from": "abandoned_journey_detection",
+      "to": "crm_marketing_platform",
+      "type": "implemented_by",
+      "label": "Detection logic runs in CRM",
+      "metadata": {
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "warehouse_to_crm",
+      "from": "data_warehouse",
+      "to": "crm_marketing_platform",
+      "type": "reads",
+      "label": "Customer contact details for outreach",
+      "metadata": {
+        "containsPii": true,
+        "confidence": "medium",
+        "openQuestions": ["Is PII pushed to CRM or does CRM pull?", "What consent model applies?"]
+      }
+    },
+    {
+      "id": "crm_creates_email",
+      "from": "crm_marketing_platform",
+      "to": "reengagement_email",
+      "type": "creates",
+      "label": "Generates re-engagement campaign",
+      "metadata": {
+        "containsPii": true,
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "email_sent_to_customer",
+      "from": "reengagement_email",
+      "to": "customer",
+      "type": "sends",
+      "label": "Re-engagement email delivered",
+      "metadata": {
+        "confidence": "medium"
+      }
+    },
+
+    {
+      "id": "warehouse_exports_commission_data",
+      "from": "data_warehouse",
+      "to": "commission_data_export",
+      "type": "batch_export",
+      "label": "Monthly commission data export",
+      "metadata": {
+        "schedule": "monthly",
+        "format": "CSV",
+        "confidence": "medium",
+        "evidencedBy": ["e003"]
+      }
+    },
+    {
+      "id": "commission_export_to_spreadsheet",
+      "from": "commission_data_export",
+      "to": "commission_spreadsheet",
+      "type": "manual_rekey",
+      "label": "Finance copies data into reconciliation workbook",
+      "metadata": {
+        "confidence": "medium",
+        "evidencedBy": ["e003"]
+      }
+    },
+    {
+      "id": "finance_performs_reconciliation",
+      "from": "finance_team_member",
+      "to": "commission_reconciliation",
+      "type": "performs",
+      "label": "Manual monthly reconciliation",
+      "metadata": {
+        "confidence": "medium",
+        "evidencedBy": ["e003"]
+      }
+    },
+    {
+      "id": "reconciliation_implemented_by_spreadsheet",
+      "from": "commission_reconciliation",
+      "to": "commission_spreadsheet",
+      "type": "implemented_by",
+      "label": "Reconciliation done in Excel",
+      "metadata": {
+        "confidence": "medium",
+        "evidencedBy": ["e003"]
+      }
+    }
+  ],
+
+  "views": [
+    {
+      "id": "journey_view",
+      "label": "Journey View",
+      "description": "Operational story of the customer quote journey — actors, processes, decisions, states, and outcomes.",
+      "includeNodeTypes": ["actor", "process", "decision", "state", "event", "data_object", "output", "metric"],
+      "includeEdgeTypes": ["performs", "triggers", "creates", "reads", "changes_state", "sends"]
+    },
+    {
+      "id": "technical_view",
+      "label": "Technical Architecture",
+      "description": "Systems, integrations, and infrastructure that implement the operational flow.",
+      "includeNodeTypes": ["application", "external_saas", "database", "data_warehouse", "pipeline", "bi_tool", "spreadsheet"],
+      "includeEdgeTypes": ["implemented_by", "api_call", "db_write", "db_read", "elt_job", "batch_export", "manual_rekey", "report_query"]
+    },
+    {
+      "id": "data_lineage_view",
+      "label": "Data Lineage",
+      "description": "How data objects are created, transformed, stored, and consumed across the flow.",
+      "includeNodeTypes": ["data_object", "database", "data_warehouse", "pipeline", "bi_tool", "spreadsheet", "output", "metric"],
+      "includeEdgeTypes": ["creates", "reads", "writes", "stores", "transforms", "elt_job", "batch_export", "manual_rekey", "report_query", "sends"]
+    },
+    {
+      "id": "risk_view",
+      "label": "Risk View",
+      "description": "Fragility, uncertainty, manual processes, and operational exposure.",
+      "includeNodeTypes": ["spreadsheet", "process", "decision", "event", "external_saas", "database", "data_warehouse", "application"],
+      "includeEdgeTypes": ["manual_rekey", "api_call", "batch_export", "implemented_by", "performs"],
+      "highlightMetadata": {
+        "riskLevel": ["high", "medium"],
+        "automationLevel": ["manual"],
+        "confidence": ["low", "medium"]
+      }
+    }
+  ],
+
+  "overlays": [
+    {
+      "id": "pii",
+      "label": "PII / Sensitive Data",
+      "description": "Highlights nodes and edges that contain, process, transmit, or store personally identifiable information.",
+      "match": {
+        "metadata.containsPii": true
+      }
+    },
+    {
+      "id": "manual_process",
+      "label": "Manual Processes",
+      "description": "Highlights manual steps, spreadsheets, human workarounds, and manual data transfers.",
+      "match": {
+        "metadata.automationLevel": "manual"
+      },
+      "alsoMatchNodeTypes": ["spreadsheet"],
+      "alsoMatchEdgeTypes": ["manual_rekey"]
+    },
+    {
+      "id": "unknowns",
+      "label": "Unknowns & Low Confidence",
+      "description": "Highlights nodes and edges with medium or low confidence, open questions, and assumed details.",
+      "match": {
+        "metadata.confidence": ["low", "medium"]
+      },
+      "alsoMatchMetadata": {
+        "openQuestions": "non_empty"
+      }
+    },
+    {
+      "id": "high_risk",
+      "label": "High Risk",
+      "description": "Highlights elements with elevated risk — fragile integrations, manual dependencies, lack of ownership.",
+      "match": {
+        "metadata.riskLevel": "high"
+      }
+    },
+    {
+      "id": "system_of_record",
+      "label": "System of Record",
+      "description": "Highlights authoritative sources for key data objects.",
+      "match": {
+        "metadata.systemOfRecord": true
+      }
+    }
+  ],
+
+  "scenarios": [
+    {
+      "id": "happy_path",
+      "label": "Happy Path — Quote to Results",
+      "description": "Customer enters details, enrichment passes without discrepancy, quotes are distributed, results displayed.",
+      "steps": [
+        { "nodeId": "customer", "action": "pulse_node", "durationMs": 600 },
+        { "edgeId": "customer_performs_enter_details", "action": "animate_flow", "durationMs": 800 },
+        { "nodeId": "enter_details", "action": "pulse_node", "durationMs": 700 },
+        { "edgeId": "enter_details_implemented_by_frontend", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "frontend_calls_backend", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "backend_calls_vehicle_data", "action": "animate_flow", "durationMs": 600 },
+        { "edgeId": "reg_lookup_creates_vehicle_data", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "backend_writes_session", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "enter_details_triggers_enrichment", "action": "animate_flow", "durationMs": 600 },
+        { "nodeId": "enrichment_orchestration", "action": "pulse_node", "durationMs": 700 },
+        { "edgeId": "backend_calls_cue", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "backend_calls_dvla", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "backend_calls_address_service", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "backend_calls_fraud_service", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "claims_check_creates_claims_history", "action": "animate_flow", "durationMs": 500 },
+        { "nodeId": "claims_discrepancy_check", "action": "pulse_node", "durationMs": 700 },
+        { "edgeId": "discrepancy_check_to_verified", "action": "animate_flow", "durationMs": 600 },
+        { "nodeId": "verified", "action": "pulse_node", "durationMs": 600 },
+        { "edgeId": "verified_triggers_distribution", "action": "animate_flow", "durationMs": 600 },
+        { "nodeId": "quote_engine", "action": "pulse_node", "durationMs": 700 },
+        { "edgeId": "engine_calls_insurer_a", "action": "animate_flow", "durationMs": 600 },
+        { "edgeId": "engine_calls_insurer_b", "action": "animate_flow", "durationMs": 600 },
+        { "edgeId": "engine_calls_insurer_c", "action": "animate_flow", "durationMs": 600 },
+        { "edgeId": "insurer_a_creates_quote", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "insurer_b_creates_decline", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "insurer_c_creates_timeout", "action": "animate_flow", "durationMs": 500 },
+        { "nodeId": "response_evaluation", "action": "pulse_node", "durationMs": 600 },
+        { "edgeId": "evaluation_to_quotes_collected", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "collected_triggers_normalisation", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "normalisation_triggers_ranking", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "ranking_creates_ranked_list", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "customer_performs_display_results", "action": "animate_flow", "durationMs": 600 },
+        { "nodeId": "results_presented", "action": "pulse_node", "durationMs": 800 }
+      ]
+    },
+    {
+      "id": "discrepancy_path",
+      "label": "Claims Discrepancy — Customer Resolution",
+      "description": "Customer enters details, CUE returns undeclared claims, customer is prompted to resolve before quotes proceed.",
+      "steps": [
+        { "nodeId": "customer", "action": "pulse_node", "durationMs": 600 },
+        { "edgeId": "customer_performs_enter_details", "action": "animate_flow", "durationMs": 800 },
+        { "nodeId": "enter_details", "action": "pulse_node", "durationMs": 700 },
+        { "edgeId": "enter_details_triggers_enrichment", "action": "animate_flow", "durationMs": 600 },
+        { "nodeId": "enrichment_orchestration", "action": "pulse_node", "durationMs": 700 },
+        { "edgeId": "backend_calls_cue", "action": "animate_flow", "durationMs": 600 },
+        { "edgeId": "claims_check_creates_claims_history", "action": "animate_flow", "durationMs": 500 },
+        { "nodeId": "claims_discrepancy_check", "action": "pulse_node", "durationMs": 800 },
+        { "edgeId": "discrepancy_check_to_pending", "action": "animate_flow", "durationMs": 700 },
+        { "nodeId": "pending_verification", "action": "pulse_node", "durationMs": 800 },
+        { "edgeId": "pending_triggers_resolve", "action": "animate_flow", "durationMs": 600 },
+        { "nodeId": "resolve_discrepancy", "action": "pulse_node", "durationMs": 800 },
+        { "edgeId": "resolve_discrepancy_implemented_by_frontend", "action": "animate_flow", "durationMs": 500 },
+        { "edgeId": "resolve_discrepancy_to_verified", "action": "animate_flow", "durationMs": 700 },
+        { "nodeId": "verified", "action": "pulse_node", "durationMs": 600 },
+        { "edgeId": "verified_triggers_distribution", "action": "animate_flow", "durationMs": 600 }
+      ]
+    }
+  ],
+
+  "evidence": [
+    {
+      "id": "e001",
+      "type": "workshop",
+      "label": "Architecture walkthrough with Platform Engineering lead",
+      "date": "2026-05-15",
+      "excerpt": "The backend orchestrates all enrichment calls in parallel before assembling the final quote request. Timeout is 3 seconds per provider."
+    },
+    {
+      "id": "e002",
+      "type": "document",
+      "label": "CUE API integration specification",
+      "date": "2026-03-01",
+      "excerpt": "Claims data is returned as a structured array of claim events linked to the policyholder's licence number."
+    },
+    {
+      "id": "e003",
+      "type": "interview",
+      "label": "Interview with Head of Commercial Partnerships",
+      "date": "2026-05-10",
+      "excerpt": "Commission reconciliation is still done in Excel. We've been talking about automating it for two years but it keeps getting deprioritised."
+    },
+    {
+      "id": "e004",
+      "type": "interview",
+      "label": "Briefing with Product Manager on quote journey",
+      "date": "2026-05-12",
+      "excerpt": "The discrepancy screen was added last year after we found that about 8% of customers under-declare claims. CUE catches most of them."
+    }
+  ]
+}

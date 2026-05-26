@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solstein — Operator Users</title>
+<link rel="stylesheet" href="solstein-tokens.css">
+<link rel="stylesheet" href="solstein-app.css">
+<link rel="stylesheet" href="solstein-toast.css">
+<link rel="stylesheet" href="solstein-operator.css">
+<script src="solstein-toast.js" defer></script>
+</head>
+<body data-op-page="users">
+<div class="op-shell">
+  <main class="op-main">
+    <div class="op-page-head">
+      <div>
+        <div class="kicker">§ Operator Console</div>
+        <h1>Users <span style="color: var(--sol-text-3); font-family: var(--font-display); font-size: 14px; letter-spacing: 0.15em; margin-left: 10px;">42 total · 38 active</span></h1>
+      </div>
+      <div class="right">
+        <a class="btn btn-primary" href="operator-invitations.html" style="text-decoration: none; height: 36px;">Send Invite…</a>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="op-filter">
+      <input class="search" type="text" placeholder="Search users by name or email…" id="u-search">
+      <div class="seg" data-filter-group="status">
+        <button class="is-here" data-status="all">All · 42</button>
+        <button data-status="active">Active · 38</button>
+        <button data-status="invited">Invited · 3</button>
+        <button data-status="suspended">Suspended · 1</button>
+      </div>
+      <div class="seg" data-filter-group="class">
+        <button class="is-here" data-class="all">All</button>
+        <button data-class="member">Member</button>
+        <button data-class="external">External</button>
+      </div>
+    </div>
+
+    <table class="op-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Account class</th>
+          <th>Projects</th>
+          <th>Joined</th>
+          <th>Last active</th>
+          <th>Status</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="users-tbody"></tbody>
+    </table>
+
+    <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-display); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sol-text-3);">
+      <span id="u-count">Showing 1–10 of 42</span>
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <button class="row-action" id="u-prev">‹ Prev</button>
+        <span id="u-pageinfo" style="min-width: 80px; text-align: center;">Page 1 / 5</span>
+        <button class="row-action" id="u-next">Next ›</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- User detail panel -->
+<div class="op-panel-backdrop" id="panel-backdrop" onclick="closePanel()"></div>
+<aside class="op-panel" id="user-panel">
+  <div class="op-panel-head">
+    <div>
+      <h3 class="title" id="up-name">Sarah Chen</h3>
+      <p class="sub" id="up-email">sarah.chen@northern-co.com</p>
+    </div>
+    <button class="close" onclick="closePanel()">Close</button>
+  </div>
+
+  <div class="op-panel-body">
+
+    <div class="pgrp">
+      <div class="pgrp-lbl">§ Identity</div>
+      <dl>
+        <dt>Name</dt>      <dd id="up-name2">Sarah Chen</dd>
+        <dt>Email</dt>     <dd id="up-email2">sarah.chen@northern-co.com</dd>
+        <dt>User ID</dt>   <dd class="mono" id="up-id">usr_3f8c92a3e102</dd>
+        <dt>Joined</dt>    <dd id="up-joined">May 22, 2026 · via Operator invite</dd>
+      </dl>
+    </div>
+
+    <div class="pgrp">
+      <div class="pgrp-lbl">§ Account Class</div>
+      <dl>
+        <dt>Class</dt><dd id="up-class-row"><span class="pill is-full" id="up-class">Member</span> <span id="up-class-note">— can create projects</span></dd>
+        <dt>Status</dt><dd id="up-status-row"><span class="pill is-active" id="up-status">Active</span></dd>
+      </dl>
+      <div style="margin-top: 10px; font-size: 12px; color: var(--sol-text-3); line-height: 1.5;">
+        <strong style="color: var(--sol-text); font-weight: 500;">Members</strong> are part of your workspace — they can create projects, invite people, and count as billable seats. <strong style="color: var(--sol-text); font-weight: 500;">External</strong> users are clients invited to specific projects only. Promoting an External user to Project Owner inside a project does <strong style="color: var(--sol-text); font-weight: 500;">not</strong> make them a Member — only you, the Operator, can do that, from here.
+      </div>
+    </div>
+
+    <div class="pgrp">
+      <div class="pgrp-lbl" id="up-projects-lbl">§ Projects (2 owned)</div>
+      <table class="op-table" style="font-size: 12.5px;" id="up-projects-table">
+        <thead><tr><th>Name</th><th>Created</th><th>Your role</th><th>Others</th></tr></thead>
+        <tbody id="up-projects-body">
+          <tr><td class="text">Northern Co · Risk Audit</td><td class="faint">May 22</td><td><span class="role-pill is-owner">Owner</span></td><td class="mut">2</td></tr>
+          <tr><td class="text">Acme Insurance Comparison</td><td class="faint">May 20</td><td><span class="role-pill is-owner">Owner</span></td><td class="mut">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pgrp">
+      <div class="pgrp-lbl">§ Recent Activity</div>
+      <ul style="margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--sol-text-2); line-height: 1.7;">
+        <li><strong style="color: var(--sol-text);">Edited</strong> Northern Co · Risk Audit · <span style="color: var(--sol-text-3);">2h ago</span></li>
+        <li><strong style="color: var(--sol-text);">Invited</strong> diego.ruiz@acmecorp.io · <span style="color: var(--sol-text-3);">5h ago</span></li>
+        <li><strong style="color: var(--sol-text);">Signed in</strong> · <span style="color: var(--sol-text-3);">2h ago</span></li>
+      </ul>
+    </div>
+
+    <div class="pgrp">
+      <div class="pgrp-lbl">§ Notes (operator-private)</div>
+      <textarea style="width: 100%; min-height: 60px; background: var(--sol-ground); border: 1px solid var(--sol-hairline-strong); border-radius: var(--radius); padding: 10px 12px; color: var(--sol-text); font: inherit; font-size: 13px; resize: vertical;" placeholder="Notes only visible in the Operator Console…"></textarea>
+    </div>
+
+  </div>
+
+  <div class="op-panel-actions">
+    <button class="row-action" id="up-promote">Promote to Member</button>
+    <button class="row-action" id="up-demote" style="display: none;">Demote to External</button>
+    <button class="row-action">Send Password Reset</button>
+    <button class="row-action">Sign Out All Sessions</button>
+    <button class="row-action danger" id="up-suspend">Suspend</button>
+    <button class="row-action" id="up-reactivate" style="display: none;">Reactivate</button>
+    <button class="row-action danger">Delete Account</button>
+  </div>
+</aside>
+
+<script>
+// ============================================================
+// User data — 42 entries, primary source of truth for rows + panel
+// ============================================================
+var USERS = [
+  { id: 'james',  name: 'James Mitchell',    email: 'james.mitchell@consultancy.com',     cls: 'member',   status: 'active',    uid: 'usr_8f3d2c1b4a90', joined: 'Mar 12, 2026',  joinedDetail: 'Mar 12, 2026 · via Operator invite',  lastActive: 'just now',     lastActiveDetail: 'just now · Firefox · Windows 11',  ownedCount: 3, collabCount: 0,
+    projects: [['Acme Insurance Comparison','May 20', 'Owner',4],['Northern Bank · Ops Audit','May 14', 'Owner',2],['Morrison Partners · Risk Map','May 03', 'Owner',3]] },
+  { id: 'sarah',  name: 'Sarah Chen',        email: 'sarah.chen@northern-co.com',          cls: 'member',   status: 'active',    uid: 'usr_3f8c92a3e102', joined: 'May 22, 2026',  joinedDetail: 'May 22, 2026 · via Operator invite',  lastActive: '2h ago',       lastActiveDetail: '2h ago · Chrome · macOS 14',       ownedCount: 2, collabCount: 0,
+    projects: [['Northern Co · Risk Audit','May 22', 'Owner',2],['Acme Insurance Comparison','May 20', 'Owner',1]] },
+  { id: 'alex',   name: 'Alex Petrov',       email: 'alex@alex-petrov.com',                cls: 'external', status: 'active',    uid: 'usr_4d2c9f81a3b0', joined: 'May 22, 2026',  joinedDetail: 'May 22, 2026 · via project invite',   lastActive: '5h ago',       lastActiveDetail: '5h ago · Chrome · macOS 14',       ownedCount: 0, collabCount: 4, projects: [['Acme Insurance Comparison','May 21','Editor',5],['Northern Bank · Ops Audit','May 18','Viewer',3],['Morrison Partners · Risk Map','May 14','Editor',4],['Hollow Co · Strategy Draft','May 09','Viewer',2]] },
+  { id: 'mei',    name: 'Mei Tanaka',        email: 'mei.tanaka@morrison-partners.com',    cls: 'member',   status: 'active',    uid: 'usr_7b1ea2d40c91', joined: 'May 21, 2026',  joinedDetail: 'May 21, 2026 · via Operator invite',  lastActive: '1d ago',       lastActiveDetail: '1d ago · Safari · macOS 14',       ownedCount: 1, collabCount: 1,
+    projects: [['Morrison Partners · Risk Map','May 03', 'Owner',3]] },
+  { id: 'diego',  name: 'Diego Ruiz',        email: 'diego.ruiz@acmecorp.io',              cls: 'external', status: 'active',    uid: 'usr_2a90e74cf518', joined: 'May 20, 2026',  joinedDetail: 'May 20, 2026 · via project invite',   lastActive: '2d ago',       lastActiveDetail: '2d ago · Chrome · Windows 11',     ownedCount: 0, collabCount: 2, projects: [['Acme Insurance Comparison','May 20','Editor',5],['Northern Co · Risk Audit','May 19','Owner',2]] },
+  { id: 'priya',  name: 'Priya Nair',        email: 'p.nair@nair-strategy.com',            cls: 'member',   status: 'active',    uid: 'usr_91e2c70b8d4a', joined: 'May 19, 2026',  joinedDetail: 'May 19, 2026 · via Operator invite',  lastActive: '3d ago',       lastActiveDetail: '3d ago · Firefox · macOS 14',      ownedCount: 4, collabCount: 1,
+    projects: [['Nair Strategy · Q2 Audit','May 18', 'Owner',2],['Confidential · Client A','May 12', 'Owner',1],['Confidential · Client B','Apr 28', 'Owner',1],['Internal Test Project','Apr 20', 'Owner',0]] },
+  { id: 'rachel', name: 'Rachel Holloway',   email: 'rachel@hollow-co.com',                cls: 'member',   status: 'invited',   uid: 'usr_5c30a91b7e22', joined: 'May 15, 2026',  joinedDetail: 'May 15, 2026 · via Operator invite',  lastActive: '8d ago',       lastActiveDetail: '8d ago · Chrome · macOS 14',       ownedCount: 2, collabCount: 0,
+    projects: [['Hollow Co · Strategy Draft','May 15', 'Owner',1],['Hollow Co · Onboarding','May 10', 'Owner',0]] },
+  { id: 'tom',    name: 'Tom Wright',        email: 'tom.wright@wright-advisory.com',      cls: 'member',   status: 'invited',   uid: 'usr_—',             joined: '—',              joinedDetail: 'Pending acceptance · sent 1d ago',     lastActive: 'never',        lastActiveDetail: 'Never',                            ownedCount: 0, collabCount: 0, projects: [] },
+  { id: 'ben',    name: 'Ben Halligan',      email: 'ben.halligan@oldfirm.co.uk',          cls: 'external', status: 'suspended', uid: 'usr_7a8b1d29f045', joined: 'Apr 03, 2026',  joinedDetail: 'Apr 03, 2026 · via project invite',   lastActive: '21d ago',      lastActiveDetail: '21 days ago · Chrome · Windows 11', ownedCount: 0, collabCount: 0, projects: [] },
+
+  /* ----- generated entries (10–42) ----- */
+  { id: 'u10', name: 'Eleanor Park',         email: 'e.park@parkadvisory.com',             cls: 'member',   status: 'active',    uid: 'usr_a1b2c3d4e5f6', joined: 'May 18, 2026',  joinedDetail: 'May 18, 2026 · via Operator invite',  lastActive: '4h ago',       lastActiveDetail: '4h ago · Chrome · macOS 14',       ownedCount: 3, collabCount: 0,
+    projects: [['Park Advisory · Diligence','May 18', 'Owner',2],['Park Advisory · Onboarding','May 12', 'Owner',1],['Confidential · Project K','May 02', 'Owner',0]] },
+  { id: 'u11', name: 'Marcus Lindqvist',     email: 'marcus@lindqvist-co.se',              cls: 'external', status: 'active',    uid: 'usr_b2c3d4e5f6a1', joined: 'May 17, 2026',  joinedDetail: 'May 17, 2026 · via project invite',   lastActive: '6h ago',       lastActiveDetail: '6h ago · Safari · iOS',            ownedCount: 0, collabCount: 3, projects: [['Lindqvist · Mapping','May 17','Owner',2],['Hoshino Ops · Mapping','May 14','Editor',3],['Møller Data · Pipeline','May 09','Viewer',2]] },
+  { id: 'u12', name: 'Yuki Hoshino',         email: 'yuki.hoshino@hoshino-ops.jp',         cls: 'member',   status: 'active',    uid: 'usr_c3d4e5f6a1b2', joined: 'May 16, 2026',  joinedDetail: 'May 16, 2026 · via Operator invite',  lastActive: '12h ago',      lastActiveDetail: '12h ago · Chrome · Windows 11',    ownedCount: 1, collabCount: 0,
+    projects: [['Hoshino Ops · Mapping','May 16', 'Owner',1]] },
+  { id: 'u13', name: 'Aisha Khan',           email: 'aisha.khan@khan-strategy.com',        cls: 'member',   status: 'active',    uid: 'usr_d4e5f6a1b2c3', joined: 'May 15, 2026',  joinedDetail: 'May 15, 2026 · via Operator invite',  lastActive: '1d ago',       lastActiveDetail: '1d ago · Chrome · macOS 14',       ownedCount: 2, collabCount: 1,
+    projects: [['Khan Strategy · Audit','May 15', 'Owner',2],['Khan Strategy · Onboarding','May 10', 'Owner',1]] },
+  { id: 'u14', name: 'Olu Adeyemi',          email: 'olu@adeyemi-ops.ng',                  cls: 'external', status: 'active',    uid: 'usr_e5f6a1b2c3d4', joined: 'May 14, 2026',  joinedDetail: 'May 14, 2026 · via project invite',   lastActive: '2d ago',       lastActiveDetail: '2d ago · Firefox · Ubuntu',        ownedCount: 0, collabCount: 1, projects: [] },
+  { id: 'u15', name: 'Henrik Møller',        email: 'h.moller@moller-data.dk',             cls: 'member',   status: 'active',    uid: 'usr_f6a1b2c3d4e5', joined: 'May 13, 2026',  joinedDetail: 'May 13, 2026 · via Operator invite',  lastActive: '3d ago',       lastActiveDetail: '3d ago · Safari · macOS 14',       ownedCount: 1, collabCount: 2,
+    projects: [['Møller Data · Pipeline','May 13', 'Owner',2]] },
+  { id: 'u16', name: 'Sofia Romero',         email: 'sofia.r@romero-and-co.es',            cls: 'external', status: 'active',    uid: 'usr_a1b2c3d4e5f7', joined: 'May 12, 2026',  joinedDetail: 'May 12, 2026 · via project invite',   lastActive: '3d ago',       lastActiveDetail: '3d ago · Chrome · Windows 11',     ownedCount: 0, collabCount: 2, projects: [] },
+  { id: 'u17', name: 'David Okonkwo',        email: 'david.o@okonkwo-advisory.com',        cls: 'member',   status: 'active',    uid: 'usr_b2c3d4e5f7a1', joined: 'May 11, 2026',  joinedDetail: 'May 11, 2026 · via Operator invite',  lastActive: '4d ago',       lastActiveDetail: '4d ago · Chrome · macOS 14',       ownedCount: 2, collabCount: 0,
+    projects: [['Okonkwo · Risk Review','May 11', 'Owner',1],['Okonkwo · Comp Plan','May 04', 'Owner',0]] },
+  { id: 'u18', name: 'Liana Ferreira',       email: 'l.ferreira@ferreira-partners.com.br', cls: 'external', status: 'active',    uid: 'usr_c3d4e5f7a1b2', joined: 'May 10, 2026',  joinedDetail: 'May 10, 2026 · via project invite',   lastActive: '4d ago',       lastActiveDetail: '4d ago · Firefox · macOS 14',      ownedCount: 0, collabCount: 1, projects: [] },
+  { id: 'u19', name: 'Anders Bergström',     email: 'anders@bergstrom-ops.se',             cls: 'member',   status: 'active',    uid: 'usr_d4e5f7a1b2c3', joined: 'May 09, 2026',  joinedDetail: 'May 09, 2026 · via Operator invite',  lastActive: '5d ago',       lastActiveDetail: '5d ago · Chrome · Windows 11',     ownedCount: 1, collabCount: 0,
+    projects: [['Bergström Ops · Q1 Audit','May 09', 'Owner',1]] },
+  { id: 'u20', name: 'Reema Iyer',           email: 'reema.iyer@iyer-consulting.in',       cls: 'member',   status: 'active',    uid: 'usr_e5f7a1b2c3d4', joined: 'May 08, 2026',  joinedDetail: 'May 08, 2026 · via Operator invite',  lastActive: '5d ago',       lastActiveDetail: '5d ago · Chrome · macOS 14',       ownedCount: 2, collabCount: 1,
+    projects: [['Iyer · Banking Map','May 08', 'Owner',2],['Iyer · Compliance Brief','May 01', 'Owner',1]] },
+  { id: 'u21', name: 'Tobias Krause',        email: 't.krause@krause-data.de',             cls: 'external', status: 'active',    uid: 'usr_f7a1b2c3d4e5', joined: 'May 07, 2026',  joinedDetail: 'May 07, 2026 · via project invite',   lastActive: '6d ago',       lastActiveDetail: '6d ago · Firefox · Linux',         ownedCount: 0, collabCount: 1, projects: [] },
+  { id: 'u22', name: 'Camille Beaulieu',     email: 'camille@beaulieu-strategy.fr',        cls: 'member',   status: 'active',    uid: 'usr_a8b9c0d1e2f3', joined: 'May 06, 2026',  joinedDetail: 'May 06, 2026 · via Operator invite',  lastActive: '7d ago',       lastActiveDetail: '7d ago · Safari · macOS 14',       ownedCount: 1, collabCount: 0,
+    projects: [['Beaulieu · Risk Map','May 06', 'Owner',1]] },
+  { id: 'u23', name: 'Jonas Lehmann',        email: 'jonas@lehmann-co.ch',                 cls: 'member',   status: 'active',    uid: 'usr_b9c0d1e2f3a8', joined: 'May 05, 2026',  joinedDetail: 'May 05, 2026 · via Operator invite',  lastActive: '8d ago',       lastActiveDetail: '8d ago · Chrome · macOS 14',       ownedCount: 1, collabCount: 0,
+    projects: [['Lehmann · Banking Audit','May 05', 'Owner',1]] },
+  { id: 'u24', name: 'Hana Sato',            email: 'h.sato@sato-advisory.jp',             cls: 'external', status: 'active',    uid: 'usr_c0d1e2f3a8b9', joined: 'May 04, 2026',  joinedDetail: 'May 04, 2026 · via project invite',   lastActive: '9d ago',       lastActiveDetail: '9d ago · Chrome · Windows 11',     ownedCount: 0, collabCount: 2, projects: [] },
+  { id: 'u25', name: 'Mateo Vargas',         email: 'mateo.v@vargas-data.mx',              cls: 'member',   status: 'active',    uid: 'usr_d1e2f3a8b9c0', joined: 'May 03, 2026',  joinedDetail: 'May 03, 2026 · via Operator invite',  lastActive: '10d ago',      lastActiveDetail: '10d ago · Chrome · macOS 14',      ownedCount: 2, collabCount: 0,
+    projects: [['Vargas Data · ETL Audit','May 03', 'Owner',1],['Vargas Data · Workshop','Apr 25', 'Owner',0]] },
+  { id: 'u26', name: 'Layla Hassan',         email: 'l.hassan@hassan-partners.ae',         cls: 'external', status: 'active',    uid: 'usr_e2f3a8b9c0d1', joined: 'May 02, 2026',  joinedDetail: 'May 02, 2026 · via project invite',   lastActive: '10d ago',      lastActiveDetail: '10d ago · Safari · iOS',           ownedCount: 0, collabCount: 1, projects: [] },
+  { id: 'u27', name: 'Cillian Walsh',        email: 'cwalsh@walsh-ops.ie',                 cls: 'member',   status: 'active',    uid: 'usr_f3a8b9c0d1e2', joined: 'May 01, 2026',  joinedDetail: 'May 01, 2026 · via Operator invite',  lastActive: '11d ago',      lastActiveDetail: '11d ago · Firefox · macOS 14',     ownedCount: 1, collabCount: 1,
+    projects: [['Walsh Ops · Onboarding','May 01', 'Owner',1]] },
+  { id: 'u28', name: 'Nora Petersen',        email: 'nora@petersen-data.no',               cls: 'external', status: 'active',    uid: 'usr_a4b5c6d7e8f9', joined: 'Apr 30, 2026',  joinedDetail: 'Apr 30, 2026 · via project invite',   lastActive: '12d ago',      lastActiveDetail: '12d ago · Chrome · Windows 11',    ownedCount: 0, collabCount: 1, projects: [] },
+  { id: 'u29', name: 'Karthik Subramanian',  email: 'ks@subramanian-strategy.in',          cls: 'member',   status: 'active',    uid: 'usr_b5c6d7e8f9a4', joined: 'Apr 29, 2026',  joinedDetail: 'Apr 29, 2026 · via Operator invite',  lastActive: '13d ago',      lastActiveDetail: '13d ago · Chrome · macOS 14',      ownedCount: 2, collabCount: 0,
+    projects: [['Subramanian · Insurance Map','Apr 29', 'Owner',2],['Subramanian · Banking Map','Apr 22', 'Owner',1]] },
+  { id: 'u30', name: 'Isabelle Dubois',      email: 'i.dubois@dubois-co.fr',               cls: 'member',   status: 'active',    uid: 'usr_c6d7e8f9a4b5', joined: 'Apr 28, 2026',  joinedDetail: 'Apr 28, 2026 · via Operator invite',  lastActive: '14d ago',      lastActiveDetail: '14d ago · Safari · macOS 14',      ownedCount: 1, collabCount: 1,
+    projects: [['Dubois · Audit Q1','Apr 28', 'Owner',1]] },
+  { id: 'u31', name: 'Pieter van Dam',       email: 'p.vandam@vandam-partners.nl',         cls: 'external', status: 'active',    uid: 'usr_d7e8f9a4b5c6', joined: 'Apr 27, 2026',  joinedDetail: 'Apr 27, 2026 · via project invite',   lastActive: '14d ago',      lastActiveDetail: '14d ago · Chrome · Linux',         ownedCount: 0, collabCount: 1, projects: [] },
+  { id: 'u32', name: 'Aleksandra Nowak',     email: 'a.nowak@nowak-ops.pl',                cls: 'member',   status: 'active',    uid: 'usr_e8f9a4b5c6d7', joined: 'Apr 26, 2026',  joinedDetail: 'Apr 26, 2026 · via Operator invite',  lastActive: '15d ago',      lastActiveDetail: '15d ago · Chrome · macOS 14',      ownedCount: 1, collabCount: 0,
+    projects: [['Nowak Ops · Pipeline','Apr 26', 'Owner',1]] },
+  { id: 'u33', name: 'Wei Zhang',            email: 'wei.zhang@zhang-data.sg',             cls: 'external', status: 'active',    uid: 'usr_f9a4b5c6d7e8', joined: 'Apr 25, 2026',  joinedDetail: 'Apr 25, 2026 · via project invite',   lastActive: '16d ago',      lastActiveDetail: '16d ago · Chrome · Windows 11',    ownedCount: 0, collabCount: 1, projects: [] },
+  { id: 'u34', name: 'Aruña Bopha',          email: 'a.bopha@bopha-strategy.kh',           cls: 'member',   status: 'active',    uid: 'usr_a0b1c2d3e4f5', joined: 'Apr 24, 2026',  joinedDetail: 'Apr 24, 2026 · via Operator invite',  lastActive: '17d ago',      lastActiveDetail: '17d ago · Firefox · macOS 14',     ownedCount: 1, collabCount: 0,
+    projects: [['Bopha · Risk Map','Apr 24', 'Owner',1]] },
+  { id: 'u35', name: 'Fatima Al-Sayed',      email: 'f.al-sayed@alsayed-partners.qa',      cls: 'member',   status: 'active',    uid: 'usr_b1c2d3e4f5a0', joined: 'Apr 23, 2026',  joinedDetail: 'Apr 23, 2026 · via Operator invite',  lastActive: '18d ago',      lastActiveDetail: '18d ago · Safari · iOS',           ownedCount: 2, collabCount: 0,
+    projects: [['Al-Sayed · Insurance Audit','Apr 23', 'Owner',1],['Al-Sayed · Banking Audit','Apr 16', 'Owner',0]] },
+  { id: 'u36', name: 'Stefan Novak',         email: 'stefan@novak-ops.cz',                 cls: 'external', status: 'active',    uid: 'usr_c2d3e4f5a0b1', joined: 'Apr 22, 2026',  joinedDetail: 'Apr 22, 2026 · via project invite',   lastActive: '19d ago',      lastActiveDetail: '19d ago · Chrome · Windows 11',    ownedCount: 0, collabCount: 2, projects: [] },
+  { id: 'u37', name: 'Bianca Costa',         email: 'b.costa@costa-data.pt',               cls: 'member',   status: 'active',    uid: 'usr_d3e4f5a0b1c2', joined: 'Apr 21, 2026',  joinedDetail: 'Apr 21, 2026 · via Operator invite',  lastActive: '20d ago',      lastActiveDetail: '20d ago · Chrome · macOS 14',      ownedCount: 1, collabCount: 0,
+    projects: [['Costa Data · Pipeline','Apr 21', 'Owner',1]] },
+  { id: 'u38', name: 'Idris Mahmood',        email: 'idris@mahmood-strategy.pk',           cls: 'external', status: 'active',    uid: 'usr_e4f5a0b1c2d3', joined: 'Apr 20, 2026',  joinedDetail: 'Apr 20, 2026 · via project invite',   lastActive: '21d ago',      lastActiveDetail: '21d ago · Firefox · macOS 14',     ownedCount: 0, collabCount: 1, projects: [] },
+  { id: 'u39', name: 'Theresa O’Connor',     email: 'theresa@oconnor-ops.ie',              cls: 'member',   status: 'active',    uid: 'usr_f5a0b1c2d3e4', joined: 'Apr 18, 2026',  joinedDetail: 'Apr 18, 2026 · via Operator invite',  lastActive: '22d ago',      lastActiveDetail: '22d ago · Chrome · macOS 14',      ownedCount: 1, collabCount: 0,
+    projects: [['O’Connor Ops · Mapping','Apr 18', 'Owner',1]] },
+  { id: 'u40', name: 'Ramon Castillo',       email: 'r.castillo@castillo-advisory.ph',     cls: 'external', status: 'invited',   uid: 'usr_—',             joined: '—',              joinedDetail: 'Pending acceptance · sent 3d ago',     lastActive: 'never',        lastActiveDetail: 'Never',                            ownedCount: 0, collabCount: 0, projects: [] },
+  { id: 'u41', name: 'Maya Goldberg',        email: 'maya@goldberg-co.il',                 cls: 'member',   status: 'active',    uid: 'usr_a1c2e3f4b5d6', joined: 'Apr 15, 2026',  joinedDetail: 'Apr 15, 2026 · via Operator invite',  lastActive: '25d ago',      lastActiveDetail: '25d ago · Chrome · macOS 14',      ownedCount: 1, collabCount: 0,
+    projects: [['Goldberg · Risk Profile','Apr 15', 'Owner',1]] }
+];
+
+var USER_BY_ID = {};
+USERS.forEach(function (u) { USER_BY_ID[u.id] = u; });
+
+// ============================================================
+// Table rendering + filter + pagination
+// ============================================================
+var PAGE_SIZE = 10;
+var state = { status: 'all', cls: 'all', q: '', page: 1 };
+
+function filtered() {
+  return USERS.filter(function (u) {
+    if (state.status !== 'all' && u.status !== state.status) return false;
+    if (state.cls    !== 'all' && u.cls    !== state.cls)    return false;
+    if (state.q) {
+      var hay = (u.name + ' ' + u.email).toLowerCase();
+      if (hay.indexOf(state.q) === -1) return false;
+    }
+    return true;
+  });
+}
+
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+function projectCellText(u) {
+  if (u.status === 'invited' && u.projects.length === 0) return '—';
+  var owned = (u.projects || []).filter(function (p) { return p[2] === 'Owner'; }).length;
+  var collab = (u.projects || []).length - owned;
+  var parts = [];
+  if (owned)  parts.push(owned + ' owned');
+  if (collab) parts.push(collab + ' collab');
+  if (!parts.length) return '—';
+  return parts.join(' · ');
+}
+
+function activeFilterLabels() {
+  var parts = [];
+  if (state.status && state.status !== 'all') parts.push('Status: ' + state.status.charAt(0).toUpperCase() + state.status.slice(1));
+  if (state.cls    && state.cls    !== 'all') parts.push('Class: ' + (state.cls === 'member' ? 'Member' : 'External'));
+  if (state.q) parts.push('Search: "' + state.q + '"');
+  return parts;
+}
+
+function emptyFilterRow() {
+  var labels = activeFilterLabels();
+  var helpText = labels.length
+    ? labels.join(' \u00b7 ') + '. Try widening the filter or clearing the search.'
+    : 'Try widening the status filter, or clear the search.';
+  var clearLink = labels.length
+    ? '<button type="button" class="e-link" id="users-clear-filters">Clear filters</button>'
+    : '';
+  return [
+    '<div class="empty-inline">',
+      '<svg class="e-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">',
+        '<circle cx="10" cy="10" r="6"></circle>',
+        '<line x1="14.5" y1="14.5" x2="20" y2="20"></line>',
+        '<line x1="7" y1="10" x2="13" y2="10" opacity="0.5"></line>',
+      '</svg>',
+      '<div class="e-lede">No users match this filter</div>',
+      '<div class="e-help">' + esc(helpText) + '</div>',
+      clearLink ? '<div class="e-link-row">' + clearLink + '</div>' : '',
+    '</div>'
+  ].join('');
+}
+
+function wireClearLink() {
+  var link = document.getElementById('users-clear-filters');
+  if (!link) return;
+  link.addEventListener('click', function () {
+    state.status = 'all';
+    state.cls = 'all';
+    state.q = '';
+    state.page = 1;
+    // reflect in UI
+    document.querySelectorAll('[data-filter-group="status"] button').forEach(function (b) {
+      b.classList.toggle('is-here', b.getAttribute('data-status') === 'all');
+    });
+    document.querySelectorAll('[data-filter-group="class"] button').forEach(function (b) {
+      b.classList.toggle('is-here', b.getAttribute('data-class') === 'all');
+    });
+    var s = document.getElementById('u-search');
+    if (s) s.value = '';
+    renderRows();
+  });
+}
+
+function renderRows() {
+  var list = filtered();
+  var total = list.length;
+  var pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (state.page > pageCount) state.page = pageCount;
+  if (state.page < 1) state.page = 1;
+
+  var start = (state.page - 1) * PAGE_SIZE;
+  var slice = list.slice(start, start + PAGE_SIZE);
+
+  var tbody = document.getElementById('users-tbody');
+  if (slice.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="padding: 0;">' + emptyFilterRow() + '</td></tr>';
+    wireClearLink();
+  } else {
+    tbody.innerHTML = slice.map(function (u) {
+      var clsPill    = u.cls === 'member' ? 'is-full' : 'is-limited';
+      var clsLabel   = u.cls === 'member' ? 'Member' : 'External';
+      var statusPill = u.status === 'active' ? 'is-active' : (u.status === 'invited' ? 'is-invited' : 'is-suspended');
+      var statusLabel= u.status.charAt(0).toUpperCase() + u.status.slice(1);
+      return '<tr data-user="' + u.id + '" data-status="' + u.status + '" data-class="' + u.cls + '">' +
+        '<td><div class="nm">' + esc(u.name) + '<small>' + esc(u.email) + '</small></div></td>' +
+        '<td><span class="pill ' + clsPill + '">' + clsLabel + '</span></td>' +
+        '<td class="mut">' + projectCellText(u) + '</td>' +
+        '<td class="faint">' + u.joined + '</td>' +
+        '<td class="faint">' + u.lastActive + '</td>' +
+        '<td><span class="pill ' + statusPill + '">' + statusLabel + '</span></td>' +
+        '<td style="text-align: right;"><button class="row-action" onclick="openPanel(\'' + u.id + '\')">View</button></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  var from = total === 0 ? 0 : (start + 1);
+  var to   = Math.min(start + PAGE_SIZE, total);
+  document.getElementById('u-count').textContent    = total === 0 ? 'No matches' : 'Showing ' + from + '–' + to + ' of ' + total;
+  document.getElementById('u-pageinfo').textContent = 'Page ' + state.page + ' / ' + pageCount;
+
+  var prev = document.getElementById('u-prev');
+  var next = document.getElementById('u-next');
+  prev.disabled = state.page <= 1;
+  next.disabled = state.page >= pageCount;
+  prev.style.opacity = prev.disabled ? '0.35' : '';
+  next.style.opacity = next.disabled ? '0.35' : '';
+  prev.style.cursor  = prev.disabled ? 'not-allowed' : 'pointer';
+  next.style.cursor  = next.disabled ? 'not-allowed' : 'pointer';
+}
+
+document.querySelectorAll('[data-filter-group="status"] button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    b.parentElement.querySelectorAll('button').forEach(function (x) { x.classList.remove('is-here'); });
+    b.classList.add('is-here');
+    state.status = b.getAttribute('data-status');
+    state.page = 1;
+    renderRows();
+  });
+});
+document.querySelectorAll('[data-filter-group="class"] button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    b.parentElement.querySelectorAll('button').forEach(function (x) { x.classList.remove('is-here'); });
+    b.classList.add('is-here');
+    state.cls = b.getAttribute('data-class');
+    state.page = 1;
+    renderRows();
+  });
+});
+var searchEl = document.getElementById('u-search');
+if (searchEl) {
+  searchEl.addEventListener('input', function (e) {
+    state.q = e.target.value.trim().toLowerCase();
+    state.page = 1;
+    renderRows();
+  });
+}
+document.getElementById('u-prev').addEventListener('click', function () { if (state.page > 1) { state.page--; renderRows(); } });
+document.getElementById('u-next').addEventListener('click', function () { state.page++; renderRows(); });
+
+renderRows();
+</script>
+
+<!-- Promote / demote confirmation modal -->
+<div class="op-confirm-backdrop" id="promote-confirm" onclick="if(event.target===this)closePromote()">
+  <div class="op-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="promote-title">
+    <div class="op-confirm-head">
+      <p class="eyebrow" id="promote-eyebrow">§ Account Class Change</p>
+      <h2 class="title" id="promote-title">Promote to Member?</h2>
+    </div>
+    <div class="op-confirm-body" id="promote-body">
+      <!-- populated by JS -->
+    </div>
+    <div class="op-confirm-foot">
+      <button class="btn-cancel" type="button" onclick="closePromote()">Cancel</button>
+      <button class="btn-go" type="button" id="promote-go">Promote</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function setPill(el, cls, label) {
+  if (!el) return;
+  el.className = 'pill ' + cls;
+  el.textContent = label;
+}
+
+function openPanel(key) {
+  var u = USER_BY_ID[key];
+  if (!u) return;
+
+  document.getElementById('up-name').textContent       = u.name;
+  document.getElementById('up-email').textContent      = u.email;
+  document.getElementById('up-name2').textContent      = u.name;
+  document.getElementById('up-email2').textContent     = u.email;
+  document.getElementById('up-id').textContent         = u.uid;
+  document.getElementById('up-joined').textContent     = u.joinedDetail;
+
+  var classPill = document.getElementById('up-class');
+  var classNote = document.getElementById('up-class-note');
+  if (u.cls === 'full') {
+    setPill(classPill, 'is-full',    'Full');
+    classNote.textContent = '— can create projects';
+  } else {
+    setPill(classPill, 'is-limited', 'Collab');
+    classNote.textContent = '— collaborator only, cannot create projects';
+  }
+
+  var statusPill = document.getElementById('up-status');
+  if (u.status === 'active')         setPill(statusPill, 'is-active',    'Active');
+  else if (u.status === 'invited')   setPill(statusPill, 'is-invited',   'Invited');
+  else if (u.status === 'suspended') setPill(statusPill, 'is-suspended', 'Suspended');
+
+  var owned = (u.projects || []).filter(function (p) { return p[2] === 'Owner'; }).length;
+  var collab = (u.projects || []).length - owned;
+  var lbl;
+  if (owned === 0 && collab === 0) lbl = '§ Projects · none';
+  else {
+    var parts = [];
+    if (owned)  parts.push(owned + ' owned');
+    if (collab) parts.push(collab + ' collab');
+    lbl = '§ Projects (' + parts.join(' · ') + ')';
+  }
+  document.getElementById('up-projects-lbl').textContent = lbl;
+  var pbody = document.getElementById('up-projects-body');
+  if (u.projects.length === 0) {
+    pbody.innerHTML = '<tr><td colspan="4" class="faint" style="text-align: center; padding: 18px 0;">— no owned projects —</td></tr>';
+  } else {
+    pbody.innerHTML = u.projects.map(function (p) {
+      var role = p[2] || 'Owner';
+      var cls = role === 'Owner' ? 'is-owner' : (role === 'Editor' ? 'is-editor' : 'is-viewer');
+      return '<tr><td class="text">' + p[0] + '</td>' +
+             '<td class="faint">' + p[1] + '</td>' +
+             '<td><span class="role-pill ' + cls + '">' + role + '</span></td>' +
+             '<td class="mut">' + (p[3] != null ? p[3] : 0) + '</td></tr>';
+    }).join('');
+  }
+
+  document.getElementById('up-promote').style.display    = (u.cls === 'external') ? '' : 'none';
+  document.getElementById('up-demote').style.display     = (u.cls === 'member' && u.ownedCount === 0) ? '' : 'none';
+  document.getElementById('up-suspend').style.display    = (u.status === 'active')    ? '' : 'none';
+  document.getElementById('up-reactivate').style.display = (u.status === 'suspended') ? '' : 'none';
+
+  document.getElementById('user-panel').classList.add('is-open');
+  document.getElementById('panel-backdrop').classList.add('is-open');
+}
+function closePanel() {
+  document.getElementById('user-panel').classList.remove('is-open');
+  document.getElementById('panel-backdrop').classList.remove('is-open');
+}
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePanel(); });
+
+// ============================================================
+// Billing-aware Promote / Demote confirmation
+// ============================================================
+var currentUser = null;
+
+function openPromote(u, action) {
+  currentUser = u;
+  var modal   = document.getElementById('promote-confirm');
+  var title   = document.getElementById('promote-title');
+  var eyebrow = document.getElementById('promote-eyebrow');
+  var body    = document.getElementById('promote-body');
+  var goBtn   = document.getElementById('promote-go');
+
+  if (action === 'promote') {
+    eyebrow.textContent = '§ Promote External user';
+    title.textContent   = 'Promote ' + u.name + ' to Member?';
+    goBtn.textContent   = 'Promote to Member';
+    goBtn.dataset.action = 'promote';
+    body.innerHTML = [
+      '<p>This will move <strong>' + u.name + '</strong> from External into your workspace as a full Member.</p>',
+      '<ul class="op-confirm-bullets">',
+        '<li><span class="icon is-warn">£</span><div><strong>Adds 1 billable seat</strong> to your subscription. Effective immediately, prorated.</div></li>',
+        '<li><span class="icon">+</span><div>They can <strong>create new projects</strong>, invite collaborators, and see the workspace archived view.</div></li>',
+        '<li><span class="icon">+</span><div>They keep their existing project roles. Owner here, Editor there — unchanged.</div></li>',
+        '<li><span class="icon">↻</span><div><strong>Reversible.</strong> Demoting them later returns them to External and removes the billable seat.</div></li>',
+      '</ul>'
+    ].join('');
+  } else {
+    eyebrow.textContent = '§ Demote Member';
+    title.textContent   = 'Demote ' + u.name + ' to External?';
+    goBtn.textContent   = 'Demote to External';
+    goBtn.dataset.action = 'demote';
+    body.innerHTML = [
+      '<p>This will move <strong>' + u.name + '</strong> out of your workspace and back into the External pool.</p>',
+      '<ul class="op-confirm-bullets">',
+        '<li><span class="icon is-warn">−</span><div><strong>Removes 1 billable seat</strong> from your subscription on next invoice.</div></li>',
+        '<li><span class="icon is-warn">⚠</span><div>They <strong>can no longer create new projects</strong> or invite people.</div></li>',
+        '<li><span class="icon">+</span><div>Existing project memberships are kept. They’ll still see projects they’ve been invited to.</div></li>',
+      '</ul>',
+      (u.ownedCount > 0 ? '<p style="margin-top: 14px; color: var(--sol-risk);">⚠ They currently own <strong style="color: var(--sol-risk);">' + u.ownedCount + ' project' + (u.ownedCount === 1 ? '' : 's') + '</strong>. You’ll need to transfer ownership first.</p>' : '')
+    ].join('');
+    if (u.ownedCount > 0) {
+      goBtn.disabled = true;
+      goBtn.style.opacity = '0.4';
+      goBtn.style.pointerEvents = 'none';
+    } else {
+      goBtn.disabled = false;
+      goBtn.style.opacity = '';
+      goBtn.style.pointerEvents = '';
+    }
+  }
+
+  modal.classList.add('is-open');
+}
+function closePromote() {
+  document.getElementById('promote-confirm').classList.remove('is-open');
+  currentUser = null;
+}
+document.getElementById('up-promote').addEventListener('click', function () {
+  // Find the currently-loaded user.
+  var name = document.getElementById('up-name').textContent;
+  var u = USERS.find(function (x) { return x.name === name; });
+  if (u) openPromote(u, 'promote');
+});
+document.getElementById('up-demote').addEventListener('click', function () {
+  var name = document.getElementById('up-name').textContent;
+  var u = USERS.find(function (x) { return x.name === name; });
+  if (u) openPromote(u, 'demote');
+});
+document.getElementById('promote-go').addEventListener('click', function () {
+  if (!currentUser) return;
+  var act = this.dataset.action;
+  currentUser.cls = (act === 'promote') ? 'member' : 'external';
+  closePromote();
+  openPanel(currentUser.id); // re-render with new class
+  renderRows();
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closePromote();
+});
+</script>
+
+<script src="operator-chrome.js"></script>
+</body>
+</html>
