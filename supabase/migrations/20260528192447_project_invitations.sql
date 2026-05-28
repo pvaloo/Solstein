@@ -87,7 +87,7 @@ set search_path = public, extensions
 as $$
 declare
   current_user_id uuid := auth.uid();
-  normalized_email text := lower(trim(invitee_email));
+  normalized_email text := lower(trim(create_project_invitation.invitee_email));
   raw_token text := encode(gen_random_bytes(32), 'hex');
   hashed_token text := encode(digest(raw_token, 'sha256'), 'hex');
   target_workspace_id uuid;
@@ -129,7 +129,7 @@ begin
     update public.project_invitations pi
     set
       inviter_user_id = current_user_id,
-      invitee_email = trim(invitee_email),
+      invitee_email = trim(create_project_invitation.invitee_email),
       workspace_role = 'member',
       project_role = invite_project_role,
       token_hash = hashed_token,
@@ -156,14 +156,14 @@ begin
       target_workspace_id,
       target_project_id,
       current_user_id,
-      trim(invitee_email),
+      trim(create_project_invitation.invitee_email),
       normalized_email,
       'member',
       invite_project_role,
       hashed_token,
       nullif(invite_personal_note, '')
     )
-    returning id, invitee_email, project_invitations.project_role, raw_token, project_invitations.expires_at
+    returning project_invitations.id, project_invitations.invitee_email, project_invitations.project_role, raw_token, project_invitations.expires_at
     into invitation_id, email, project_role, token, expires_at;
   end if;
 
