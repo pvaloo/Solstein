@@ -34,7 +34,7 @@ The MVP should let a user sign in, see projects, create/open a project, import o
 | In progress | `project.html` | `/project/:projectId` | Authenticated + project access | Project hub: graphs, members, settings. | React route loads project, graphs, and members; settings/lifecycle modals pending. |
 | In progress | `import-wizard.html` | `/project/:projectId/import` | Authenticated + project access | Graph ingestion wizard. | React import route can create sample/uploaded JSON graphs; full six-step wizard UX pending. |
 | In progress | `canvas.html` | `/project/:projectId/graph/:graphId` | Authenticated + project access | Main graph viewer and editor surface. | Route renders the interactive canvas with Supabase graph data. Save/version actions still pending. |
-| In progress | `profile.html` | `/profile` | Authenticated user | Account settings. | Route exists via prototype-backed React wrapper; Supabase profile editing pending. |
+| In progress | `profile.html` | `/profile` | Authenticated user | Account settings. | React route loads current profile, saves display name, and updates password; change-email/delete/session management pending. |
 | Done | `sign-in.html` | `/sign-in` | Public auth page | User sign-in. | React page supports sign-in/sign-up and redirects signed-in users to `/`. |
 | Done | `forgot-password.html` | `/forgot` | Public auth page | Password reset request. | React page calls Supabase reset email flow. |
 | In progress | `reset-password.html` | `/reset/:token` | Public auth page | Set new password. | React page updates Supabase password; token/hash route behavior still needs end-to-end verification. |
@@ -56,7 +56,7 @@ The MVP should let a user sign in, see projects, create/open a project, import o
 |---|---|---|---|
 | Done | Build | `npm install`, `npm run dev`, `npm run build` work locally. | Scaffold Vite React and preserve static assets. |
 | Done | Routing | Production routes from `docs/02-routes-and-navigation.md` exist. | React Router route map covers workspace, project, canvas, auth, legal, error, and operator routes. |
-| In progress | Auth | Email/password sign-in, sign-up, sign-out, reset password, invite acceptance. | Sign-in/sign-up/reset exist; invite acceptance still needs backend table and token handling. |
+| In progress | Auth | Email/password sign-in, sign-up, sign-out, reset password, invite acceptance. | Sign-in/sign-up/reset exist; Supabase Auth email templates are tasked in `docs/tasks/003-supabase-auth-email-templates.md`. |
 | In progress | Workspace | List active/archived projects scoped to the signed-in user's workspace. | `/` now uses the active workspace and project table, including per-project graph counts. |
 | In progress | Projects | Create, rename, archive, restore, delete, transfer owner. | Create exists through `create_workspace_project`; rename/archive/restore/delete still pending. |
 | In progress | Members | Workspace/project member roles. | Project member read UI, owner invite modal, pending invites, and revoke action exist; accepted-member management still pending. |
@@ -75,7 +75,8 @@ The MVP should let a user sign in, see projects, create/open a project, import o
 | Status | Resource | Notes |
 |---|---|---|
 | In progress | Supabase project setup | Auth env is present; workspace/project/graph migrations and RPCs exist. Confirm remote/local migration state before deploying. |
-| In progress | Users/profiles | User id, email, name, avatar, suspended/operator flags as needed. Table and bootstrap RPC exist. |
+| In progress | Users/profiles | User id, email, name, avatar, suspended/operator flags as needed. Profile page can read/update display name; avatar and account lifecycle pending. |
+| Todo | Auth email templates | Solstein-branded Supabase Auth templates for signup, reset password, and verification. Tasked in `docs/tasks/003-supabase-auth-email-templates.md`. |
 | In progress | Workspaces | Every direct signup gets one default owner workspace. Client bootstrap now calls the RPC after session load. |
 | In progress | Workspace members | Workspace role/status. Required for tenant boundary and RLS. Table and RLS exist. |
 | In progress | Projects | Name, description, owner, archive/delete lifecycle. Always scoped by `workspace_id`. Create RPC and dashboard wiring exist; lifecycle actions pending. |
@@ -91,7 +92,8 @@ Continue the remaining production wiring while preserving visual parity:
 
 1. Add graph edit/save actions that persist current canvas edits and create new `graph_revisions`.
 2. Add archive/restore lifecycle actions for projects.
-3. Add email delivery for project team-member invitations.
-4. Replace prototype-backed profile/operator routes with Supabase-backed React implementations as needed for MVP.
-5. Document required Vercel/Supabase env vars and run a deployed smoke test.
-6. Browser-smoke-test `/project/:projectId/import` and `/project/:projectId/graph/:graphId` with a signed-in user.
+3. Create Solstein-branded Supabase Auth email templates from `docs/tasks/003-supabase-auth-email-templates.md`.
+4. Add email delivery for project team-member invitations.
+5. Replace prototype-backed profile/operator routes with Supabase-backed React implementations as needed for MVP.
+6. Document required Vercel/Supabase env vars and run a deployed smoke test.
+7. Browser-smoke-test `/project/:projectId/import` and `/project/:projectId/graph/:graphId` with a signed-in user.

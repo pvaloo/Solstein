@@ -9,6 +9,7 @@ import { ForgotPasswordPage } from "../pages/ForgotPasswordPage.jsx";
 import { GraphPage } from "../pages/GraphPage.jsx";
 import { ImportGraphPage } from "../pages/ImportGraphPage.jsx";
 import { NewProjectPage } from "../pages/NewProjectPage.jsx";
+import { ProfilePage } from "../pages/ProfilePage.jsx";
 import { ProjectPage } from "../pages/ProjectPage.jsx";
 import { ResetPasswordPage } from "../pages/ResetPasswordPage.jsx";
 import { SignInPage } from "../pages/SignInPage.jsx";
@@ -75,6 +76,16 @@ function routeElement(route) {
       <RequireUser>
         <WorkspaceChrome>
           <ProjectPage />
+        </WorkspaceChrome>
+      </RequireUser>
+    );
+  }
+
+  if (route.id === "profile") {
+    return (
+      <RequireUser>
+        <WorkspaceChrome>
+          <ProfilePage />
         </WorkspaceChrome>
       </RequireUser>
     );

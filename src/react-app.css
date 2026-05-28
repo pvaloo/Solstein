@@ -133,6 +133,217 @@
   width: min(100%, 520px);
 }
 
+.profile-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 56px 28px 72px;
+}
+
+.prof-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.prof-nav {
+  position: sticky;
+  top: 64px;
+  align-self: start;
+}
+
+.prof-nav .lbl {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--sol-accent-55);
+  margin-bottom: 12px;
+}
+
+.prof-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prof-nav a {
+  display: block;
+  padding: 8px 12px;
+  margin-left: -12px;
+  color: var(--sol-text-2);
+  font-size: 13px;
+  border-left: 1px solid transparent;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.prof-nav a:hover {
+  color: var(--sol-text);
+}
+
+.prof-nav a.is-here {
+  color: var(--sol-text);
+  border-left-color: var(--sol-accent);
+}
+
+.psec {
+  margin-bottom: 36px;
+}
+
+.psec-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 16px;
+}
+
+.psec-head h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sol-text);
+  margin: 0;
+}
+
+.psec-head .meta {
+  font-size: 12px;
+  color: var(--sol-text-3);
+}
+
+.psec-body {
+  background: var(--sol-surface);
+  border: 1px solid var(--sol-hairline);
+  padding: 24px 26px;
+}
+
+.identity-row {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 22px;
+}
+
+.identity-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--sol-ground);
+  border: 1px solid var(--sol-hairline-strong);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.1em;
+  color: var(--sol-text);
+}
+
+.identity-info dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 8px 16px;
+  font-size: 13px;
+  align-items: baseline;
+}
+
+.identity-info dt {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sol-text-3);
+}
+
+.identity-info dd {
+  margin: 0;
+  color: var(--sol-text);
+  min-width: 0;
+}
+
+.identity-info .account-id {
+  font-family: var(--font-code, monospace);
+  font-size: 12px;
+  color: var(--sol-text-2);
+  overflow-wrap: anywhere;
+}
+
+.identity-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-inline-input {
+  width: min(100%, 320px);
+  background: var(--sol-ground);
+  border: 1px solid var(--sol-hairline-strong);
+  color: var(--sol-text);
+  padding: 6px 10px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  border-radius: 2px;
+}
+
+.profile-inline-input:focus {
+  outline: 1px solid var(--sol-accent);
+}
+
+.psec-body .field {
+  margin-bottom: 18px;
+}
+
+.psec-body .field:last-of-type {
+  margin-bottom: 0;
+}
+
+.psec-body .field .input {
+  width: 100%;
+  background: var(--sol-ground);
+}
+
+.psec-body .field-actions {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--sol-hairline);
+  display: flex;
+  gap: 12px;
+}
+
+.pw-strength {
+  margin-top: 10px;
+}
+
+.pw-strength .bars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.pw-strength .seg {
+  height: 4px;
+  background: var(--sol-hairline-strong);
+}
+
+.pw-strength .seg.on {
+  background: var(--sol-accent);
+}
+
+.pw-strength .label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sol-text-3);
+}
+
 .workspace-page {
   max-width: 1120px;
   margin: 0 auto;
@@ -1612,6 +1823,24 @@
   .np-layout {
     grid-template-columns: 1fr;
     gap: 32px;
+  }
+
+  .prof-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .prof-nav {
+    position: static;
+  }
+
+  .identity-row {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .identity-info dl {
+    grid-template-columns: 1fr;
   }
 
   .np-side {
