@@ -85,9 +85,11 @@ language plpgsql
 security definer
 set search_path = public, extensions
 as $$
+#variable_conflict use_column
 declare
   current_user_id uuid := auth.uid();
-  normalized_email text := lower(trim(create_project_invitation.invitee_email));
+  requested_invitee_email text := trim($2);
+  normalized_email text := lower(requested_invitee_email);
   raw_token text := encode(gen_random_bytes(32), 'hex');
   hashed_token text := encode(digest(raw_token, 'sha256'), 'hex');
   target_workspace_id uuid;
@@ -129,7 +131,7 @@ begin
     update public.project_invitations pi
     set
       inviter_user_id = current_user_id,
-      invitee_email = trim(create_project_invitation.invitee_email),
+      invitee_email = requested_invitee_email,
       workspace_role = 'member',
       project_role = invite_project_role,
       token_hash = hashed_token,
@@ -156,7 +158,7 @@ begin
       target_workspace_id,
       target_project_id,
       current_user_id,
-      trim(create_project_invitation.invitee_email),
+      requested_invitee_email,
       normalized_email,
       'member',
       invite_project_role,
