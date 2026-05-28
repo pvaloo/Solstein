@@ -83,7 +83,7 @@ returns table (
 )
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   current_user_id uuid := auth.uid();
@@ -259,7 +259,7 @@ returns table (
 )
 language sql
 security definer
-set search_path = public
+set search_path = public, extensions
 stable
 as $$
   select
@@ -293,7 +293,7 @@ returns table (
 )
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   current_user_id uuid := auth.uid();
