@@ -27,7 +27,7 @@ function overlayHasMatches(overlay, nodes, edges, nodeMap, view) {
   return visibleEdges.some(e => window.LensMatch.edgeMatchesLens(e, overlay, nodeMap));
 }
 
-function App({ data: graphData, projectPath = '/' }) {
+function App({ data: graphData, projectPath = '/', onProjectNavigate }) {
   const data = graphData || window.FLOWLENS_DATA;
   window.FLOWLENS_DATA = data;
   const CanvasComponent = window.Canvas;
@@ -428,6 +428,11 @@ function App({ data: graphData, projectPath = '/' }) {
 
   // Settings page
   const [settingsOpen, setSettingsOpen] = useState(false);
+  function navigateToProject(event) {
+    if (!onProjectNavigate) return;
+    event.preventDefault();
+    onProjectNavigate();
+  }
 
   return React.createElement('div', { className: 'app' + (sel.id ? ' has-inspector' : '') + (migrationActive ? ' is-migrating' : '') },
     React.createElement('div', { className: 'topbar' },
@@ -452,6 +457,7 @@ function App({ data: graphData, projectPath = '/' }) {
       React.createElement('a', {
         className: 'tb-back',
         href: projectPath,
+        onClick: navigateToProject,
         title: 'Back to project',
         'aria-label': 'Back to project',
       },
@@ -460,7 +466,7 @@ function App({ data: graphData, projectPath = '/' }) {
         ),
       ),
       React.createElement('div', { className: 'topbar-meta' },
-        React.createElement('a', { className: 'name', href: projectPath, title: 'Back to project' }, data.project.name),
+        React.createElement('a', { className: 'name', href: projectPath, onClick: navigateToProject, title: 'Back to project' }, data.project.name),
       ),
       React.createElement('div', { className: 'topbar-divider' }),
       React.createElement('div', { className: 'tb-stat' },

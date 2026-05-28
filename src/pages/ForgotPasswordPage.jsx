@@ -59,7 +59,7 @@ export function ForgotPasswordPage() {
           <>
             <p className="auth-card-eyebrow">§ Account Recovery</p>
             <h1>Reset Password</h1>
-            <p className="sub">Enter your email and we'll send a link to set a new password.</p>
+            <p className="sub">Enter your email and we'll send a link to set a new password. Links expire in 15 minutes.</p>
 
             {status === "error" ? (
               <div className="banner is-error">
@@ -94,7 +94,7 @@ export function ForgotPasswordPage() {
             </form>
 
             <div className="aux">
-              <Link to="/sign-in">Back to sign in</Link>
+              <Link to="/sign-in">← Back to sign in</Link>
             </div>
           </>
         )}

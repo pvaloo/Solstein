@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getGraphDocument } from "../lib/projects.js";
-import { FlowLensCanvas } from "./FlowLensCanvas.jsx";
+import { CanvasLoadingShell, FlowLensCanvas } from "./FlowLensCanvas.jsx";
 
 export function GraphPage() {
   const { projectId, graphId } = useParams();
@@ -37,12 +37,10 @@ export function GraphPage() {
 
   if (isLoading) {
     return (
-      <main className="page graph-document-page">
-        <Link className="back-link" to={`/project/${projectId}`}>
-          &lt;- Project
-        </Link>
-        <div className="archived-empty">Loading graph</div>
-      </main>
+      <CanvasLoadingShell
+        projectPath={`/project/${projectId}`}
+        status="Loading graph"
+      />
     );
   }
 

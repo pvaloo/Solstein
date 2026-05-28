@@ -4,6 +4,7 @@ import {
   RequireOperator,
   RequireUser,
 } from "../auth/RouteGuards.jsx";
+import { AcceptInvitePage } from "../pages/AcceptInvitePage.jsx";
 import { ForgotPasswordPage } from "../pages/ForgotPasswordPage.jsx";
 import { GraphPage } from "../pages/GraphPage.jsx";
 import { ImportGraphPage } from "../pages/ImportGraphPage.jsx";
@@ -43,6 +44,10 @@ function routeElement(route) {
 
   if (route.id === "reset") {
     return <ResetPasswordPage />;
+  }
+
+  if (route.id === "invite") {
+    return <AcceptInvitePage />;
   }
 
   if (route.id === "workspace") {

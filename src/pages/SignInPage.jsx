@@ -64,12 +64,14 @@ export function SignInPage({ operator = false }) {
   return (
     <AuthChrome>
       <section className="auth-card">
-        <p className="auth-card-eyebrow">§ {operator ? "Operator Access" : "Workspace Access"}</p>
+        <p className="auth-card-eyebrow">§ {operator ? "Privileged Access" : "Workspace Access"}</p>
         <h1>{mode === "sign-up" ? "Create Account" : operator ? "Operator Sign In" : "Sign In"}</h1>
         <p className="sub">
-          {mode === "sign-up"
-            ? "Create your Solstein account for the MVP environment."
-            : "Enter your credentials to continue."}
+          {operator
+            ? "Solstein team only. All sign-ins are audited."
+            : mode === "sign-up"
+              ? "Create your Solstein account for the MVP environment."
+              : "Enter your credentials to continue."}
         </p>
 
         {status === "error" ? (
@@ -150,20 +152,15 @@ export function SignInPage({ operator = false }) {
 
         {!operator ? (
           <div className="aux">
-            {mode === "sign-in" ? (
-              <>
-                New to Solstein?{" "}
-                <button className="link-button" type="button" onClick={() => setMode("sign-up")}>
-                  Create an MVP account
-                </button>
-              </>
-            ) : (
+            {mode === "sign-up" ? (
               <>
                 Already have access?{" "}
                 <button className="link-button" type="button" onClick={() => setMode("sign-in")}>
                   Sign in
                 </button>
               </>
+            ) : (
+              "New to Solstein? Access is invite-only."
             )}
           </div>
         ) : null}

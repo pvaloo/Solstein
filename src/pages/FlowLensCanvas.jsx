@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles.css";
 import "../solstein-skin.css";
 
@@ -161,10 +162,91 @@ async function loadCanvasApp() {
   return canvasAppPromise;
 }
 
+export function CanvasLoadingShell({
+  projectPath = "/",
+  onProjectNavigate,
+  title = "Loading graph",
+  version = "",
+  createdAt = "",
+  status = "Loading canvas",
+}) {
+  function navigateToProject(event) {
+    if (!onProjectNavigate) return;
+    event.preventDefault();
+    onProjectNavigate();
+  }
+
+  return (
+    <div className="app legacy-canvas-shell">
+      <div className="topbar">
+        <div className="brand">
+          <div
+            className="brand-mark"
+            aria-hidden="true"
+            dangerouslySetInnerHTML={{
+              __html:
+                '<svg width="22" height="22" viewBox="0 0 52 52">'
+                + '<polygon points="26,4 40,12 44,26 40,40 26,48 12,40 8,26 12,12" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.9"></polygon>'
+                + '<polygon class="refraction" points="26,10 36,16 39,26 36,36 26,42 16,36 13,26 16,16" fill="none" stroke="currentColor" stroke-width="0.75" opacity="0.4"></polygon>'
+                + '<circle cx="26" cy="26" r="2.5" fill="currentColor" opacity="0.9"></circle>'
+                + '<circle class="glow" cx="26" cy="26" r="5" fill="currentColor" opacity="0.25" style="filter: blur(3px);"></circle>'
+                + '<line x1="26" y1="10" x2="26" y2="42" stroke="currentColor" stroke-width="0.5" opacity="0.25"></line>'
+                + '<line x1="10" y1="26" x2="42" y2="26" stroke="currentColor" stroke-width="0.5" opacity="0.25"></line>'
+                + "</svg>",
+            }}
+          />
+          SOLSTEIN
+        </div>
+        <div className="topbar-divider" />
+        <a
+          className="tb-back"
+          href={projectPath}
+          onClick={navigateToProject}
+          title="Back to project"
+          aria-label="Back to project"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M10 3L5 8l5 5" />
+          </svg>
+        </a>
+        <div className="topbar-meta">
+          <a className="name" href={projectPath} onClick={navigateToProject} title="Back to project">
+            {title}
+          </a>
+        </div>
+        {(version || createdAt) && (
+          <>
+            <div className="topbar-divider" />
+            <div className="tb-stat">
+              {version && <>v{version}</>}
+              {version && createdAt && " · "}
+              {createdAt && <strong>{createdAt}</strong>}
+            </div>
+          </>
+        )}
+        <div className="topbar-spacer" />
+      </div>
+      <div className="legacy-canvas-loading">{status}</div>
+    </div>
+  );
+}
+
 export function FlowLensCanvas({ graph, projectId }) {
+  const navigate = useNavigate();
   const [CanvasApp, setCanvasApp] = useState(null);
   const [loadError, setLoadError] = useState(null);
   const canvasData = useMemo(() => normalizeCanvasData(graph), [graph]);
+  const projectPath = `/project/${projectId}`;
 
   useEffect(() => {
     let isMounted = true;
@@ -198,8 +280,22 @@ export function FlowLensCanvas({ graph, projectId }) {
   }
 
   if (!CanvasApp) {
-    return <div className="legacy-canvas-loading">Loading canvas</div>;
+    return (
+      <CanvasLoadingShell
+        projectPath={projectPath}
+        onProjectNavigate={() => navigate(projectPath)}
+        title={canvasData.project.name}
+        version={canvasData.project.version}
+        createdAt={canvasData.project.createdAt}
+      />
+    );
   }
 
-  return <CanvasApp data={canvasData} projectPath={`/project/${projectId}`} />;
+  return (
+    <CanvasApp
+      data={canvasData}
+      projectPath={projectPath}
+      onProjectNavigate={() => navigate(projectPath)}
+    />
+  );
 }

@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabaseClient.js";
 
 export function ResetPasswordPage() {
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
 
@@ -12,6 +13,12 @@ export function ResetPasswordPage() {
     event.preventDefault();
     setStatus("loading");
     setMessage("");
+
+    if (password !== confirmPassword) {
+      setStatus("error");
+      setMessage("The password confirmation does not match.");
+      return;
+    }
 
     if (!supabase) {
       setStatus("error");
@@ -28,15 +35,18 @@ export function ResetPasswordPage() {
     }
 
     setStatus("success");
-    setMessage("Your password has been updated. You can continue to the workspace.");
+    setMessage("Your password is set. We've signed out all other sessions on this account. You'll be redirected to Workspace momentarily.");
   }
 
   return (
     <AuthChrome>
       <section className="auth-card">
         <p className="auth-card-eyebrow">§ Account Recovery</p>
-        <h1>Set Password</h1>
-        <p className="sub">Choose a new password for your Solstein account.</p>
+        <h1>Set New Password</h1>
+        <p className="sub">
+          Choose a new password for <strong style={{ color: "var(--sol-text)" }}>your Solstein account</strong>.
+          All other sessions will be signed out.
+        </p>
 
         {status === "error" ? (
           <div className="banner is-error">
@@ -61,7 +71,7 @@ export function ResetPasswordPage() {
         <form className="form" onSubmit={handleSubmit}>
           <div className="field">
             <label className="field-label" htmlFor="rp-password">
-              New password
+              New Password
             </label>
             <input
               className="input"
@@ -75,13 +85,29 @@ export function ResetPasswordPage() {
             />
           </div>
 
+          <div className="field">
+            <label className="field-label" htmlFor="rp-confirm">
+              Confirm New Password
+            </label>
+            <input
+              className="input"
+              id="rp-confirm"
+              type="password"
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              minLength={6}
+              required
+            />
+          </div>
+
           <button className="btn btn-primary" type="submit" disabled={status === "loading"}>
-            {status === "loading" ? "Saving" : "Save Password"}
+            {status === "loading" ? "Saving" : "Update Password"}
           </button>
         </form>
 
         <div className="aux">
-          <Link to="/">Continue to workspace</Link>
+          <Link to="/">Continue to Workspace</Link>
         </div>
       </section>
     </AuthChrome>

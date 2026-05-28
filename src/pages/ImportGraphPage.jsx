@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import sampleGraph from "../../data/car-insurance-comparison.json";
 import { createProjectGraph } from "../lib/projects.js";
@@ -22,20 +22,10 @@ function graphNameFromPayload(payload) {
 export function ImportGraphPage() {
   const { projectId } = useParams();
   const navigate = useNavigate();
-  const [rawJson, setRawJson] = useState("");
+  const [graphPayload, setGraphPayload] = useState(null);
   const [selectedFileName, setSelectedFileName] = useState("");
   const [isImporting, setIsImporting] = useState(false);
   const [error, setError] = useState(null);
-
-  const parsed = useMemo(() => {
-    if (!rawJson.trim()) return { payload: null, error: null };
-    try {
-      const payload = JSON.parse(rawJson);
-      return { payload, error: validateGraph(payload) };
-    } catch (parseError) {
-      return { payload: null, error: parseError.message };
-    }
-  }, [rawJson]);
 
   async function commitGraph(payload) {
     const validationError = validateGraph(payload);
@@ -83,13 +73,14 @@ export function ImportGraphPage() {
       const validationError = validateGraph(payload);
 
       if (validationError) {
-        setRawJson(text);
+        setGraphPayload(null);
         setError(new Error(validationError));
         return;
       }
 
-      setRawJson(JSON.stringify(payload, null, 2));
+      setGraphPayload(payload);
     } catch (fileError) {
+      setGraphPayload(null);
       setError(fileError);
     }
   }
@@ -115,15 +106,15 @@ export function ImportGraphPage() {
       <section className="wiz-body">
         <h2>Bring in graph JSON</h2>
         <p className="sub">
-          Paste a graph JSON payload or import the bundled Solstein sample graph.
+          Upload a graph JSON payload or import the bundled Solstein sample graph.
         </p>
 
-        {error || parsed.error ? (
+        {error ? (
           <div className="banner is-error workspace-banner">
             <div className="banner-mark" />
             <div className="banner-body">
               <span className="ban-title">Import blocked</span>
-              {error?.message ?? parsed.error}
+              {error.message}
             </div>
           </div>
         ) : null}
@@ -144,7 +135,8 @@ export function ImportGraphPage() {
             type="button"
             onClick={() => {
               setSelectedFileName("Bundled sample graph");
-              setRawJson(JSON.stringify(sampleGraph, null, 2));
+              setGraphPayload(sampleGraph);
+              setError(null);
             }}
             disabled={isImporting}
           >
@@ -152,28 +144,18 @@ export function ImportGraphPage() {
           </button>
         </div>
 
-        <textarea
-          className="textarea paste-area"
-          placeholder="Paste graph JSON here"
-          value={rawJson}
-          onChange={(event) => {
-            setError(null);
-            setRawJson(event.target.value);
-          }}
-        />
-
         <div className="wiz-foot">
           <Link className="btn btn-ghost" to={`/project/${projectId}`}>
             Cancel
           </Link>
           <span className="counter">
-            {parsed.payload?.nodes?.length ?? 0} nodes · {parsed.payload?.edges?.length ?? 0} edges
+            {graphPayload?.nodes?.length ?? 0} nodes · {graphPayload?.edges?.length ?? 0} edges
           </span>
           <button
             className="btn btn-primary"
             type="button"
-            disabled={!parsed.payload || Boolean(parsed.error) || isImporting}
-            onClick={() => commitGraph(parsed.payload)}
+            disabled={!graphPayload || isImporting}
+            onClick={() => commitGraph(graphPayload)}
           >
             {isImporting ? "Importing" : "Commit graph"}
           </button>
