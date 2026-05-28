@@ -712,6 +712,103 @@
   white-space: pre-wrap;
 }
 
+.project-archived-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 28px;
+  padding: 14px 16px;
+  border: 1px solid var(--sol-hairline);
+  border-left: 2px solid var(--sol-manual);
+  border-radius: var(--radius);
+  background: var(--sol-surface);
+}
+
+.project-archived-banner .ab-eyebrow {
+  flex: 0 0 auto;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sol-manual);
+}
+
+.project-archived-banner .ab-copy {
+  flex: 1;
+  color: var(--sol-text-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.project-archived-banner .ab-copy strong {
+  color: var(--sol-text);
+  font-weight: 500;
+}
+
+.project-lifecycle-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  margin: 0 0 34px;
+  padding: 18px;
+  border: 1px solid var(--sol-hairline);
+  border-radius: var(--radius);
+  background: var(--sol-surface);
+}
+
+.project-lifecycle-panel .section-kicker {
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sol-text-3);
+}
+
+.project-lifecycle-panel h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sol-text);
+}
+
+.project-lifecycle-panel p {
+  max-width: 660px;
+  margin: 0;
+  color: var(--sol-text-3);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.project-lifecycle-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.lifecycle-archive-btn {
+  color: var(--sol-manual);
+  border-color: color-mix(in oklch, var(--sol-manual) 45%, transparent);
+}
+
+.lifecycle-archive-btn:hover:not(:disabled) {
+  color: var(--sol-text);
+  border-color: var(--sol-manual);
+}
+
+.lifecycle-gate {
+  margin: 14px 0 0;
+}
+
+.project-page.is-archived .graph-card-add {
+  display: none;
+}
+
 .tabs {
   display: flex;
   gap: 0;
@@ -1849,6 +1946,20 @@
 
   .graphs-grid {
     grid-template-columns: 1fr;
+  }
+
+  .project-archived-banner,
+  .project-lifecycle-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .project-archived-banner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .project-lifecycle-actions {
+    justify-content: flex-start;
   }
 
   .members-card .head {

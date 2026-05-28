@@ -10,6 +10,7 @@ import {
   getProject,
   listProjectGraphs,
   listProjectMembers,
+  setProjectStatus,
 } from "../lib/projects.js";
 
 const ROLE_LABELS = {
@@ -323,6 +324,8 @@ export function ProjectPage() {
   const [inviteMessage, setInviteMessage] = useState(null);
   const [inviteLinks, setInviteLinks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUpdatingLifecycle, setIsUpdatingLifecycle] = useState(false);
+  const [lifecycleMessage, setLifecycleMessage] = useState(null);
   const [error, setError] = useState(null);
 
   const loadProject = useCallback(async () => {
@@ -379,7 +382,9 @@ export function ProjectPage() {
   );
 
   const currentMember = activeMembers.find((member) => member.user_id === user?.id);
-  const canInvite = currentMember?.role === "owner";
+  const canManageProject = currentMember?.role === "owner";
+  const canInvite = canManageProject && project?.status === "active";
+  const isArchived = project?.status === "archived";
   const pendingInvitations = invitations.filter((invitation) => invitation.status === "pending");
   const existingEmails = useMemo(
     () =>
@@ -440,6 +445,30 @@ export function ProjectPage() {
     }
   }
 
+  async function changeLifecycleStatus(status) {
+    if (!project || isUpdatingLifecycle) return;
+
+    setIsUpdatingLifecycle(true);
+    setError(null);
+    setLifecycleMessage(null);
+
+    const { project: updatedProject, error: statusError } = await setProjectStatus(project.id, status);
+
+    if (statusError) {
+      setError(statusError);
+      setIsUpdatingLifecycle(false);
+      return;
+    }
+
+    setProject(updatedProject);
+    setLifecycleMessage(
+      status === "archived"
+        ? `Archived "${updatedProject.name}". The project is now read-only.`
+        : `Restored "${updatedProject.name}".`,
+    );
+    setIsUpdatingLifecycle(false);
+  }
+
   if (isLoading) {
     return (
       <main className="page project-page">
@@ -469,19 +498,44 @@ export function ProjectPage() {
   }
 
   return (
-    <main className="page project-page">
+    <main className={`page project-page${isArchived ? " is-archived" : ""}`}>
       <Link className="back-link" to="/">
         ← All projects
       </Link>
+
+      {isArchived ? (
+        <div className="project-archived-banner" role="status">
+          <div className="ab-eyebrow">§ Archived</div>
+          <div className="ab-copy">
+            This project is <strong>read-only</strong>. Restore it to import graphs, invite members, or make lifecycle changes.
+          </div>
+          {canManageProject ? (
+            <button
+              className="btn btn-sm"
+              type="button"
+              disabled={isUpdatingLifecycle}
+              onClick={() => changeLifecycleStatus("active")}
+            >
+              {isUpdatingLifecycle ? "Restoring" : "Unarchive"}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
       <header className="proj-header">
         <div className="title-row">
           <h1 className="page-title" style={{ marginBottom: 0 }}>
             {project.name}
           </h1>
-          <Link className="btn btn-sm" to={`/project/${project.id}/import`}>
-            Import graph
-          </Link>
+          {isArchived ? (
+            <button className="btn btn-sm" type="button" disabled>
+              Import graph
+            </button>
+          ) : (
+            <Link className="btn btn-sm" to={`/project/${project.id}/import`}>
+              Import graph
+            </Link>
+          )}
         </div>
         <div className="meta-row">
           <span className="domain">Workspace project</span>
@@ -494,6 +548,52 @@ export function ProjectPage() {
         </div>
         {project.description ? <p className="desc">{project.description}</p> : null}
       </header>
+
+      {lifecycleMessage ? (
+        <div className="banner is-success workspace-banner">
+          <div className="banner-mark" />
+          <div className="banner-body">
+            <span className="ban-title">Project updated</span>
+            {lifecycleMessage}
+          </div>
+        </div>
+      ) : null}
+
+      <section className="project-lifecycle-panel" aria-labelledby="project-lifecycle-title">
+        <div>
+          <div className="section-kicker">§ Lifecycle</div>
+          <h2 id="project-lifecycle-title">Project lifecycle</h2>
+          <p>
+            Archive finished engagements without deleting graphs, members, or project history. Archived projects move to the workspace archived tab.
+          </p>
+          {!canManageProject ? (
+            <div className="members-gate lifecycle-gate">
+              Only project owners can archive or restore this project.
+            </div>
+          ) : null}
+        </div>
+        <div className="project-lifecycle-actions">
+          {isArchived ? (
+            <button
+              className="btn btn-primary"
+              type="button"
+              disabled={!canManageProject || isUpdatingLifecycle}
+              onClick={() => changeLifecycleStatus("active")}
+            >
+              {isUpdatingLifecycle ? "Restoring..." : "Unarchive project"}
+            </button>
+          ) : (
+            <button
+              className="btn lifecycle-archive-btn"
+              type="button"
+              disabled={!canManageProject || isUpdatingLifecycle}
+              onClick={() => changeLifecycleStatus("archived")}
+            >
+              {isUpdatingLifecycle ? "Archiving..." : "Archive project"}
+            </button>
+          )}
+        </div>
+      </section>
 
       <div className="tabs" role="tablist" aria-label="Project sections">
         <button
@@ -520,13 +620,19 @@ export function ProjectPage() {
             {graphs.map((graph) => (
               <GraphCard key={graph.id} graph={graph} />
             ))}
-            <Link className="add-card graph-card-add" to={`/project/${project.id}/import`}>
-              <div className="plus">+</div>
-              <div className="label">Import graph</div>
-            </Link>
+            {!isArchived ? (
+              <Link className="add-card graph-card-add" to={`/project/${project.id}/import`}>
+                <div className="plus">+</div>
+                <div className="label">Import graph</div>
+              </Link>
+            ) : null}
           </div>
         ) : (
-          <EmptyGraphs projectId={project.id} />
+          isArchived ? (
+            <div className="archived-empty">No graphs in this archived project</div>
+          ) : (
+            <EmptyGraphs projectId={project.id} />
+          )
         )}
       </section>
 

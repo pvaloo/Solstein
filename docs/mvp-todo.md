@@ -29,9 +29,9 @@ The MVP should let a user sign in, see projects, create/open a project, import o
 
 | Status | Prototype file | Production route | Auth gate | MVP purpose | Notes |
 |---|---|---|---|---|---|
-| In progress | `home.html` | `/` | Authenticated user | Workspace dashboard with project list and archived tab. | React route queries workspace projects with graph counts and can create projects; unarchive is still a stub. |
+| In progress | `home.html` | `/` | Authenticated user | Workspace dashboard with project list and archived tab. | React route queries workspace projects with graph counts, can create projects, and can restore archived projects. |
 | Done | `new-project.html` | `/new-project` | Authenticated user | Create project flow. | React route uses Supabase project creation RPC. |
-| In progress | `project.html` | `/project/:projectId` | Authenticated + project access | Project hub: graphs, members, settings. | React route loads project, graphs, and members; settings/lifecycle modals pending. |
+| In progress | `project.html` | `/project/:projectId` | Authenticated + project access | Project hub: graphs, members, settings. | React route loads project, graphs, and members; archive/restore lifecycle actions are wired. Rename/delete/transfer remain pending. |
 | In progress | `import-wizard.html` | `/project/:projectId/import` | Authenticated + project access | Graph ingestion wizard. | React import route can create sample/uploaded JSON graphs; full six-step wizard UX pending. |
 | In progress | `canvas.html` | `/project/:projectId/graph/:graphId` | Authenticated + project access | Main graph viewer and editor surface. | Route renders the interactive canvas with Supabase graph data. Save/version actions still pending. |
 | In progress | `profile.html` | `/profile` | Authenticated user | Account settings. | React route loads current profile, saves display name, and updates password; change-email/delete/session management pending. |
@@ -58,7 +58,7 @@ The MVP should let a user sign in, see projects, create/open a project, import o
 | Done | Routing | Production routes from `docs/02-routes-and-navigation.md` exist. | React Router route map covers workspace, project, canvas, auth, legal, error, and operator routes. |
 | In progress | Auth | Email/password sign-in, sign-up, sign-out, reset password, invite acceptance. | Sign-in/sign-up/reset exist; Supabase Auth email templates are tasked in `docs/tasks/003-supabase-auth-email-templates.md`. |
 | In progress | Workspace | List active/archived projects scoped to the signed-in user's workspace. | `/` now uses the active workspace and project table, including per-project graph counts. |
-| In progress | Projects | Create, rename, archive, restore, delete, transfer owner. | Create exists through `create_workspace_project`; rename/archive/restore/delete still pending. |
+| In progress | Projects | Create, rename, archive, restore, delete, transfer owner. | Create exists through `create_workspace_project`; archive/restore is wired through `set_project_status`; rename/delete/transfer still pending. |
 | In progress | Members | Workspace/project member roles. | Project member read UI, owner invite modal, pending invites, and revoke action exist; accepted-member management still pending. |
 | In progress | Invitations | Create, accept, expire, revoke invitations. | Project team-member invite migration/RPCs and `/invite/:token` acceptance route exist; email delivery still pending. |
 | In progress | Graphs | Store, version, and open project graphs. | Normalized node/edge tables, immutable revision snapshots, create RPC, read RPC, and canvas open route exist; save/new revision is pending. |
@@ -79,7 +79,7 @@ The MVP should let a user sign in, see projects, create/open a project, import o
 | Todo | Auth email templates | Solstein-branded Supabase Auth templates for signup, reset password, and verification. Tasked in `docs/tasks/003-supabase-auth-email-templates.md`. |
 | In progress | Workspaces | Every direct signup gets one default owner workspace. Client bootstrap now calls the RPC after session load. |
 | In progress | Workspace members | Workspace role/status. Required for tenant boundary and RLS. Table and RLS exist. |
-| In progress | Projects | Name, description, owner, archive/delete lifecycle. Always scoped by `workspace_id`. Create RPC and dashboard wiring exist; lifecycle actions pending. |
+| In progress | Projects | Name, description, owner, archive/delete lifecycle. Always scoped by `workspace_id`. Create RPC, dashboard wiring, and owner-only archive/restore status RPC exist; rename/delete/transfer remain pending. |
 | In progress | Project members | Owner, Editor, Viewer roles. Create RPC adds project owner membership; member UI pending. |
 | In progress | Invitations | Project invitation table, token-hash storage, list/create/revoke/accept RPCs, expiry status, and React acceptance route exist. Email provider integration pending. |
 | In progress | Graphs | Hybrid storage is applied: `graphs` holds the current document identity/payload, `graph_nodes` and `graph_edges` hold editable current state, and `graph_revisions` stores immutable snapshots. `create_project_graph` writes all three layers; `get_graph_document` reads the full document; canvas opens that document. Save/version RPC still pending. |
@@ -91,9 +91,8 @@ The MVP should let a user sign in, see projects, create/open a project, import o
 Continue the remaining production wiring while preserving visual parity:
 
 1. Add graph edit/save actions that persist current canvas edits and create new `graph_revisions`.
-2. Add archive/restore lifecycle actions for projects.
-3. Create Solstein-branded Supabase Auth email templates from `docs/tasks/003-supabase-auth-email-templates.md`.
-4. Add email delivery for project team-member invitations.
-5. Replace prototype-backed profile/operator routes with Supabase-backed React implementations as needed for MVP.
-6. Document required Vercel/Supabase env vars and run a deployed smoke test.
-7. Browser-smoke-test `/project/:projectId/import` and `/project/:projectId/graph/:graphId` with a signed-in user.
+2. Create Solstein-branded Supabase Auth email templates from `docs/tasks/003-supabase-auth-email-templates.md`.
+3. Add email delivery for project team-member invitations.
+4. Replace prototype-backed profile/operator routes with Supabase-backed React implementations as needed for MVP.
+5. Document required Vercel/Supabase env vars and run a deployed smoke test.
+6. Browser-smoke-test `/project/:projectId/import` and `/project/:projectId/graph/:graphId` with a signed-in user.

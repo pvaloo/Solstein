@@ -4,6 +4,7 @@ import { useAuth } from "../auth/useAuth.js";
 import {
   createWorkspaceProject,
   listWorkspaceProjects,
+  setProjectStatus,
 } from "../lib/projects.js";
 
 function relativeDate(value) {
@@ -70,6 +71,7 @@ export function WorkspacePage() {
   const [tab, setTab] = useState("active");
   const [newProjectName, setNewProjectName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [statusMessage, setStatusMessage] = useState(null);
 
   const refreshProjects = useCallback(async () => {
     setIsLoading(true);
@@ -109,7 +111,31 @@ export function WorkspacePage() {
       return;
     }
 
+    setStatusMessage(null);
     setNewProjectName("");
+    refreshProjects();
+  }
+
+  async function restoreProject(project) {
+    setError(null);
+    setStatusMessage(null);
+
+    const previousProjects = projects;
+    setProjects((currentProjects) =>
+      currentProjects.map((item) =>
+        item.id === project.id ? { ...item, status: "active", updated_at: new Date().toISOString() } : item,
+      ),
+    );
+
+    const { error: restoreError } = await setProjectStatus(project.id, "active");
+
+    if (restoreError) {
+      setProjects(previousProjects);
+      setError(restoreError);
+      return;
+    }
+
+    setStatusMessage(`Restored "${project.name}".`);
     refreshProjects();
   }
 
@@ -136,6 +162,16 @@ export function WorkspacePage() {
           <div className="banner-body">
             <span className="ban-title">Workspace error</span>
             {error.message}
+          </div>
+        </div>
+      ) : null}
+
+      {statusMessage ? (
+        <div className="banner is-success workspace-banner">
+          <div className="banner-mark" />
+          <div className="banner-body">
+            <span className="ban-title">Project restored</span>
+            {statusMessage}
           </div>
         </div>
       ) : null}
@@ -199,7 +235,7 @@ export function WorkspacePage() {
                   key={project.id}
                   project={project}
                   archived
-                  onRestore={() => setError(new Error("Restore is not wired yet."))}
+                  onRestore={() => restoreProject(project)}
                 />
               ))
             ) : (

@@ -44,6 +44,19 @@ export async function createWorkspaceProject(workspaceId, name, description) {
   return { project, error };
 }
 
+export async function setProjectStatus(projectId, status) {
+  if (!supabase) {
+    return { project: null, error: new Error("Supabase is not configured.") };
+  }
+
+  const { data: project, error } = await supabase.rpc("set_project_status", {
+    target_project_id: projectId,
+    next_status: status,
+  });
+
+  return { project, error };
+}
+
 export async function getProject(projectId) {
   if (!supabase) {
     return { project: null, error: new Error("Supabase is not configured.") };
