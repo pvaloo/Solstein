@@ -29,11 +29,11 @@ The MVP should let a user sign in, see projects, create/open a project, import o
 
 | Status | Prototype file | Production route | Auth gate | MVP purpose | Notes |
 |---|---|---|---|---|---|
-| In progress | `home.html` | `/` | Authenticated user | Workspace dashboard with project list and archived tab. | React route queries workspace projects with graph counts, can create projects, and can restore archived projects. |
+| In progress | `home.html` | `/` | Authenticated user | Workspace dashboard with project list and archived tab. | React route queries workspace projects with graph counts, links to the full `/new-project` flow, and can restore archived projects. |
 | Done | `new-project.html` | `/new-project` | Authenticated user | Create project flow. | React route uses Supabase project creation RPC. |
 | In progress | `project.html` | `/project/:projectId` | Authenticated + project access | Project hub: graphs, members, settings. | React route loads project, graphs, and members; archive/restore lifecycle actions are wired. Rename/delete/transfer remain pending. |
 | In progress | `import-wizard.html` | `/project/:projectId/import` | Authenticated + project access | Graph ingestion wizard. | React import route can create sample/uploaded JSON graphs; full six-step wizard UX pending. |
-| In progress | `canvas.html` | `/project/:projectId/graph/:graphId` | Authenticated + project access | Main graph viewer and editor surface. | Route renders the interactive canvas with Supabase graph data. Save/version actions still pending. |
+| In progress | `canvas.html` | `/project/:projectId/graph/:graphId` | Authenticated + project access | Main graph viewer and editor surface. | Route renders the interactive canvas with Supabase graph data. Categories/node types/edge types are graph-scoped in localStorage; scenarios are hidden for now. Save/version actions still pending. |
 | In progress | `profile.html` | `/profile` | Authenticated user | Account settings. | React route loads current profile, saves display name, and updates password; change-email/delete/session management pending. |
 | Done | `sign-in.html` | `/sign-in` | Public auth page | User sign-in. | React page supports sign-in/sign-up and redirects signed-in users to `/`. |
 | Done | `forgot-password.html` | `/forgot` | Public auth page | Password reset request. | React page calls Supabase reset email flow. |
@@ -57,13 +57,13 @@ The MVP should let a user sign in, see projects, create/open a project, import o
 | Done | Build | `npm install`, `npm run dev`, `npm run build` work locally. | Scaffold Vite React and preserve static assets. |
 | Done | Routing | Production routes from `docs/02-routes-and-navigation.md` exist. | React Router route map covers workspace, project, canvas, auth, legal, error, and operator routes. |
 | In progress | Auth | Email/password sign-in, sign-up, sign-out, reset password, invite acceptance. | Sign-in/sign-up/reset exist; Supabase Auth email templates are tasked in `docs/tasks/003-supabase-auth-email-templates.md`. |
-| In progress | Workspace | List active/archived projects scoped to the signed-in user's workspace. | `/` now uses the active workspace and project table, including per-project graph counts. |
+| In progress | Workspace | List active/archived projects scoped to the signed-in user's workspace. | `/` now uses the active workspace and project table, including per-project graph counts, and links project creation to `/new-project`. |
 | In progress | Projects | Create, rename, archive, restore, delete, transfer owner. | Create exists through `create_workspace_project`; archive/restore is wired through `set_project_status`; rename/delete/transfer still pending. |
 | In progress | Members | Workspace/project member roles. | Project member read UI, owner invite modal, pending invites, and revoke action exist; accepted-member management still pending. |
 | In progress | Invitations | Create, accept, expire, revoke invitations. | Project team-member invite migration/RPCs and `/invite/:token` acceptance route exist; email delivery still pending. |
 | In progress | Graphs | Store, version, and open project graphs. | Normalized node/edge tables, immutable revision snapshots, create RPC, read RPC, and canvas open route exist; save/new revision is pending. |
-| In progress | Import | Upload/validate JSON and create graph. | Minimal sample/upload JSON import exists; full wizard flow pending. |
-| In progress | Canvas | Pan/zoom, view switcher, lenses, inspector, replay, export. | Original canvas modules are now loaded as Vite chunks and rendered directly from the graph route. Persistence of edits still needs Supabase wiring. |
+| In progress | Import | Upload/validate JSON and create graph. | Minimal sample/upload JSON import exists; full wizard flow pending. Added `data/nodes-edges-only-neutral.json` as a neutral nodes/edges-only regression fixture. |
+| In progress | Canvas | Pan/zoom, view switcher, lenses, inspector, replay, export. | Original canvas modules are now loaded as Vite chunks and rendered directly from the graph route. Scenarios/replay are hidden for the current MVP focus. Persistence of edits still needs Supabase wiring. |
 | Todo | Canvas editing | Add node, edit metadata, layout overrides, settings. | Keep localStorage initially. |
 | Todo | Persistence | Replace prototype localStorage keys with Supabase resources where needed. | Follow `docs/09-state-and-persistence.md`. |
 | Todo | Operator | Operator dashboard, users, invitations. | Static route port before privileged backend. |

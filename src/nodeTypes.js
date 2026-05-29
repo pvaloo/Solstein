@@ -5,7 +5,7 @@
 // or delete unused custom types.
 
 (function () {
-  const STORAGE_KEY = 'flowlens.nodeTypes';
+  const STORAGE_PREFIX = 'flowlens.nodeTypes.';
 
   // Pretty default labels for known types — used when no label exists in
   // the data. Falls back to title-cased id otherwise.
@@ -31,6 +31,15 @@
     return DEFAULT_LABELS[id] || titleCase(id);
   }
 
+  function projectStorageId(projectOrData) {
+    const source = projectOrData || window.FLOWLENS_DATA || {};
+    return source.project?.id || source.graph?.id || source.id || 'default';
+  }
+
+  function storageKey(projectOrData) {
+    return STORAGE_PREFIX + projectStorageId(projectOrData);
+  }
+
   // Seed: discover node types from the graph data; default each type's
   // iconKey to its own id (so it picks up the matching NODE_ICONS entry).
   function seedFromData(data) {
@@ -49,10 +58,11 @@
   }
 
   function loadNodeTypes(data) {
-    const seed = seedFromData(data);
+    const source = data || window.FLOWLENS_DATA || {};
+    const seed = seedFromData(source);
     let stored = [];
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(storageKey(source));
       if (raw) stored = JSON.parse(raw) || [];
       if (!Array.isArray(stored)) stored = [];
     } catch (e) { stored = []; }
@@ -72,8 +82,8 @@
     return out;
   }
 
-  function saveNodeTypes(list) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
+  function saveNodeTypes(list, projectOrData) {
+    try { localStorage.setItem(storageKey(projectOrData), JSON.stringify(list)); }
     catch (e) { /* no-op */ }
   }
 

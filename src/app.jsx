@@ -135,8 +135,8 @@ function App({ data: graphData, projectPath = '/', onProjectNavigate }) {
   const allLanes   = useMemo(() => window.precomputeAllLanes  (data, views), [data, views]);
 
   // ── Categories (runtime-editable list with labels + colors) ────────
-  const [categories, setCategories] = useState(() => window.Categories.loadCategories());
-  useEffect(() => { window.Categories.saveCategories(categories); }, [categories]);
+  const [categories, setCategories] = useState(() => window.Categories.loadCategories(data));
+  useEffect(() => { window.Categories.saveCategories(categories, data); }, [categories, data]);
   const categoriesById = useMemo(
     () => Object.fromEntries(categories.map(c => [c.id, c])),
     [categories]
@@ -182,7 +182,7 @@ function App({ data: graphData, projectPath = '/', onProjectNavigate }) {
 
   // ── Node Types (runtime-editable list with label + icon) ──────────
   const [nodeTypes, setNodeTypes] = useState(() => window.NodeTypes.loadNodeTypes(data));
-  useEffect(() => { window.NodeTypes.saveNodeTypes(nodeTypes); }, [nodeTypes]);
+  useEffect(() => { window.NodeTypes.saveNodeTypes(nodeTypes, data); }, [nodeTypes, data]);
   const nodeTypesById = useMemo(
     () => Object.fromEntries(nodeTypes.map(t => [t.id, t])),
     [nodeTypes]
@@ -207,7 +207,7 @@ function App({ data: graphData, projectPath = '/', onProjectNavigate }) {
 
   // ── Edge Types (runtime-editable list with labels) ────────────────
   const [edgeTypes, setEdgeTypes] = useState(() => window.EdgeTypes.loadEdgeTypes(data));
-  useEffect(() => { window.EdgeTypes.saveEdgeTypes(edgeTypes); }, [edgeTypes]);
+  useEffect(() => { window.EdgeTypes.saveEdgeTypes(edgeTypes, data); }, [edgeTypes, data]);
   const edgeTypeUsage = useMemo(() => {
     const out = {};
     data.edges.forEach(e => { if (e.type) out[e.type] = (out[e.type] || 0) + 1; });

@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/useAuth.js";
 import {
-  createWorkspaceProject,
   listWorkspaceProjects,
   setProjectStatus,
 } from "../lib/projects.js";
@@ -69,8 +68,6 @@ export function WorkspacePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tab, setTab] = useState("active");
-  const [newProjectName, setNewProjectName] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
 
   const refreshProjects = useCallback(async () => {
@@ -95,26 +92,6 @@ export function WorkspacePage() {
     () => projects.filter((project) => project.status === "archived"),
     [projects],
   );
-
-  async function handleCreateProject(event) {
-    event.preventDefault();
-    const name = newProjectName.trim();
-
-    if (!name || !workspaceId) return;
-
-    setIsCreating(true);
-    const { error: createError } = await createWorkspaceProject(workspaceId, name);
-    setIsCreating(false);
-
-    if (createError) {
-      setError(createError);
-      return;
-    }
-
-    setStatusMessage(null);
-    setNewProjectName("");
-    refreshProjects();
-  }
 
   async function restoreProject(project) {
     setError(null);
@@ -209,23 +186,11 @@ export function WorkspacePage() {
               <ProjectCard key={project.id} project={project} />
             ))}
 
-            <form className="add-card project-create-card" onSubmit={handleCreateProject}>
+            <Link className="add-card project-create-card" to="/new-project">
               <div className="plus">+</div>
-              <label className="label" htmlFor="new-project-name">
-                New project
-              </label>
-              <input
-                id="new-project-name"
-                className="project-create-input"
-                type="text"
-                value={newProjectName}
-                placeholder="Project name"
-                onChange={(event) => setNewProjectName(event.target.value)}
-              />
-              <button className="project-create-submit" type="submit" disabled={isCreating}>
-                {isCreating ? "Creating" : "Create"}
-              </button>
-            </form>
+              <div className="label">New project</div>
+              <div className="sub">Open the full project setup form</div>
+            </Link>
           </div>
 
           <div className="archived-grid" id="archivedGrid">

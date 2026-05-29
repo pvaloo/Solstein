@@ -62,6 +62,6 @@ export function GraphPage() {
   }
 
   return (
-    <FlowLensCanvas graph={graph} projectId={projectId} />
+    <FlowLensCanvas key={graph.id} graph={graph} projectId={projectId} />
   );
 }

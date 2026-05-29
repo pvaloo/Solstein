@@ -1,0 +1,91 @@
+{
+  "nodes": [
+    {
+      "id": "research_request",
+      "type": "intake_signal",
+      "label": "Research request",
+      "metadata": {
+        "team": "strategy",
+        "confidence": "medium"
+      }
+    },
+    {
+      "id": "source_notes",
+      "type": "field_material",
+      "label": "Source notes",
+      "metadata": {
+        "containsPersonalData": false,
+        "quality": "mixed"
+      }
+    },
+    {
+      "id": "synthesis_board",
+      "type": "analysis_workspace",
+      "label": "Synthesis board",
+      "metadata": {
+        "tool": "whiteboard",
+        "manual": true
+      }
+    },
+    {
+      "id": "insight_review",
+      "type": "review_gate",
+      "label": "Insight review",
+      "metadata": {
+        "owner": "lead consultant",
+        "risk": "low"
+      }
+    },
+    {
+      "id": "client_readout",
+      "type": "delivery_artifact",
+      "label": "Client readout",
+      "metadata": {
+        "format": "presentation",
+        "external": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "request_collects_notes",
+      "from": "research_request",
+      "to": "source_notes",
+      "type": "collects",
+      "label": "Collects source material",
+      "metadata": {
+        "channel": "interview"
+      }
+    },
+    {
+      "id": "notes_feed_synthesis",
+      "from": "source_notes",
+      "to": "synthesis_board",
+      "type": "feeds",
+      "label": "Feeds synthesis",
+      "metadata": {
+        "manual": true
+      }
+    },
+    {
+      "id": "synthesis_to_review",
+      "from": "synthesis_board",
+      "to": "insight_review",
+      "type": "requires_review",
+      "label": "Requires review",
+      "metadata": {
+        "approval": "required"
+      }
+    },
+    {
+      "id": "review_publishes_readout",
+      "from": "insight_review",
+      "to": "client_readout",
+      "type": "publishes",
+      "label": "Publishes readout",
+      "metadata": {
+        "audience": "client"
+      }
+    }
+  ]
+}

@@ -808,10 +808,6 @@ function SettingsPage(props) {
             className: 'settings-nav-item' + (activeNav === 'lenses' ? ' is-active' : ''),
             onClick: () => setActiveNav('lenses'),
           }, 'Lenses'),
-          React.createElement('button', {
-            className: 'settings-nav-item' + (activeNav === 'scenarios' ? ' is-active' : ''),
-            onClick: () => setActiveNav('scenarios'),
-          }, 'Scenarios'),
         ),
       ),
 
@@ -972,25 +968,6 @@ function SettingsPage(props) {
           ),
         ) : null,
 
-        // ─── Scenarios (placeholder) ────────────────────────────────
-        activeNav === 'scenarios' ? React.createElement(React.Fragment, null,
-          React.createElement('div', { className: 'settings-section-head' },
-            React.createElement('h2', null, 'Scenarios'),
-            React.createElement('p', null, 'Step-through animations of how the graph behaves under specific journeys.'),
-          ),
-          React.createElement('div', { className: 'settings-coming-soon' },
-            React.createElement('div', { className: 'sc-glyph' },
-              React.createElement('svg', { width: 36, height: 36, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round', strokeLinejoin: 'round' },
-                React.createElement('circle', { cx: 12, cy: 12, r: 9 }),
-                React.createElement('path', { d: 'M10 8.5l5 3.5-5 3.5z', fill: 'currentColor', fillOpacity: 0.18 }),
-              ),
-            ),
-            React.createElement('div', { className: 'sc-title' }, 'Scenario authoring is coming'),
-            React.createElement('p', { className: 'sc-body' },
-              'For now, scenarios are read from the imported JSON and played from the Scenarios control panel on the canvas. ',
-              'A scenario editor — record, edit, reorder steps, branch on conditions — is on the roadmap.'),
-          ),
-        ) : null,
       ),
     ),
   );

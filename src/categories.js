@@ -4,7 +4,7 @@
 // stored in localStorage and merged on top.
 
 (function () {
-  const STORAGE_KEY = 'flowlens.categories';
+  const STORAGE_PREFIX = 'flowlens.categories.';
 
   // Built-in categories — their ids match what the seed graph data uses.
   // Built-ins can be renamed and re-colored, but not deleted.
@@ -15,9 +15,18 @@
     { id: 'governance',  label: 'Governance',  color: 'oklch(0.76 0.14 25)',  builtin: true },
   ];
 
-  function loadCategories() {
+  function projectStorageId(projectOrData) {
+    const source = projectOrData || window.FLOWLENS_DATA || {};
+    return source.project?.id || source.graph?.id || source.id || 'default';
+  }
+
+  function storageKey(projectOrData) {
+    return STORAGE_PREFIX + projectStorageId(projectOrData);
+  }
+
+  function loadCategories(projectOrData) {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(storageKey(projectOrData));
       if (!raw) return DEFAULT_CATEGORIES.map(c => ({ ...c }));
       const parsed = JSON.parse(raw);
       if (!Array.isArray(parsed) || parsed.length === 0) {
@@ -43,9 +52,9 @@
     }
   }
 
-  function saveCategories(list) {
+  function saveCategories(list, projectOrData) {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      localStorage.setItem(storageKey(projectOrData), JSON.stringify(list));
     } catch (e) { /* no-op */ }
   }
 

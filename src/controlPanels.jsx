@@ -246,7 +246,7 @@ function ScenariosGroup({ replay, open, onToggle }) {
 
 // ── Main stack ───────────────────────────────────────────────────────
 function ControlPanels({ views, overlays, activeViewId, onViewChange, activeOverlays, onToggleOverlay, replay }) {
-  const [open, setOpen] = useState(null); // null | 'views' | 'lenses' | 'scenarios'
+  const [open, setOpen] = useState(null); // null | 'views' | 'lenses'
 
   // Esc to close
   useEffect(() => {
@@ -265,11 +265,6 @@ function ControlPanels({ views, overlays, activeViewId, onViewChange, activeOver
       overlays, activeOverlays, onToggleOverlay,
       open: open === 'lenses',
       onToggle: (v) => setOpen(v ? 'lenses' : null),
-    }),
-    ch(ScenariosGroup, {
-      replay,
-      open: open === 'scenarios',
-      onToggle: (v) => setOpen(v ? 'scenarios' : null),
     }),
   );
 }

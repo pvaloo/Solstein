@@ -4,7 +4,7 @@
 // rename, add new types, or delete unused custom types.
 
 (function () {
-  const STORAGE_KEY = 'flowlens.edgeTypes';
+  const STORAGE_PREFIX = 'flowlens.edgeTypes.';
 
   // Default labels for known edge type ids.
   const DEFAULT_LABELS = {
@@ -33,6 +33,15 @@
     return DEFAULT_LABELS[id] || titleCase(id);
   }
 
+  function projectStorageId(projectOrData) {
+    const source = projectOrData || window.FLOWLENS_DATA || {};
+    return source.project?.id || source.graph?.id || source.id || 'default';
+  }
+
+  function storageKey(projectOrData) {
+    return STORAGE_PREFIX + projectStorageId(projectOrData);
+  }
+
   // Seed from the graph data — every edge type referenced becomes built-in.
   function seedFromData(data) {
     const seen = new Map();
@@ -49,10 +58,11 @@
   }
 
   function loadEdgeTypes(data) {
-    const seed = seedFromData(data);
+    const source = data || window.FLOWLENS_DATA || {};
+    const seed = seedFromData(source);
     let stored = [];
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(storageKey(source));
       if (raw) stored = JSON.parse(raw) || [];
       if (!Array.isArray(stored)) stored = [];
     } catch (e) { stored = []; }
@@ -72,8 +82,8 @@
     return out;
   }
 
-  function saveEdgeTypes(list) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
+  function saveEdgeTypes(list, projectOrData) {
+    try { localStorage.setItem(storageKey(projectOrData), JSON.stringify(list)); }
     catch (e) { /* no-op */ }
   }
 
