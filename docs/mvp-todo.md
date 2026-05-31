@@ -7,7 +7,7 @@ This is the living inventory for turning the Claude/static prototype into a work
 - Static prototype screens live as root `*.html` files and have been copied to `original_files/` as the read-only design reference.
 - The canvas is the most complete interactive feature and lives in `src/`, loaded by `canvas.html` through Babel and browser globals.
 - A Vite + React app now exists with React Router, Supabase client dependency, npm scripts, auth guards, and Vercel SPA rewrites.
-- The route inventory is present in the React app. Core workspace/project/import/canvas/auth pages have React implementations; lower-priority legal, profile, verification, invitation, and operator routes currently render the preserved prototype markup inside React.
+- The route inventory is present in the React app. Core workspace/project/import/canvas/auth/legal/error pages have React implementations; operator routes currently render the preserved prototype markup inside React.
 
 ## MVP Definition
 
@@ -38,17 +38,17 @@ The MVP should let a user sign in, see projects, create/open a project, import o
 | Done | `sign-in.html` | `/sign-in` | Public auth page | User sign-in. | React page supports sign-in/sign-up and redirects signed-in users to `/`. |
 | Done | `forgot-password.html` | `/forgot` | Public auth page | Password reset request. | React page calls Supabase reset email flow. |
 | In progress | `reset-password.html` | `/reset/:token` | Public auth page | Set new password. | React page updates Supabase password; token/hash route behavior still needs end-to-end verification. |
-| In progress | `verify-email.html` | `/verify/:token` | Public auth page | Email verification. | Route exists via prototype-backed React wrapper; Supabase verification handling pending. |
-| In progress | `accept-invite.html` | `/invite/:token` | Public auth page | Invitation acceptance. | Route exists via prototype-backed React wrapper; invitation backend pending. |
-| Done | `signed-out.html` | `/signed-out` | Public | Sign-out confirmation. | Route exists via prototype-backed React wrapper. |
+| In progress | `verify-email.html` | `/verify/:token` | Public auth page | Email verification. | Native React route verifies Supabase `token_hash` links and renders sent/success/expired states; branded email-template handoff still needs end-to-end confirmation. |
+| In progress | `accept-invite.html` | `/invite/:token` | Public auth page | Invitation acceptance. | Native React route reads, validates, and accepts project invitations; email delivery still pending. |
+| Done | `signed-out.html` | `/signed-out` | Public | Sign-out confirmation. | Native React route signs out locally and links back to sign-in. |
 | Done | `operator-sign-in.html` | `/operator/sign-in` | Public operator auth page | Operator auth. | React page reuses auth UI with operator copy; operator guard checks metadata. |
 | In progress | `operator-dashboard.html` | `/operator/` | Authenticated operator | Operator metrics overview. | Route exists behind operator guard via prototype-backed React wrapper; live metrics pending. |
 | In progress | `operator-users.html` | `/operator/users` | Authenticated operator | User administration. | Route exists behind operator guard via prototype-backed React wrapper; backend actions pending. |
 | In progress | `operator-invitations.html` | `/operator/invitations` | Authenticated operator | Invitation administration. | Route exists behind operator guard via prototype-backed React wrapper; backend actions pending. |
-| Done | `terms.html` | `/terms` | Public | Public legal page. | Route exists via prototype-backed React wrapper. |
-| Done | `privacy.html` | `/privacy` | Public | Public legal page. | Route exists via prototype-backed React wrapper. |
-| Done | `404.html` | catch-all | Public | Unknown route page. | Router fallback is implemented. |
-| In progress | `500.html` | `/500` | Public | Server/app error page. | Route exists; app error boundary wiring pending. |
+| Done | `terms.html` | `/terms` | Public | Public legal page. | Native React route preserves the placeholder legal layout and route links. |
+| Done | `privacy.html` | `/privacy` | Public | Public legal page. | Native React route preserves the placeholder legal layout and route links. |
+| Done | `404.html` | catch-all | Public | Unknown route page. | Native React route renders `/404` and the router fallback. |
+| In progress | `500.html` | `/500` | Public | Server/app error page. | Native React route exists; app error boundary wiring pending. |
 
 ## Functional Todo
 
@@ -66,8 +66,8 @@ The MVP should let a user sign in, see projects, create/open a project, import o
 | In progress | Canvas | Pan/zoom, view switcher, lenses, inspector, replay, export. | Original canvas modules are now loaded as Vite chunks and rendered directly from the graph route. Scenarios/replay are hidden for the current MVP focus. Persistence of edits still needs Supabase wiring. |
 | Todo | Canvas editing | Add node, edit metadata, layout overrides, settings. | Keep localStorage initially. |
 | Todo | Persistence | Replace prototype localStorage keys with Supabase resources where needed. | Follow `docs/09-state-and-persistence.md`. |
-| Todo | Operator | Operator dashboard, users, invitations. | Static route port before privileged backend. |
-| Todo | Errors | 404, 500, empty/loading/error states. | Port documented empty states. |
+| Todo | Operator | Operator dashboard, users, invitations. | Keep prototype-backed until a dedicated operator slice is approved. |
+| In progress | Errors | 404, 500, empty/loading/error states. | 404 and 500 are native React routes; app error-boundary wiring and broader empty-state coverage remain. |
 | In progress | Deployment | Vercel build, env vars, production routes. | `vercel.json` SPA rewrite exists and local build passes; env/deploy docs and deployed smoke test remain. |
 
 ## Backend Todo
@@ -93,6 +93,6 @@ Continue the remaining production wiring while preserving visual parity:
 1. Add graph edit/save actions that persist current canvas edits and create new `graph_revisions`.
 2. Create Solstein-branded Supabase Auth email templates from `docs/tasks/003-supabase-auth-email-templates.md`.
 3. Add email delivery for project team-member invitations.
-4. Replace prototype-backed profile/operator routes with Supabase-backed React implementations as needed for MVP.
+4. Keep operator routes prototype-backed until a dedicated operator implementation slice is approved.
 5. Document required Vercel/Supabase env vars and run a deployed smoke test.
 6. Browser-smoke-test `/project/:projectId/import` and `/project/:projectId/graph/:graphId` with a signed-in user.

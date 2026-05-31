@@ -1,12 +1,4 @@
 import { useEffect, useMemo, useRef } from "react";
-import acceptInviteHtml from "../../original_files/html/accept-invite.html?raw";
-import notFoundHtml from "../../original_files/html/404.html?raw";
-import privacyHtml from "../../original_files/html/privacy.html?raw";
-import profileHtml from "../../original_files/html/profile.html?raw";
-import serverErrorHtml from "../../original_files/html/500.html?raw";
-import signedOutHtml from "../../original_files/html/signed-out.html?raw";
-import termsHtml from "../../original_files/html/terms.html?raw";
-import verifyEmailHtml from "../../original_files/html/verify-email.html?raw";
 import operatorDashboardHtml from "../../original_files/html/operator-dashboard.html?raw";
 import operatorInvitationsHtml from "../../original_files/html/operator-invitations.html?raw";
 import operatorUsersHtml from "../../original_files/html/operator-users.html?raw";
@@ -14,17 +6,9 @@ import operatorChromeScript from "../../operator-chrome.js?raw";
 import userMenuScript from "../../user-menu.js?raw";
 
 const prototypeHtmlByFile = {
-  "404.html": notFoundHtml,
-  "500.html": serverErrorHtml,
-  "accept-invite.html": acceptInviteHtml,
   "operator-dashboard.html": operatorDashboardHtml,
   "operator-invitations.html": operatorInvitationsHtml,
   "operator-users.html": operatorUsersHtml,
-  "privacy.html": privacyHtml,
-  "profile.html": profileHtml,
-  "signed-out.html": signedOutHtml,
-  "terms.html": termsHtml,
-  "verify-email.html": verifyEmailHtml,
 };
 
 const htmlRouteByFile = {

@@ -1,4 +1,4 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../auth/useAuth.js";
 
@@ -56,6 +56,7 @@ function AmbientMark() {
 
 export function WorkspaceChrome({ children }) {
   const { signOut, user } = useAuth();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const initials = userInitials(user);
 
@@ -119,9 +120,10 @@ export function WorkspaceChrome({ children }) {
               className="um-item is-danger workspace-signout"
               role="menuitem"
               type="button"
-              onClick={() => {
+              onClick={async () => {
                 setIsMenuOpen(false);
-                signOut();
+                await signOut();
+                navigate("/signed-out", { replace: true });
               }}
             >
               Sign out

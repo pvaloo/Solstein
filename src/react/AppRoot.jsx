@@ -5,14 +5,18 @@ import {
   RequireUser,
 } from "../auth/RouteGuards.jsx";
 import { AcceptInvitePage } from "../pages/AcceptInvitePage.jsx";
+import { ErrorPage } from "../pages/ErrorPage.jsx";
 import { ForgotPasswordPage } from "../pages/ForgotPasswordPage.jsx";
 import { GraphPage } from "../pages/GraphPage.jsx";
 import { ImportGraphPage } from "../pages/ImportGraphPage.jsx";
+import { LegalPage } from "../pages/LegalPage.jsx";
 import { NewProjectPage } from "../pages/NewProjectPage.jsx";
 import { ProfilePage } from "../pages/ProfilePage.jsx";
 import { ProjectPage } from "../pages/ProjectPage.jsx";
 import { ResetPasswordPage } from "../pages/ResetPasswordPage.jsx";
 import { SignInPage } from "../pages/SignInPage.jsx";
+import { SignedOutPage } from "../pages/SignedOutPage.jsx";
+import { VerifyEmailPage } from "../pages/VerifyEmailPage.jsx";
 import { WorkspacePage } from "../pages/WorkspacePage.jsx";
 import { WorkspaceChrome } from "../components/WorkspaceChrome.jsx";
 import { ROUTES } from "../routes.js";
@@ -49,6 +53,30 @@ function routeElement(route) {
 
   if (route.id === "invite") {
     return <AcceptInvitePage />;
+  }
+
+  if (route.id === "verify") {
+    return <VerifyEmailPage />;
+  }
+
+  if (route.id === "signed-out") {
+    return <SignedOutPage />;
+  }
+
+  if (route.id === "terms") {
+    return <LegalPage kind="terms" />;
+  }
+
+  if (route.id === "privacy") {
+    return <LegalPage kind="privacy" />;
+  }
+
+  if (route.id === "not-found") {
+    return <ErrorPage code="404" />;
+  }
+
+  if (route.id === "server-error") {
+    return <ErrorPage code="500" />;
   }
 
   if (route.id === "workspace") {
@@ -132,7 +160,7 @@ export default function AppRoot() {
       <Route path="/operator" element={<Navigate to="/operator/" replace />} />
       <Route
         path="*"
-        element={<StaticRoutePage route={ROUTES.find((route) => route.id === "not-found")} />}
+        element={<ErrorPage code="404" />}
       />
     </Routes>
   );
